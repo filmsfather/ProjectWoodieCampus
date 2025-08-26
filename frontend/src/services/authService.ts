@@ -38,9 +38,16 @@ export class AuthService {
 
       if (response.ok && data.success) {
         // 토큰을 로컬스토리지에 저장
+        console.log('🔍 AuthService - 받은 데이터:', data);
+        console.log('🔍 AuthService - 사용자 정보:', data.data?.user);
+        console.log('🔍 AuthService - 토큰 정보:', data.data?.tokens);
+        
         if (data.data?.tokens?.accessToken) {
           localStorage.setItem('accessToken', data.data.tokens.accessToken);
           localStorage.setItem('user', JSON.stringify(data.data.user));
+          console.log('🔍 AuthService - localStorage 저장 완료');
+        } else {
+          console.log('🔍 AuthService - 토큰을 찾을 수 없음');
         }
         return data;
       } else {

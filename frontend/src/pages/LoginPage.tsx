@@ -26,13 +26,20 @@ const LoginPage: React.FC = () => {
 
     try {
       const response = await AuthService.login(credentials);
+      console.log('🔍 전체 로그인 응답:', response);
       
       if (response.success) {
         // 로그인 성공 - 역할에 따른 리디렉션
         const user = AuthService.getCurrentUser();
+        console.log('🔍 getCurrentUser 결과:', user);
+        console.log('🔍 localStorage user:', localStorage.getItem('user'));
+        console.log('🔍 사용자 role:', user?.role);
+        
         if (user?.role === 'admin') {
+          console.log('🔍 관리자로 인식 - /admin으로 이동');
           window.location.href = '/admin';
         } else {
+          console.log('🔍 일반 사용자로 인식 - /dashboard로 이동');
           window.location.href = '/dashboard';
         }
       }
