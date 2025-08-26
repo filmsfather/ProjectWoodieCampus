@@ -1,104 +1,53 @@
 #!/bin/bash
 
-# Woodie Campus EC2 Deployment Script
-# This script automates the deployment process on EC2
+# Woodie Campus 배포 스크립트
 
-set -e  # Exit on any error
+echo "🚀 Woodie Campus 배포를 시작합니다..."
 
-echo "🚀 Starting Woodie Campus deployment..."
+# 컨테이너 중지 및 제거
+echo "📦 기존 컨테이너를 중지하고 제거합니다..."
+docker compose down || true
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+# 최신 코드 업데이트
+echo "📥 최신 코드를 가져옵니다..."
+git pull origin main
 
-# Function to print colored output
-print_status() {
-    echo -e "${BLUE}[INFO]${NC} $1"
-}
-
-print_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
-}
-
-print_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
-}
-
-print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
-
-# Check if .env file exists
-if [ ! -f ".env" ]; then
-    print_error ".env file not found! Please create it from .env.production template"
+# 환경변수 파일 확인
+if [ ! -f ".env.prod" ]; then
+    echo "❌ .env.prod 파일이 없습니다. 환경변수를 설정해주세요."
     exit 1
 fi
 
-print_status "Loading environment variables..."
-source .env
+# 프로덕션 환경으로 빌드 및 시작
+echo "🏗️  프로덕션 환경으로 빌드합니다..."
+docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
 
-# Create necessary directories
-print_status "Creating necessary directories..."
-mkdir -p uploads
-mkdir -p ssl
-mkdir -p logs
+# 상태 확인
+echo "⏳ 컨테이너 시작을 기다립니다..."
+sleep 10
 
-# Set proper permissions
-chmod 755 uploads
-chmod 755 logs
+echo "📊 컨테이너 상태를 확인합니다..."
+docker ps
 
-# Stop existing containers if running
-print_status "Stopping existing containers..."
-docker-compose -f docker-compose.prod.yml down || true
+echo "🏥 서비스 health check를 수행합니다..."
+sleep 5
 
-# Remove old images (optional, saves space)
-print_warning "Removing old Docker images..."
-docker image prune -f || true
+# API health check
+API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost/api/auth/login -X POST -H "Content-Type: application/json" -d '{"username":"test","password":"test"}' || echo "FAIL")
 
-# Build and start services
-print_status "Building and starting services..."
-docker-compose -f docker-compose.prod.yml up -d --build
-
-# Wait for services to be ready
-print_status "Waiting for services to start..."
-sleep 30
-
-# Check service health
-print_status "Checking service health..."
-
-# Check backend health
-if curl -f http://localhost/health > /dev/null 2>&1; then
-    print_success "Backend is healthy"
+if [ "$API_STATUS" = "401" ] || [ "$API_STATUS" = "400" ]; then
+    echo "✅ API 서버가 정상적으로 응답하고 있습니다 (HTTP $API_STATUS)"
 else
-    print_error "Backend health check failed"
-    docker-compose -f docker-compose.prod.yml logs backend
-    exit 1
+    echo "❌ API 서버 응답에 문제가 있습니다 (HTTP $API_STATUS)"
 fi
 
-# Check frontend
-if curl -f http://localhost > /dev/null 2>&1; then
-    print_success "Frontend is accessible"
-else
-    print_error "Frontend is not accessible"
-    docker-compose -f docker-compose.prod.yml logs frontend
-    exit 1
-fi
+# 로그 확인
+echo "📋 최근 로그를 확인합니다..."
+echo "--- Backend 로그 ---"
+docker logs woodie-backend --tail=10
+echo ""
+echo "--- Nginx 로그 ---" 
+docker logs woodie-nginx --tail=10
 
-# Show running containers
-print_status "Running containers:"
-docker-compose -f docker-compose.prod.yml ps
-
-print_success "Deployment completed successfully! 🎉"
-print_status "Your application is running at:"
-print_status "  Frontend: http://$(curl -s http://checkip.amazonaws.com)"
-print_status "  Backend API: http://$(curl -s http://checkip.amazonaws.com)/api"
-print_status "  Health Check: http://$(curl -s http://checkip.amazonaws.com)/health"
-
-print_status "To check logs:"
-print_status "  docker-compose -f docker-compose.prod.yml logs -f [service_name]"
-
-print_status "To stop services:"
-print_status "  docker-compose -f docker-compose.prod.yml down"
+echo "🎉 배포가 완료되었습니다!"
+echo "🌐 웹사이트: http://$(curl -s ifconfig.me)/"

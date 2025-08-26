@@ -15,6 +15,7 @@ node_modules/
 .env.local
 .env.production
 .env.docker
+.env.prod
 
 # Build outputs
 */dist/
