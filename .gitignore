@@ -57,3 +57,12 @@ temp/
 # Testing
 coverage/
 .nyc_output/
+
+# SSH Keys and Certificates
+*.pem
+*.key
+*.crt
+*.cert
+id_rsa*
+id_ed25519*
+ssh_host_*
