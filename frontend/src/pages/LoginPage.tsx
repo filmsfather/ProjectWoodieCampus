@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+import { AuthService } from '../services/authService';
 
 const LoginPage: React.FC = () => {
   const [credentials, setCredentials] = useState({
     username: '',
     password: '',
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -14,10 +17,25 @@ const LoginPage: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: 로그인 로직 구현
     console.log('Login attempt:', credentials);
+    
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await AuthService.login(credentials);
+      
+      if (response.success) {
+        // 로그인 성공 - 대시보드로 리디렉션
+        window.location.href = '/dashboard';
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -28,6 +46,12 @@ const LoginPage: React.FC = () => {
           <p>Woodie Campus에 오신 것을 환영합니다</p>
           
           <form onSubmit={handleSubmit} className="login-form">
+            {error && (
+              <div className="error-message">
+                {error}
+              </div>
+            )}
+            
             <div className="form-group">
               <label htmlFor="username">사용자명</label>
               <input
@@ -38,6 +62,7 @@ const LoginPage: React.FC = () => {
                 onChange={handleInputChange}
                 required
                 placeholder="사용자명을 입력하세요"
+                disabled={loading}
               />
             </div>
             
@@ -51,11 +76,12 @@ const LoginPage: React.FC = () => {
                 onChange={handleInputChange}
                 required
                 placeholder="비밀번호를 입력하세요"
+                disabled={loading}
               />
             </div>
             
-            <button type="submit" className="login-btn">
-              로그인
+            <button type="submit" className="login-btn" disabled={loading}>
+              {loading ? '로그인 중...' : '로그인'}
             </button>
           </form>
           
