@@ -27,6 +27,9 @@ validateConfig();
 const app = express();
 const PORT = config.server.port;
 
+// Trust proxy for nginx reverse proxy
+app.set('trust proxy', 1);
+
 // Security middleware
 app.use(SecurityMiddleware.securityHeaders);
 app.use(SecurityMiddleware.validateUserAgent);
