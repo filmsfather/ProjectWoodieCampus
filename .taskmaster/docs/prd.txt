@@ -1,0 +1,182 @@
+<context>
+# Overview  
+이 시스템은 **에빙하우스 망각곡선 이론**을 기반으로 학생들이 학습한 내용을 **장기 기억으로 전환**하도록 돕는 **웹 기반 학습 관리 플랫폼**이다.  
+문제와 문제집을 단위로 학생에게 제공하고, 자동 복습 스케줄을 통해 학습 효율성을 높인다.  
+대상은 **중·고등학생**과 이를 관리하는 **교사/관리자**이며, 복잡한 분석이나 AI 기능 없이도 **즉시 사용 가능한 최소 기능(MVP)**으로 가치 제공이 가능하다.  
+
+# Core Features  
+
+### 1. 문제 관리 (개별 문제 단위)
+- **What:** 관리자가 개별 문제를 등록/편집/삭제  
+- **Why:** 문제집의 최소 단위가 되며, 단독으로도 배포 가능  
+- **How:** 관리자 UI에서 문제 입력 → DB 저장 → 학생은 문제 풀기 가능  
+
+### 2. 문제집 관리 (묶음 단위)
+- **What:** 여러 문제를 모아 문제집 단위로 생성 및 배포  
+- **Why:** 학생은 체계적으로 학습 단위를 인식하고, 교사는 관리 단위를 확보  
+- **How:** 관리자가 DB에서 문제를 선택 → 문제집 생성 → 학생은 문제집 단위로 풀이  
+
+### 3. 학습 및 복습 관리
+- **What:** 망각곡선 기반 스케줄로 복습 필요 문제집/문제 자동 추천  
+- **Why:** 학생이 장기 기억을 형성하도록 학습 타이밍을 자동화  
+- **How:** 백엔드가 복습 일정 계산 → 학생 “오늘의 복습” 화면에 표시  
+
+### 4. 문제 풀이 (학생 화면)
+- **What:** 학생이 문제집 혹은 개별 문제를 풀고 정답/오답 저장  
+- **Why:** 풀이 기록이 있어야 복습 대상 선정 가능  
+- **How:** 풀이 제출 시 DB에 저장 → 관리자 화면에서 결과 확인 가능  
+
+### 5. 계정 및 접근 제어
+- **What:** 로그인은 **ID/PW**만, 계정 발급/삭제는 관리자만 가능  
+- **Why:** 단순하면서도 기본적인 사용자 관리 확보  
+- **How:** Auth 테이블에서 관리자만 CRUD 가능, 학생은 로그인/풀이만 수행  
+
+# User Experience  
+
+### 사용자 페르소나
+- **학생**: 로그인 → 오늘의 문제집 풀이/복습 수행  
+- **교사/관리자**: 문제/문제집 등록 → 학생 계정 관리 → 풀이 결과 확인  
+
+### 주요 플로우
+1. 학생 로그인  
+2. “오늘의 학습/복습” 화면 진입  
+3. 문제집 선택 → 풀이 → 결과 저장  
+4. 관리자: 새 문제집 생성, 문제 등록, 계정 관리  
+
+### UI/UX 고려사항
+- 학생 화면: **심플 UI**, “오늘의 학습/복습” 바로 보기  
+- 관리자 화면: 문제 단위/문제집 단위 **탭 구분**  
+- 미디어 업로드: 이미지 첨부 간단 지원 (Drag & Drop)  
+
+</context>
+
+<PRD>
+# Technical Architecture  
+
+### System Components
+- **Frontend:** React + Vite  
+- **Backend:** Node.js(Express)  
+- **Database:** Supabase(Postgres, Auth, Storage)  
+- **Infra:** Docker Compose (프론트+백엔드 컨테이너), Nginx 리버스 프록시  
+
+### Data Models
+- `users (id, role, name, password_hash)`  
+- `problems (id, title, type, content, answer, media_url)`  
+- `workbooks (id, title, description)`  
+- `workbook_problems (workbook_id, problem_id)`  
+- `attempts (id, user_id, problem_id, is_correct, timestamp)`  
+- `reviews (id, user_id, workbook_id, next_review_date)`  
+
+### APIs and Integrations
+- **Auth API**: 로그인/로그아웃 (ID/PW)  
+- **Problems API**: CRUD  
+- **Workbooks API**: CRUD, 문제집-문제 매핑  
+- **Attempt API**: 풀이 제출/결과 저장  
+- **Review API**: 오늘의 복습 가져오기  
+
+### Infrastructure Requirements
+- 서버 1대(EC2 t3.small 이상)  
+- Docker Compose로 프론트+백엔드+Nginx 배포  
+- Supabase (DB/Auth/Storage) 연결  
+- HTTPS 인증서 (Let’s Encrypt)  
+
+---
+
+# Development Roadmap  
+
+## Phase 1 — MVP (학습 루프 + 접근 제어)
+1) **Auth/로그인 (ID/PW)**  
+   - 관리자만 계정 발급/삭제  
+   - 비밀번호 해시, 세션/JWT 중 택1  
+
+2) **역할 기반 대시보드 분리 (핵심)**  
+   - **관리자 대시보드**: 문제/문제집 CRUD, 계정 발급/삭제, 배포 현황  
+   - **교사 대시보드**: 문제/문제집 CRUD, 반별 배포, 기본 성취도 확인  
+   - **학생 대시보드**: 오늘의 학습/복습, 내 문제집 목록, 최근 성적  
+   - 라우팅 가드(RBAC): `admin`, `teacher`, `student` 전용 경로  
+
+3) 문제 관리 (개별 문제 단위, 객관식·단답형 + 이미지 업로드)  
+4) 문제집 관리 (문제 묶기/배포)  
+5) 문제 풀이/기록 저장 (정답/오답, 시간)  
+6) **복습 스케줄링** (문제집 + 개별 문제 단위, 간격: 1/3/7/14일)  
+7) 오늘의 복습 화면 (필터: 문제집/문항)  
+
+## Phase 2 — 기본 개선
+- 문제 유형 확장(다중 선택, 주관식 입력)  
+- 반응형/접근성 개선, 간단 통계(정답률/최근 오답)  
+- 이미지 업로드 UX(드래그/리사이즈)  
+
+## Phase 3 — 고급 기능
+- 동영상 임베딩(YouTube/Vimeo)  
+- 서술형 자동 채점(키워드 매칭) 베타  
+- 교사용 리포트(주간/월간)  
+
+---
+
+# Logical Dependency Chain  
+1. **Auth/계정 관리** → 기반 없으면 학생 로그인 불가  
+2. **문제 CRUD** → 문제집 생성의 토대  
+3. **문제집 CRUD** → 학생 학습 단위 확립  
+4. **풀이 제출/저장** → 학습 루프 완성  
+5. **복습 스케줄링** → 오늘의 복습 제공, MVP 핵심 가치  
+6. (추후) 확장 문제 유형, 통계, 리포트  
+
+---
+
+# Risks and Mitigations  
+- **위험: 기능 과도 확장 → MVP 완성 지연**  
+  - 대응: “문제 등록 → 문제집 → 풀이 → 복습” 루프만 우선 개발  
+- **위험: Supabase 의존도**  
+  - 대응: DB/Storage 스키마를 별도 정의 → 벤더 락인 최소화  
+- **위험: 초급 개발 리소스 부족**  
+  - 대응: Docker Compose로 로컬=서버 동일 환경, 배포 단순화  
+- **위험: 망각곡선 알고리즘 복잡성**  
+  - 대응: 초기에는 단순 간격(1일, 3일, 7일, 14일)로 구현 → 점진 개선  
+
+---
+
+# Appendix  
+
+## Research
+- 에빙하우스 망각곡선(1885), 장기 기억 형성 연구
+
+## Technical Specifications
+- 프론트: React 18 + Vite  
+- 백엔드: Node.js 20 + Express  
+- DB: Supabase Postgres (테이블+Storage)  
+- 배포: Docker Compose + Nginx + Let’s Encrypt  
+
+## Design System  
+
+### Typography
+- 본문: Noto Sans KR, 16px, line-height 1.6  
+- 제목: Inter/Noto Sans KR  
+  - H1: 28–32px / bold  
+  - H2: 24px / semibold  
+  - H3: 20px / semibold  
+- 버튼/라벨: 14–16px / medium  
+
+### Color System
+- Primary / Main  
+  - Hex: **#5A6450** | RGB: (90, 100, 80)  
+- Secondary-1  
+  - Hex: **#6E7864** | RGB: (110, 120, 100)  
+- Neutral-50 (Background)  
+  - Hex: **#F5F5F0** | RGB: (245, 245, 240)  
+- Neutral-100 (Sub Background)  
+  - Hex: **#E1E1DC** | RGB: (225, 225, 220)  
+- Accent  
+  - Hex: **#AA4632** | RGB: (170, 70, 50)  
+
+### Grid & Spacing
+- 8pt 기반 (8/16/24/32/40/64)  
+- 페이지 컨테이너: max 1200px, padding 16–24px  
+- 카드: radius 12–16px, subtle shadow  
+- 버튼: 높이 40–44px, 좌우 패딩 16–20px  
+
+### Accessibility
+- WCAG AA 대비 준수  
+- 포커스 링: 2px, Accent 색상  
+- 아이콘엔 대체 텍스트 제공  
+
+</PRD>

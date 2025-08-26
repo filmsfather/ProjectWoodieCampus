@@ -1,0 +1,32 @@
+# Production configuration
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      target: production
+    environment:
+      - NODE_ENV=production
+    volumes: []  # No volume mounts in production
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      target: production
+    ports:
+      - "80:80"  # Nginx serves on port 80
+    volumes: []  # No volume mounts in production
+    restart: always
+    depends_on:
+      - backend
+
+  # Remove development databases in production
+  db:
+    deploy:
+      replicas: 0  # Don't run local DB in production
+
+  redis:
+    restart: always
+    command: redis-server --appendonly yes

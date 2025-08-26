@@ -1,0 +1,29 @@
+# Development overrides
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      target: development
+    ports:
+      - "3001:3001"  # Enable direct access in development
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    command: npm run dev
+    environment:
+      - NODE_ENV=development
+
+  frontend:
+    build:
+      context: ./frontend  
+      target: development
+    ports:
+      - "3000:5173"  # Enable direct access in development
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm run dev -- --host 0.0.0.0
+    environment:
+      - VITE_DEV_MODE=true

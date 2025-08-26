@@ -1,0 +1,103 @@
+version: '3.8'
+
+services:
+  # 백엔드 서비스
+  backend:
+    build:
+      context: ./backend
+      target: development
+    container_name: woodie-backend
+    # ports:
+    #   - "3001:3001"  # Direct access disabled, use Nginx proxy
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - JWT_SECRET=woodie_campus_jwt_secret_key_2025
+      - JWT_EXPIRES_IN=24h
+      - SUPABASE_URL=https://deplrcqieakarykfcrne.supabase.co
+      - SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRlcGxyY3FpZWFrYXJ5a2Zjcm5lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYxODgxNzEsImV4cCI6MjA3MTc2NDE3MX0.agUT1BlAe8WtAS14oNxJUSIFXaNg3KaMUIbL0J4xhZY
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - woodie-network
+    restart: unless-stopped
+    depends_on:
+      - db
+
+  # 프론트엔드 서비스
+  frontend:
+    build:
+      context: ./frontend
+      target: development
+    container_name: woodie-frontend
+    # ports:
+    #   - "3000:5173"  # Direct access disabled, use Nginx proxy
+    environment:
+      - VITE_API_BASE_URL=http://localhost:3001/api
+      - VITE_SUPABASE_URL=https://deplrcqieakarykfcrne.supabase.co
+      - VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRlcGxyY3FpZWFrYXJ5a2Zjcm5lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYxODgxNzEsImV4cCI6MjA3MTc2NDE3MX0.agUT1BlAe8WtAS14oNxJUSIFXaNg3KaMUIbL0J4xhZY
+      - VITE_DEV_MODE=true
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - woodie-network
+    restart: unless-stopped
+    depends_on:
+      - backend
+
+  # PostgreSQL 데이터베이스 (로컬 개발용, 선택사항)
+  db:
+    image: postgres:15-alpine
+    container_name: woodie-postgres
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_DB=woodie_campus
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - woodie-network
+    restart: unless-stopped
+
+  # Nginx 리버스 프록시
+  nginx:
+    build:
+      context: ./nginx
+    container_name: woodie-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./uploads:/app/uploads:rw
+    networks:
+      - woodie-network
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
+
+  # Redis (캐싱용, 선택사항)
+  redis:
+    image: redis:7-alpine
+    container_name: woodie-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - woodie-network
+    restart: unless-stopped
+
+networks:
+  woodie-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
