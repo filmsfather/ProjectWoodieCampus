@@ -4,6 +4,9 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 
+// Import security middleware
+import { SecurityMiddleware } from './middleware/securityMiddleware';
+
 // Import routes
 import authRoutes from './routes/auth';
 import problemRoutes from './routes/problems';
@@ -22,15 +25,38 @@ validateConfig();
 const app = express();
 const PORT = config.server.port;
 
-// Middleware
-app.use(helmet());
+// Security middleware
+app.use(SecurityMiddleware.securityHeaders);
+app.use(SecurityMiddleware.validateUserAgent);
+app.use(SecurityMiddleware.validateInput);
+app.use(SecurityMiddleware.slowDownAttacks);
+app.use(SecurityMiddleware.apiRateLimit);
+
+// Standard middleware
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'"],
+      fontSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'"],
+      frameSrc: ["'none'"],
+    },
+  },
+}));
 app.use(cors({
   origin: config.cors.origin,
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 app.use(morgan('combined'));
 app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Routes
 app.use('/api/auth', authRoutes);
