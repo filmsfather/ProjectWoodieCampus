@@ -58,8 +58,7 @@ export class DatabaseService {
       .from('users')
       .select('*')
       .eq('id', id)
-      .eq('is_active', true)
-      .single();
+      .single(); // 관리자 기능에서는 비활성 사용자도 조회 가능
 
     if (error) throw error;
     return data;
@@ -87,6 +86,70 @@ export class DatabaseService {
 
     if (error) throw error;
     return data;
+  }
+
+  // 관리자용 사용자 목록 조회 (필터링, 페이징 지원)
+  static async getUsersWithFilters(filters: {
+    role?: string;
+    is_active?: boolean;
+    search?: string;
+  }, limit: number, offset: number) {
+    let query = supabase
+      .from('users')
+      .select('*');
+
+    // 역할 필터
+    if (filters.role) {
+      query = query.eq('role', filters.role);
+    }
+
+    // 활성 상태 필터
+    if (filters.is_active !== undefined) {
+      query = query.eq('is_active', filters.is_active);
+    }
+
+    // 검색 필터 (username, email, full_name)
+    if (filters.search) {
+      query = query.or(`username.ilike.%${filters.search}%,email.ilike.%${filters.search}%,full_name.ilike.%${filters.search}%`);
+    }
+
+    const { data, error } = await query
+      .range(offset, offset + limit - 1)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  // 관리자용 사용자 수 조회 (필터링 지원)
+  static async getUsersCount(filters: {
+    role?: string;
+    is_active?: boolean;
+    search?: string;
+  }) {
+    let query = supabase
+      .from('users')
+      .select('*', { count: 'exact' });
+
+    // 역할 필터
+    if (filters.role) {
+      query = query.eq('role', filters.role);
+    }
+
+    // 활성 상태 필터
+    if (filters.is_active !== undefined) {
+      query = query.eq('is_active', filters.is_active);
+    }
+
+    // 검색 필터 (username, email, full_name)
+    if (filters.search) {
+      query = query.or(`username.ilike.%${filters.search}%,email.ilike.%${filters.search}%,full_name.ilike.%${filters.search}%`);
+    }
+
+    const { count, error } = await query;
+
+    if (error) throw error;
+    return count || 0;
   }
 
   // Problem related operations

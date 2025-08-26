@@ -11,7 +11,9 @@
     "test:db": "npx ts-node src/scripts/testDatabase.ts",
     "db:migrate": "npx ts-node src/scripts/migrationScript.ts",
     "db:schema": "echo \"Run supabase-schema.sql in your Supabase SQL Editor\"",
-    "db:sample": "echo \"Run sample-data.sql in your Supabase SQL Editor\""
+    "db:sample": "echo \"Run sample-data.sql in your Supabase SQL Editor\"",
+    "seed:admin": "npx ts-node src/scripts/seedAdmin.ts",
+    "seed:admin:check": "npx ts-node -e \"import('./src/scripts/seedAdmin.js').then(m => m.checkAdminSeedStatus()).then(console.log)\""
   },
   "keywords": [],
   "author": "",
