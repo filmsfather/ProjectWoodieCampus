@@ -66,3 +66,7 @@ coverage/
 id_rsa*
 id_ed25519*
 ssh_host_*
+
+# Task files
+# tasks.json
+# tasks/ 

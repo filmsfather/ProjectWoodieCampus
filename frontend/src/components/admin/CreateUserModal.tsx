@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { AdminApi, generateRandomPassword } from '../../services/adminApi';
-import type { CreateUserRequest } from '../../services/adminApi';
+import { AdminApi, generateRandomPassword, type CreateUserRequest } from '../../services/adminApi';
 
 interface CreateUserModalProps {
   onClose: () => void;

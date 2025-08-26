@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AdminApi, formatRole, formatDate } from '../../services/adminApi';
-import type { User } from '../../services/adminApi';
+import { AdminApi, formatRole, formatDate, type User } from '../../services/adminApi';
 import CreateUserModal from './CreateUserModal';
 import EditUserModal from './EditUserModal';
 import DeleteConfirmDialog from './DeleteConfirmDialog';

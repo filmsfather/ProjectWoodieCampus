@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { AdminApi, formatRole, generateRandomPassword } from '../../services/adminApi';
-import type { User } from '../../services/adminApi';
+import { AdminApi, formatRole, generateRandomPassword, type User } from '../../services/adminApi';
 
 interface EditUserModalProps {
   user: User;

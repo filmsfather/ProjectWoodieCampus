@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { AdminApi, formatRole } from '../../services/adminApi';
-import type { User } from '../../services/adminApi';
+import { AdminApi, formatRole, type User } from '../../services/adminApi';
 
 interface DeleteConfirmDialogProps {
   user: User;
