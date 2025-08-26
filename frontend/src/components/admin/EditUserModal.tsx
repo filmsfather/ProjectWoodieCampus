@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { AdminApi, User, formatRole, generateRandomPassword } from '../../services/adminApi';
+import { AdminApi, formatRole, generateRandomPassword } from '../../services/adminApi';
+import type { User } from '../../services/adminApi';
 
 interface EditUserModalProps {
   user: User;
@@ -9,7 +10,7 @@ interface EditUserModalProps {
 
 const EditUserModal: React.FC<EditUserModalProps> = ({ user, onClose, onUserUpdated }) => {
   const [activeTab, setActiveTab] = useState<'info' | 'password'>('info');
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false); // 현재 사용하지 않음
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
