@@ -28,8 +28,13 @@ const LoginPage: React.FC = () => {
       const response = await AuthService.login(credentials);
       
       if (response.success) {
-        // 로그인 성공 - 대시보드로 리디렉션
-        window.location.href = '/dashboard';
+        // 로그인 성공 - 역할에 따른 리디렉션
+        const user = AuthService.getCurrentUser();
+        if (user?.role === 'admin') {
+          window.location.href = '/admin';
+        } else {
+          window.location.href = '/dashboard';
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
