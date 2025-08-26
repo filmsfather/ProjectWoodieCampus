@@ -16,7 +16,10 @@ export interface LoginResponse {
       role: string;
       fullName?: string;
     };
-    token: string;
+    tokens: {
+      accessToken: string;
+      refreshToken: string;
+    };
   };
 }
 
@@ -35,8 +38,8 @@ export class AuthService {
 
       if (response.ok && data.success) {
         // 토큰을 로컬스토리지에 저장
-        if (data.data?.token) {
-          localStorage.setItem('accessToken', data.data.token);
+        if (data.data?.tokens?.accessToken) {
+          localStorage.setItem('accessToken', data.data.tokens.accessToken);
           localStorage.setItem('user', JSON.stringify(data.data.user));
         }
         return data;
