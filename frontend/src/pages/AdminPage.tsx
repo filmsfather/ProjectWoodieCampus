@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import UserManagement from '../components/admin/UserManagement';
 
 const AdminPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'users' | 'problems' | 'settings'>('users');
@@ -33,52 +34,7 @@ const AdminPage: React.FC = () => {
       
       <div className="admin-content">
         {activeTab === 'users' && (
-          <div className="users-management">
-            <h2>사용자 관리</h2>
-            <div className="management-actions">
-              <button className="btn-primary">새 사용자 추가</button>
-              <button className="btn-secondary">사용자 가져오기</button>
-            </div>
-            
-            <div className="users-table">
-              <table>
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>사용자명</th>
-                    <th>이메일</th>
-                    <th>역할</th>
-                    <th>가입일</th>
-                    <th>작업</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>1</td>
-                    <td>admin</td>
-                    <td>admin@woodie.com</td>
-                    <td>관리자</td>
-                    <td>2025-01-01</td>
-                    <td>
-                      <button className="btn-edit">편집</button>
-                      <button className="btn-delete">삭제</button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>2</td>
-                    <td>teacher1</td>
-                    <td>teacher@woodie.com</td>
-                    <td>교사</td>
-                    <td>2025-01-02</td>
-                    <td>
-                      <button className="btn-edit">편집</button>
-                      <button className="btn-delete">삭제</button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <UserManagement />
         )}
         
         {activeTab === 'problems' && (

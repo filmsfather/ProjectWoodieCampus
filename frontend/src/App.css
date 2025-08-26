@@ -40,3 +40,6 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Import admin styles */
+@import './styles/admin.css';

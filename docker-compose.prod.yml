@@ -1,32 +1,73 @@
-# Production configuration
+# Production configuration for EC2 deployment
 version: '3.8'
 
 services:
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: woodie_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d/production.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl  # SSL 인증서 볼륨 (옵션)
+    depends_on:
+      - backend
+      - frontend
+    restart: unless-stopped
+    networks:
+      - woodie_network
+
+  # Backend Service
   backend:
     build:
       context: ./backend
-      target: production
+      dockerfile: Dockerfile
+    container_name: woodie_backend
     environment:
       - NODE_ENV=production
-    volumes: []  # No volume mounts in production
-    restart: always
+      - PORT=3001
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=24h
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - AUTO_SEED_ADMIN=true
+      - ADMIN_USERNAME=${ADMIN_USERNAME}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - ADMIN_FULL_NAME=${ADMIN_FULL_NAME}
+      - CORS_ORIGIN=${CORS_ORIGIN}
+    volumes:
+      - ./uploads:/app/uploads
+    restart: unless-stopped
+    networks:
+      - woodie_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
+  # Frontend Service
   frontend:
     build:
       context: ./frontend
-      target: production
-    ports:
-      - "80:80"  # Nginx serves on port 80
-    volumes: []  # No volume mounts in production
-    restart: always
-    depends_on:
-      - backend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_BASE_URL=${VITE_API_BASE_URL}
+        - VITE_SUPABASE_URL=${SUPABASE_URL}
+        - VITE_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+    container_name: woodie_frontend
+    restart: unless-stopped
+    networks:
+      - woodie_network
 
-  # Remove development databases in production
-  db:
-    deploy:
-      replicas: 0  # Don't run local DB in production
+networks:
+  woodie_network:
+    driver: bridge
 
-  redis:
-    restart: always
-    command: redis-server --appendonly yes
+volumes:
+  uploads_data:

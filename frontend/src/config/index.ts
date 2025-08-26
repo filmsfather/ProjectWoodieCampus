@@ -1,5 +1,6 @@
 // 환경변수 설정
 export const config = {
+  apiUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001',
   api: {
     baseUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api',
   },
