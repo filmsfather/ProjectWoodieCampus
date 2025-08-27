@@ -1,8 +1,8 @@
 /* 대시보드 공통 스타일 */
 .dashboard-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  padding: 20px;
+  background: var(--color-neutral-50);
+  padding: var(--space-3);
 }
 
 .dashboard-page.loading, .dashboard-page.error {
@@ -18,13 +18,13 @@
 }
 
 .spinner {
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #007bff;
+  border: 4px solid var(--color-neutral-200);
+  border-top: 4px solid var(--color-primary);
   border-radius: 50%;
   width: 50px;
   height: 50px;
   animation: spin 1s linear infinite;
-  margin: 0 auto 20px;
+  margin: 0 auto var(--space-3);
 }
 
 @keyframes spin {
@@ -35,86 +35,89 @@
 /* 에러 메시지 */
 .error-message {
   background: white;
-  padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
   text-align: center;
   max-width: 400px;
 }
 
 .error-message h3 {
-  margin-bottom: 12px;
-  color: #dc3545;
+  margin-bottom: var(--space-2);
+  color: var(--color-error);
 }
 
 .retry-btn, .login-btn {
-  background: #007bff;
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
   border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  margin-top: 16px;
-  font-size: 14px;
+  margin-top: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-family: var(--font-family-primary);
+  font-weight: var(--font-weight-medium);
   transition: background-color 0.2s;
 }
 
 .retry-btn:hover, .login-btn:hover {
-  background: #0056b3;
+  background: var(--color-primary-dark);
 }
 
 /* 대시보드 헤더 */
 .dashboard-header {
   background: white;
-  padding: 24px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
+  padding: var(--space-3);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--card-shadow);
+  margin-bottom: var(--space-3);
 }
 
 .dashboard-header h1 {
-  margin: 0 0 8px 0;
-  color: #2c3e50;
-  font-size: 2rem;
-  font-weight: 700;
+  margin: 0 0 var(--space-1) 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  font-family: var(--font-family-secondary);
 }
 
 .dashboard-header p {
   margin: 0;
-  color: #6c757d;
-  font-size: 1.1rem;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-lg);
 }
 
 /* 대시보드 콘텐츠 */
 .dashboard-content {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--space-3);
 }
 
 /* 통계 섹션 */
 .stats-section, .content-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 16px;
-  margin-bottom: 20px;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
 }
 
 /* 통계 카드 */
 .stat-card {
   background: white;
-  padding: 24px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: var(--space-3);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--card-shadow);
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-2);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .stat-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-lg);
 }
 
 .stat-icon {
@@ -124,39 +127,41 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  background: rgba(0, 123, 255, 0.1);
+  border-radius: var(--radius-full);
+  background: rgba(90, 100, 80, 0.1); /* Primary color with opacity */
 }
 
 .stat-content h3 {
   margin: 0 0 4px 0;
-  color: #495057;
-  font-size: 0.9rem;
-  font-weight: 600;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  font-family: var(--font-family-secondary);
 }
 
 .stat-number {
-  font-size: 2.2rem;
-  font-weight: 700;
-  color: #2c3e50;
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
   margin: 0;
   line-height: 1;
+  font-family: var(--font-family-secondary);
 }
 
 .stat-label {
-  color: #6c757d;
+  color: var(--color-text-tertiary);
   margin: 0;
-  font-size: 0.9rem;
+  font-size: var(--font-size-sm);
 }
 
 /* 통계 카드 색상 변형 */
-.stat-card.primary .stat-icon { background: rgba(0, 123, 255, 0.1); }
-.stat-card.success .stat-icon { background: rgba(40, 167, 69, 0.1); }
-.stat-card.warning .stat-icon { background: rgba(255, 193, 7, 0.1); }
-.stat-card.info .stat-icon { background: rgba(23, 162, 184, 0.1); }
-.stat-card.secondary .stat-icon { background: rgba(108, 117, 125, 0.1); }
+.stat-card.primary .stat-icon { background: rgba(90, 100, 80, 0.1); } /* Primary */
+.stat-card.success .stat-icon { background: rgba(40, 167, 69, 0.1); } /* Success */
+.stat-card.warning .stat-icon { background: rgba(255, 193, 7, 0.1); } /* Warning */
+.stat-card.info .stat-icon { background: rgba(23, 162, 184, 0.1); } /* Info */
+.stat-card.secondary .stat-icon { background: rgba(110, 120, 100, 0.1); } /* Secondary */
 
 /* 시스템 건강도 */
 .system-health {

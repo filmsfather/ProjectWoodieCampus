@@ -1,0 +1,20 @@
+# robots.txt for Woodie Campus
+
+User-agent: *
+Allow: /
+
+# Allow all search engines to index the site
+Allow: /login
+Allow: /dashboard
+Allow: /problems
+Allow: /workbooks
+
+# Disallow admin-only pages for privacy
+Disallow: /admin
+Disallow: /upload-test
+
+# Sitemap location
+Sitemap: https://woodiecampus.com/sitemap.xml
+
+# Crawl delay (optional - 1 second)
+Crawl-delay: 1

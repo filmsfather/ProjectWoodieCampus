@@ -13,7 +13,7 @@ const Layout: React.FC<LayoutProps> = ({ showSidebar = false }) => {
       <Header />
       <div className="layout-content">
         {showSidebar && <Sidebar />}
-        <main className={`main-content ${showSidebar ? 'with-sidebar' : ''}`}>
+        <main id="main-content" className={`main-content ${showSidebar ? 'with-sidebar' : ''}`}>
           <Outlet />
         </main>
       </div>
