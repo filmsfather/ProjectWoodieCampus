@@ -17,21 +17,21 @@ router.get('/:id', WorkbookController.getWorkbook);
 router.get('/:id/problems', WorkbookController.getWorkbookWithProblems);
 
 // 문제집 생성 (관리자, 교사만 가능)
-router.post('/', AuthMiddleware.AuthMiddleware.requireRole(['admin', 'teacher']), WorkbookController.createWorkbook);
+router.post('/', AuthMiddleware.requireRole('admin', 'teacher'), WorkbookController.createWorkbook);
 
 // 문제집 수정 (관리자, 교사만 가능 - 본인 문제집만)
-router.put('/:id', AuthMiddleware.requireRole(['admin', 'teacher']), WorkbookController.updateWorkbook);
+router.put('/:id', AuthMiddleware.requireRole('admin', 'teacher'), WorkbookController.updateWorkbook);
 
 // 문제집 삭제 (관리자, 교사만 가능 - 본인 문제집만)
-router.delete('/:id', AuthMiddleware.requireRole(['admin', 'teacher']), WorkbookController.deleteWorkbook);
+router.delete('/:id', AuthMiddleware.requireRole('admin', 'teacher'), WorkbookController.deleteWorkbook);
 
 // 문제집에 문제 추가 (관리자, 교사만 가능 - 본인 문제집만)
-router.post('/:id/problems', AuthMiddleware.requireRole(['admin', 'teacher']), WorkbookController.addProblemToWorkbook);
+router.post('/:id/problems', AuthMiddleware.requireRole('admin', 'teacher'), WorkbookController.addProblemToWorkbook);
 
 // 문제집에서 문제 제거 (관리자, 교사만 가능 - 본인 문제집만)
-router.delete('/:id/problems/:problemId', AuthMiddleware.requireRole(['admin', 'teacher']), WorkbookController.removeProblemFromWorkbook);
+router.delete('/:id/problems/:problemId', AuthMiddleware.requireRole('admin', 'teacher'), WorkbookController.removeProblemFromWorkbook);
 
 // 문제집 내 문제 순서 변경 (관리자, 교사만 가능 - 본인 문제집만)
-router.patch('/:id/reorder', AuthMiddleware.requireRole(['admin', 'teacher']), WorkbookController.reorderWorkbookProblems);
+router.patch('/:id/reorder', AuthMiddleware.requireRole('admin', 'teacher'), WorkbookController.reorderWorkbookProblems);
 
 export default router;
