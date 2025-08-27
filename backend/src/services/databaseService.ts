@@ -414,7 +414,244 @@ export class DatabaseService {
       });
     }
 
+    // 문제집 완료 시 복습 일정 생성 확인
+    if (recordData.problemSetId && recordData.isCorrect) {
+      try {
+        await this.checkAndGenerateWorkbookReviewSchedule(
+          recordData.userId,
+          recordData.problemSetId
+        );
+      } catch (scheduleError) {
+        // 복습 일정 생성 실패는 로그만 남기고 계속 진행
+        console.warn('문제집 복습 일정 생성 실패:', scheduleError);
+      }
+    }
+
     return data;
+  }
+
+  // 문제집 완료 시 복습 일정 자동 생성
+  static async checkAndGenerateWorkbookReviewSchedule(userId: string, problemSetId: string) {
+    // 문제집의 총 문제 수 조회
+    const { data: problemSetProblems, error: problemsError } = await supabase
+      .from('problem_set_problems')
+      .select('problem_id')
+      .eq('problem_set_id', problemSetId);
+
+    if (problemsError) throw problemsError;
+    if (!problemSetProblems || problemSetProblems.length === 0) return;
+
+    const totalProblems = problemSetProblems.length;
+    const problemIds = problemSetProblems.map(p => p.problem_id);
+
+    // 사용자가 해당 문제집에서 정답으로 풀이한 문제 수 조회
+    const { data: solvedProblems, error: solvedError } = await supabase
+      .from('solution_records')
+      .select('problem_id')
+      .eq('user_id', userId)
+      .eq('problem_set_id', problemSetId)
+      .eq('is_correct', true)
+      .in('problem_id', problemIds);
+
+    if (solvedError) throw solvedError;
+
+    const solvedCount = solvedProblems?.length || 0;
+    const completionRate = solvedCount / totalProblems;
+
+    // 80% 이상 완료 시 복습 일정 생성
+    if (completionRate >= 0.8) {
+      // 이미 생성된 문제집 복습 스케줄이 있는지 확인
+      const { data: existingSchedule, error: scheduleCheckError } = await supabase
+        .from('workbook_review_schedules')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('problem_set_id', problemSetId)
+        .limit(1);
+
+      if (scheduleCheckError && scheduleCheckError.code !== 'PGRST116') {
+        // 테이블이 없는 경우 생성
+        await this.createWorkbookReviewScheduleTable();
+      }
+
+      // 이미 스케줄이 없는 경우에만 생성
+      if (!existingSchedule || existingSchedule.length === 0) {
+        await this.generateWorkbookReviewSchedule(userId, problemSetId, completionRate);
+        console.log(`✅ 문제집 복습 일정 생성됨: 사용자 ${userId}, 문제집 ${problemSetId}, 완료율 ${(completionRate * 100).toFixed(1)}%`);
+      }
+    }
+  }
+
+  // 문제집 복습 스케줄 테이블 생성 (필요시)
+  static async createWorkbookReviewScheduleTable() {
+    try {
+      const createTableSQL = `
+        CREATE TABLE IF NOT EXISTS workbook_review_schedules (
+          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+          user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+          problem_set_id UUID REFERENCES problem_sets(id) ON DELETE CASCADE,
+          
+          completion_rate DECIMAL(5,2) NOT NULL,
+          first_review_date DATE NOT NULL,
+          review_stage INTEGER DEFAULT 1 CHECK (review_stage >= 1 AND review_stage <= 4),
+          next_review_date DATE,
+          is_completed BOOLEAN DEFAULT false,
+          
+          created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+          
+          UNIQUE(user_id, problem_set_id)
+        );
+        
+        CREATE INDEX IF NOT EXISTS idx_workbook_review_schedules_user_next 
+          ON workbook_review_schedules(user_id, next_review_date) 
+          WHERE is_completed = false;
+      `;
+
+      const { error } = await supabase.rpc('exec_sql', {
+        sql_query: createTableSQL
+      });
+
+      if (error && !error.message?.includes('already exists')) {
+        throw error;
+      }
+    } catch (error) {
+      console.warn('문제집 복습 스케줄 테이블 생성 시도:', error);
+    }
+  }
+
+  // 문제집 복습 일정 생성
+  static async generateWorkbookReviewSchedule(userId: string, problemSetId: string, completionRate: number) {
+    const firstReviewDate = new Date();
+    firstReviewDate.setDate(firstReviewDate.getDate() + 1); // 1일 후
+
+    const { data, error } = await supabase
+      .from('workbook_review_schedules')
+      .insert([{
+        user_id: userId,
+        problem_set_id: problemSetId,
+        completion_rate: completionRate,
+        first_review_date: firstReviewDate.toISOString().split('T')[0],
+        next_review_date: firstReviewDate.toISOString().split('T')[0],
+        review_stage: 1,
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  // 문제집 복습 대상 조회
+  static async getWorkbookReviewTargets(userId: string, params: {
+    page?: number;
+    limit?: number;
+  } = {}) {
+    const { page = 1, limit = 20 } = params;
+    const offset = (page - 1) * limit;
+    const today = new Date().toISOString().split('T')[0];
+
+    const { data, error } = await supabase
+      .from('workbook_review_schedules')
+      .select(`
+        *,
+        problem_set:problem_sets(
+          id,
+          title,
+          description,
+          subject,
+          difficulty
+        )
+      `)
+      .eq('user_id', userId)
+      .eq('is_completed', false)
+      .lte('next_review_date', today)
+      .order('next_review_date', { ascending: true })
+      .order('review_stage', { ascending: true })
+      .range(offset, offset + limit - 1);
+
+    if (error && error.code !== 'PGRST116') throw error;
+
+    // 총 개수 조회
+    const { count, error: countError } = await supabase
+      .from('workbook_review_schedules')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('is_completed', false)
+      .lte('next_review_date', today);
+
+    if (countError && countError.code !== 'PGRST116') throw countError;
+
+    return {
+      data: data || [],
+      pagination: {
+        page,
+        limit,
+        total: count || 0,
+        totalPages: Math.ceil((count || 0) / limit),
+      }
+    };
+  }
+
+  // 문제집 복습 완료 처리
+  static async completeWorkbookReview(scheduleId: string, success: boolean) {
+    // 기존 스케줄 조회
+    const { data: existingSchedule, error: fetchError } = await supabase
+      .from('workbook_review_schedules')
+      .select('*')
+      .eq('id', scheduleId)
+      .single();
+
+    if (fetchError) throw fetchError;
+    if (!existingSchedule) throw new Error('문제집 복습 스케줄을 찾을 수 없습니다');
+
+    let nextReviewDate = null;
+    let newReviewStage = existingSchedule.review_stage;
+    let isCompleted = false;
+
+    if (success) {
+      // 성공 시 다음 단계로 진행
+      newReviewStage = Math.min(existingSchedule.review_stage + 1, 4);
+      
+      if (newReviewStage <= 4) {
+        const reviewIntervals = { 1: 1, 2: 3, 3: 7, 4: 14 };
+        const intervalDays = reviewIntervals[newReviewStage as keyof typeof reviewIntervals] || 14;
+        const nextDate = new Date();
+        nextDate.setDate(nextDate.getDate() + intervalDays);
+        nextReviewDate = nextDate.toISOString().split('T')[0];
+      }
+
+      if (newReviewStage >= 4) {
+        isCompleted = true; // 4단계 완료 시 종료
+      }
+    } else {
+      // 실패 시 1단계로 리셋
+      newReviewStage = 1;
+      const nextDate = new Date();
+      nextDate.setDate(nextDate.getDate() + 1);
+      nextReviewDate = nextDate.toISOString().split('T')[0];
+    }
+
+    // 스케줄 업데이트
+    const { data, error } = await supabase
+      .from('workbook_review_schedules')
+      .update({
+        review_stage: newReviewStage,
+        next_review_date: nextReviewDate,
+        is_completed: isCompleted,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', scheduleId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return {
+      ...data,
+      success,
+      stageChanged: newReviewStage !== existingSchedule.review_stage,
+      completed: isCompleted,
+    };
   }
 
   // 에빙하우스 망각곡선 기반 다음 복습일 계산
@@ -542,6 +779,260 @@ export class DatabaseService {
 
     if (error) throw error;
     return data;
+  }
+
+  // 오늘의 복습 대상 조회 (에빙하우스 망각곡선 기반)
+  static async getTodayReviewTargets(userId: string, params: {
+    page?: number;
+    limit?: number;
+  } = {}) {
+    const { page = 1, limit = 20 } = params;
+    const offset = (page - 1) * limit;
+    const today = new Date().toISOString().split('T')[0];
+
+    // solution_records에서 next_review_date가 오늘 이전이고 mastery_level이 4 미만인 문제들 조회
+    const { data, error } = await supabase
+      .from('solution_records')
+      .select(`
+        *,
+        problem:problems(
+          id,
+          title,
+          subject,
+          difficulty,
+          question,
+          problem_type,
+          options,
+          answer
+        ),
+        problem_set:problem_sets(
+          id,
+          title,
+          description
+        )
+      `)
+      .eq('user_id', userId)
+      .lt('mastery_level', 4)
+      .lte('next_review_date', today + 'T23:59:59.999Z')
+      .order('next_review_date', { ascending: true })
+      .order('mastery_level', { ascending: true })
+      .range(offset, offset + limit - 1);
+
+    if (error) throw error;
+
+    // 총 개수 조회
+    const { count, error: countError } = await supabase
+      .from('solution_records')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .lt('mastery_level', 4)
+      .lte('next_review_date', today + 'T23:59:59.999Z');
+
+    if (countError) throw countError;
+
+    return {
+      data: data || [],
+      pagination: {
+        page,
+        limit,
+        total: count || 0,
+        totalPages: Math.ceil((count || 0) / limit),
+      }
+    };
+  }
+
+  // 특정 풀이 기록 조회
+  static async getSolutionRecordById(recordId: string) {
+    const { data, error } = await supabase
+      .from('solution_records')
+      .select('*')
+      .eq('id', recordId)
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  // 복습 이력 기록
+  static async createReviewHistory(data: {
+    userId: string;
+    problemId: string;
+    solutionRecordId: string;
+    previousMasteryLevel: number;
+    newMasteryLevel: number;
+    isCorrect: boolean;
+    timeSpent?: number;
+    confidenceLevel?: number;
+    difficultyPerceived?: number;
+  }) {
+    const { data: result, error } = await supabase
+      .from('review_history')
+      .insert([{
+        user_id: data.userId,
+        problem_id: data.problemId,
+        solution_record_id: data.solutionRecordId,
+        review_session_date: new Date().toISOString().split('T')[0],
+        previous_mastery_level: data.previousMasteryLevel,
+        new_mastery_level: data.newMasteryLevel,
+        is_correct: data.isCorrect,
+        time_spent: data.timeSpent,
+        confidence_level: data.confidenceLevel,
+        difficulty_perceived: data.difficultyPerceived,
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return result;
+  }
+
+  // 우선순위 기반 복습 대상 조회
+  static async getReviewTargetsByPriority(userId: string, params: {
+    page?: number;
+    limit?: number;
+    maxOverdueDays?: number;
+  } = {}) {
+    const { page = 1, limit = 20, maxOverdueDays = 30 } = params;
+    const offset = (page - 1) * limit;
+
+    const { data, error } = await supabase
+      .from('review_priority_view')
+      .select('*')
+      .eq('user_id', userId)
+      .lte('overdue_days', maxOverdueDays)
+      .order('priority_score', { ascending: true })
+      .order('overdue_days', { ascending: false })
+      .order('mastery_level', { ascending: true })
+      .range(offset, offset + limit - 1);
+
+    if (error) throw error;
+
+    // 총 개수 조회
+    const { count, error: countError } = await supabase
+      .from('review_priority_view')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .lte('overdue_days', maxOverdueDays);
+
+    if (countError) throw countError;
+
+    return {
+      data: data || [],
+      pagination: {
+        page,
+        limit,
+        total: count || 0,
+        totalPages: Math.ceil((count || 0) / limit),
+      }
+    };
+  }
+
+  // 일일 복습 통계 조회
+  static async getDailyReviewStats(userId: string, targetDate?: string) {
+    const date = targetDate || new Date().toISOString().split('T')[0];
+    
+    const { data, error } = await supabase
+      .from('daily_review_stats')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('target_date', date)
+      .single();
+
+    if (error && error.code !== 'PGRST116') throw error; // PGRST116 = no rows found
+    
+    return data || {
+      user_id: userId,
+      target_date: date,
+      target_review_count: 0,
+      completed_review_count: 0,
+      correct_answers: 0,
+      total_time_spent: 0,
+      average_confidence: null,
+      efficiency_score: null,
+    };
+  }
+
+  // 복습 효율성 분석
+  static async getReviewEfficiency(userId: string, startDate?: string, endDate?: string) {
+    const start = startDate || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const end = endDate || new Date().toISOString().split('T')[0];
+
+    const { data, error } = await supabase
+      .rpc('calculate_review_efficiency', {
+        p_user_id: userId,
+        p_start_date: start,
+        p_end_date: end,
+      });
+
+    if (error) throw error;
+    return data?.[0] || {
+      avg_correct_rate: 0,
+      avg_time_per_problem: 0,
+      mastery_progression_rate: 0,
+      total_reviews: 0,
+    };
+  }
+
+  // 복습 완료 처리 및 다음 복습 일정 업데이트 (개선된 버전)
+  static async completeReview(recordId: string, isCorrect: boolean, timeSpent?: number, confidenceLevel?: number, difficultyPerceived?: number) {
+    // 기존 풀이 기록 조회
+    const { data: existingRecord, error: fetchError } = await supabase
+      .from('solution_records')
+      .select('*')
+      .eq('id', recordId)
+      .single();
+
+    if (fetchError) throw fetchError;
+    if (!existingRecord) throw new Error('풀이 기록을 찾을 수 없습니다');
+
+    const previousMasteryLevel = existingRecord.mastery_level;
+
+    // 다음 복습 일정 계산
+    const { nextReviewDate, masteryLevel } = this.calculateNextReview(
+      isCorrect,
+      existingRecord.mastery_level
+    );
+
+    // 풀이 기록 업데이트
+    const { data, error } = await supabase
+      .from('solution_records')
+      .update({
+        mastery_level: masteryLevel,
+        next_review_date: nextReviewDate,
+        time_spent: timeSpent || existingRecord.time_spent,
+        attempt_number: existingRecord.attempt_number + 1,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', recordId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    // 복습 이력 기록 (새 테이블이 존재할 경우에만)
+    try {
+      await this.createReviewHistory({
+        userId: existingRecord.user_id,
+        problemId: existingRecord.problem_id,
+        solutionRecordId: recordId,
+        previousMasteryLevel,
+        newMasteryLevel: masteryLevel,
+        isCorrect,
+        timeSpent,
+        confidenceLevel,
+        difficultyPerceived,
+      });
+    } catch (historyError) {
+      // 복습 이력 기록 실패는 로그만 남기고 계속 진행
+      console.warn('복습 이력 기록 실패:', historyError);
+    }
+
+    return {
+      ...data,
+      isCorrect,
+      masteryLevelChanged: masteryLevel !== existingRecord.mastery_level,
+      nextReviewDate,
+    };
   }
 
   // Statistics and Analytics

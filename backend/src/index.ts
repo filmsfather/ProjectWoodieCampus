@@ -15,6 +15,7 @@ import adminRoutes from './routes/admin';
 import uploadRoutes from './routes/upload';
 import workbookRoutes from './routes/workbookRoutes';
 import solutionRoutes from './routes/solutionRoutes';
+import reviewRoutes from './routes/reviewRoutes';
 
 // Import Supabase connection
 import { testSupabaseConnection } from './config/supabase';
@@ -75,6 +76,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/workbooks', workbookRoutes);
 app.use('/api/solutions', solutionRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
