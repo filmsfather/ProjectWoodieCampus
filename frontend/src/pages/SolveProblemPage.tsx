@@ -247,15 +247,90 @@ const SolveProblemPage: React.FC = () => {
           {problem.problem_type === 'multiple_choice' ? (
             <div className="space-y-3">
               <p className="text-sm text-gray-600">정답을 선택하세요:</p>
-              {/* TODO: 객관식 선택지 구현 (임시로 텍스트 입력) */}
-              <textarea
-                value={userAnswer}
-                onChange={(e) => setUserAnswer(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                rows={3}
-                placeholder="답안을 입력하세요..."
-                disabled={isSubmitted}
-              />
+              <div className="space-y-2">
+                {['A', 'B', 'C', 'D', 'E'].map((option) => (
+                  <label
+                    key={option}
+                    className={`flex items-center p-3 rounded-lg border cursor-pointer transition-colors ${
+                      userAnswer === option
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
+                    } ${isSubmitted ? 'cursor-not-allowed opacity-60' : ''}`}
+                  >
+                    <input
+                      type="radio"
+                      name="answer"
+                      value={option}
+                      checked={userAnswer === option}
+                      onChange={(e) => setUserAnswer(e.target.value)}
+                      disabled={isSubmitted}
+                      className="sr-only"
+                    />
+                    <div className={`w-5 h-5 rounded-full border-2 mr-3 flex items-center justify-center ${
+                      userAnswer === option
+                        ? 'border-blue-500 bg-blue-500'
+                        : 'border-gray-300'
+                    }`}>
+                      {userAnswer === option && (
+                        <div className="w-2 h-2 rounded-full bg-white"></div>
+                      )}
+                    </div>
+                    <span className={`font-medium ${
+                      userAnswer === option ? 'text-blue-900' : 'text-gray-700'
+                    }`}>
+                      {option}번
+                    </span>
+                  </label>
+                ))}
+              </div>
+              <div className="mt-3">
+                <p className="text-xs text-gray-500">
+                  * 문제에서 제시된 선택지에 해당하는 번호를 선택하세요.
+                </p>
+              </div>
+            </div>
+          ) : problem.problem_type === 'true_false' ? (
+            <div className="space-y-3">
+              <p className="text-sm text-gray-600">참/거짓을 선택하세요:</p>
+              <div className="space-y-2">
+                {[
+                  { value: 'true', label: '참 (True)', display: 'O' },
+                  { value: 'false', label: '거짓 (False)', display: 'X' }
+                ].map((option) => (
+                  <label
+                    key={option.value}
+                    className={`flex items-center p-3 rounded-lg border cursor-pointer transition-colors ${
+                      userAnswer === option.value
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
+                    } ${isSubmitted ? 'cursor-not-allowed opacity-60' : ''}`}
+                  >
+                    <input
+                      type="radio"
+                      name="answer"
+                      value={option.value}
+                      checked={userAnswer === option.value}
+                      onChange={(e) => setUserAnswer(e.target.value)}
+                      disabled={isSubmitted}
+                      className="sr-only"
+                    />
+                    <div className={`w-5 h-5 rounded-full border-2 mr-3 flex items-center justify-center ${
+                      userAnswer === option.value
+                        ? 'border-blue-500 bg-blue-500'
+                        : 'border-gray-300'
+                    }`}>
+                      {userAnswer === option.value && (
+                        <div className="w-2 h-2 rounded-full bg-white"></div>
+                      )}
+                    </div>
+                    <span className={`font-medium ${
+                      userAnswer === option.value ? 'text-blue-900' : 'text-gray-700'
+                    }`}>
+                      {option.display} - {option.label}
+                    </span>
+                  </label>
+                ))}
+              </div>
             </div>
           ) : (
             <div className="space-y-3">

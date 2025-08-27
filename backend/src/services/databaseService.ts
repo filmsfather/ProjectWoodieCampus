@@ -365,6 +365,26 @@ export class DatabaseService {
     timeSpent?: number;
     attemptNumber?: number;
   }) {
+    // 기존 풀이 기록을 조회하여 현재 숙련도 레벨 확인
+    const existingRecords = await supabase
+      .from('solution_records')
+      .select('mastery_level, is_correct')
+      .eq('user_id', recordData.userId)
+      .eq('problem_id', recordData.problemId)
+      .order('submitted_at', { ascending: false })
+      .limit(1);
+
+    let currentMasteryLevel = 0;
+    if (existingRecords.data && existingRecords.data.length > 0) {
+      currentMasteryLevel = existingRecords.data[0].mastery_level || 0;
+    }
+
+    // 에빙하우스 망각곡선 기반 다음 복습일 계산
+    const { nextReviewDate, masteryLevel } = DatabaseService.calculateNextReview(
+      recordData.isCorrect,
+      currentMasteryLevel
+    );
+
     const { data, error } = await supabase
       .from('solution_records')
       .insert([{
@@ -375,16 +395,59 @@ export class DatabaseService {
         is_correct: recordData.isCorrect,
         time_spent: recordData.timeSpent,
         attempt_number: recordData.attemptNumber || 1,
-        next_review_date: recordData.isCorrect 
-          ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 1일 후
-          : new Date().toISOString(), // 틀렸으면 즉시 다시 복습
-        mastery_level: recordData.isCorrect ? 1 : 0,
+        next_review_date: nextReviewDate,
+        mastery_level: masteryLevel,
       }])
       .select()
       .single();
 
     if (error) throw error;
+
+    // 복습 스케줄 생성 (정답인 경우에만)
+    if (recordData.isCorrect && masteryLevel < 4) {
+      await DatabaseService.createReviewSchedule({
+        userId: recordData.userId,
+        problemId: recordData.problemId,
+        problemSetId: recordData.problemSetId || '',
+        reviewStage: masteryLevel + 1,
+        scheduledDate: nextReviewDate.split('T')[0], // YYYY-MM-DD 형식으로 변환
+      });
+    }
+
     return data;
+  }
+
+  // 에빙하우스 망각곡선 기반 다음 복습일 계산
+  private static calculateNextReview(isCorrect: boolean, currentMasteryLevel: number): {
+    nextReviewDate: string;
+    masteryLevel: number;
+  } {
+    if (!isCorrect) {
+      // 틀린 경우: 숙련도 레벨 리셋하고 즉시 복습
+      return {
+        nextReviewDate: new Date().toISOString(),
+        masteryLevel: 0
+      };
+    }
+
+    // 맞은 경우: 숙련도 레벨 증가
+    const newMasteryLevel = Math.min(currentMasteryLevel + 1, 4);
+    
+    // 에빙하우스 망각곡선 일정 (일 단위)
+    const reviewIntervals = {
+      1: 1,   // 1일 후
+      2: 3,   // 3일 후  
+      3: 7,   // 7일 후 (1주일)
+      4: 14   // 14일 후 (2주일)
+    };
+
+    const intervalDays = reviewIntervals[newMasteryLevel as keyof typeof reviewIntervals] || 1;
+    const nextReviewDate = new Date(Date.now() + intervalDays * 24 * 60 * 60 * 1000);
+
+    return {
+      nextReviewDate: nextReviewDate.toISOString(),
+      masteryLevel: newMasteryLevel
+    };
   }
 
   static async getUserSolutionRecords(userId: string, filters: {
