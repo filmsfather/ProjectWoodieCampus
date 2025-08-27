@@ -12,11 +12,13 @@ import authRoutes from './routes/auth';
 import problemRoutes from './routes/problems';
 import userRoutes from './routes/users';
 import adminRoutes from './routes/admin';
+import uploadRoutes from './routes/upload';
 
 // Import Supabase connection
 import { testSupabaseConnection } from './config/supabase';
 import { config, validateConfig } from './config';
 import { autoSeedAdminIfNeeded } from './scripts/seedAdmin';
+import { setupStorageBucket } from './scripts/setupStorage';
 
 // Load environment variables
 dotenv.config();
@@ -68,6 +70,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/problems', problemRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
@@ -90,6 +93,9 @@ app.listen(PORT, async () => {
   
   // Test Supabase connection
   await testSupabaseConnection();
+  
+  // Setup Storage bucket
+  await setupStorageBucket();
   
   // Auto-seed admin account if needed
   await autoSeedAdminIfNeeded();

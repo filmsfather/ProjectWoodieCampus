@@ -242,6 +242,55 @@ export class DatabaseService {
     return data;
   }
 
+  static async updateProblem(id: string, updates: {
+    title?: string;
+    content?: string;
+    answer?: string;
+    explanation?: string;
+    imageUrl?: string;
+    difficulty?: string;
+    subject?: string;
+    topic?: string;
+    problemType?: string;
+    points?: number;
+  }) {
+    const updateData: any = {};
+    
+    if (updates.title !== undefined) updateData.title = updates.title;
+    if (updates.content !== undefined) updateData.content = updates.content;
+    if (updates.answer !== undefined) updateData.answer = updates.answer;
+    if (updates.explanation !== undefined) updateData.explanation = updates.explanation;
+    if (updates.imageUrl !== undefined) updateData.image_url = updates.imageUrl;
+    if (updates.difficulty !== undefined) updateData.difficulty = updates.difficulty;
+    if (updates.subject !== undefined) updateData.subject = updates.subject;
+    if (updates.topic !== undefined) updateData.topic = updates.topic;
+    if (updates.problemType !== undefined) updateData.problem_type = updates.problemType;
+    if (updates.points !== undefined) updateData.points = updates.points;
+
+    const { data, error } = await supabase
+      .from('problems')
+      .update(updateData)
+      .eq('id', id)
+      .eq('is_active', true)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  static async deleteProblem(id: string) {
+    const { data, error } = await supabase
+      .from('problems')
+      .update({ is_active: false })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
   // Problem Set related operations
   static async getProblemSets(filters: {
     page?: number;

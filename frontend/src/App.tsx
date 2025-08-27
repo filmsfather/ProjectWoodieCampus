@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import ProblemsPage from './pages/ProblemsPage';
 import AdminPage from './pages/AdminPage';
+import { ImageUploadTestPage } from './pages/ImageUploadTestPage';
 import { validateConfig } from './config';
 import './App.css';
 
@@ -36,6 +37,10 @@ function App() {
           
           <Route path="/admin" element={<Layout showSidebar={true} />}>
             <Route index element={<AdminPage />} />
+          </Route>
+
+          <Route path="/upload-test" element={<Layout showSidebar={true} />}>
+            <Route index element={<ImageUploadTestPage />} />
           </Route>
           
           {/* 404 리다이렉트 */}
