@@ -41,6 +41,27 @@ const WorkbookDetailPage: React.FC = () => {
     }
   }, [id]);
 
+  // 문제집 생성 완료
+  const handleCreateWorkbook = async (workbookData: Partial<Workbook>) => {
+    try {
+      const newWorkbook = await WorkbookApi.createWorkbook(workbookData);
+      setNotification({
+        type: 'success',
+        message: '문제집이 생성되었습니다.',
+      });
+      setTimeout(() => {
+        setNotification(null);
+        navigate(`/workbooks/${newWorkbook.id}`);
+      }, 2000);
+    } catch (err) {
+      setNotification({
+        type: 'error',
+        message: err instanceof Error ? err.message : '문제집 생성에 실패했습니다.',
+      });
+      setTimeout(() => setNotification(null), 3000);
+    }
+  };
+
   // 문제집 수정 완료
   const handleUpdateWorkbook = (updatedWorkbook: Workbook) => {
     setWorkbook(updatedWorkbook);
@@ -112,6 +133,45 @@ const WorkbookDetailPage: React.FC = () => {
           >
             ← 문제집 목록으로
           </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // 새 문제집 생성 모드
+  if (id === 'create') {
+    return (
+      <div className="max-w-6xl mx-auto p-6">
+        {/* 알림 */}
+        {notification && (
+          <div className={`mb-6 p-4 rounded-lg border ${
+            notification.type === 'success' 
+              ? 'bg-green-50 text-green-800 border-green-200' 
+              : 'bg-red-50 text-red-800 border-red-200'
+          }`}>
+            <div className="flex items-center justify-between">
+              <span>{notification.message}</span>
+              <button
+                onClick={dismissNotification}
+                className="text-current hover:opacity-70 ml-4"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        )}
+        
+        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Link
+              to="/workbooks"
+              className="text-blue-600 hover:text-blue-800"
+            >
+              ← 문제집 목록
+            </Link>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-6">새 문제집 만들기</h1>
+          <WorkbookForm onSubmit={handleCreateWorkbook} />
         </div>
       </div>
     );
