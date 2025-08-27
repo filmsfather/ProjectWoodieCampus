@@ -14,37 +14,47 @@ export interface User {
   last_login?: Date;
 }
 
-// 문제 타입
+// 문제 타입 (problems 테이블)
 export interface Problem {
   id: string;
   title: string;
   content: string;
-  imageUrl?: string;
+  answer?: string;
+  explanation?: string;
+  image_url?: string;
   difficulty: 'easy' | 'medium' | 'hard';
   subject: string;
-  createdBy: string;
-  createdAt: Date;
-  updatedAt: Date;
+  topic?: string;
+  problem_type: 'multiple_choice' | 'short_answer' | 'essay' | 'true_false';
+  points: number;
+  created_by: string;
+  created_at: Date;
+  updated_at: Date;
+  is_active: boolean;
 }
 
-// 문제집 타입
-export interface Workbook {
+// 문제집 타입 (problem_sets 테이블)
+export interface ProblemSet {
   id: string;
   title: string;
   description?: string;
+  subject: string;
+  grade_level?: string;
+  estimated_time?: number;
   status: 'draft' | 'published' | 'archived';
-  createdBy: string;
-  createdAt: Date;
-  updatedAt: Date;
+  created_by: string;
+  created_at: Date;
+  updated_at: Date;
+  is_active: boolean;
 }
 
-// 문제집-문제 매핑 타입
-export interface WorkbookProblem {
+// 문제집-문제 매핑 타입 (problem_set_problems 테이블)
+export interface ProblemSetProblem {
   id: string;
-  workbookId: string;
-  problemId: string;
-  order: number;
-  createdAt: Date;
+  problem_set_id: string;
+  problem_id: string;
+  order_index: number;
+  created_at: Date;
 }
 
 // JWT 페이로드 타입

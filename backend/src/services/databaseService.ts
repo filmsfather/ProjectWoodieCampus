@@ -1,5 +1,5 @@
 import { supabase } from '../config/supabase';
-import { User, Problem, Workbook, WorkbookProblem } from '../types';
+import { User, Problem, ProblemSet, ProblemSetProblem } from '../types';
 
 // Export supabase client for direct use
 export { supabase };
@@ -553,11 +553,11 @@ export class DatabaseService {
     const offset = (page - 1) * limit;
 
     let query = supabase
-      .from('workbooks')
+      .from('problem_sets')
       .select(`
         *,
-        created_by_user:users!workbooks_created_by_fkey(username, full_name),
-        problem_count:workbook_problems(count)
+        created_by_user:users!problem_sets_created_by_fkey(username, full_name),
+        problem_count:problem_set_problems(count)
       `)
       .eq('is_active', true);
 
@@ -586,10 +586,10 @@ export class DatabaseService {
 
   static async getWorkbook(id: string) {
     const { data, error } = await supabase
-      .from('workbooks')
+      .from('problem_sets')
       .select(`
         *,
-        created_by_user:users!workbooks_created_by_fkey(username, full_name)
+        created_by_user:users!problem_sets_created_by_fkey(username, full_name)
       `)
       .eq('id', id)
       .eq('is_active', true)
@@ -601,11 +601,11 @@ export class DatabaseService {
 
   static async getWorkbookWithProblems(id: string) {
     const { data, error } = await supabase
-      .from('workbooks')
+      .from('problem_sets')
       .select(`
         *,
-        created_by_user:users!workbooks_created_by_fkey(username, full_name),
-        problems:workbook_problems(
+        created_by_user:users!problem_sets_created_by_fkey(username, full_name),
+        problems:problem_set_problems(
           id,
           order_index,
           problem:problems(*)
@@ -628,14 +628,20 @@ export class DatabaseService {
   static async createWorkbook(workbookData: {
     title: string;
     description?: string;
+    subject?: string;
+    gradeLevel?: string;
+    estimatedTime?: number;
     status?: string;
     createdBy: string;
   }) {
     const { data, error } = await supabase
-      .from('workbooks')
+      .from('problem_sets')
       .insert([{
         title: workbookData.title,
         description: workbookData.description,
+        subject: workbookData.subject || 'General', // 기본값 설정 (필수 컬럼)
+        grade_level: workbookData.gradeLevel,
+        estimated_time: workbookData.estimatedTime,
         status: workbookData.status || 'draft',
         created_by: workbookData.createdBy,
       }])
@@ -649,16 +655,25 @@ export class DatabaseService {
   static async updateWorkbook(id: string, updates: {
     title?: string;
     description?: string;
+    subject?: string;
+    gradeLevel?: string;
+    estimatedTime?: number;
     status?: string;
   }) {
+    const updateData: any = {};
+    
+    if (updates.title !== undefined) updateData.title = updates.title;
+    if (updates.description !== undefined) updateData.description = updates.description;
+    if (updates.subject !== undefined) updateData.subject = updates.subject;
+    if (updates.gradeLevel !== undefined) updateData.grade_level = updates.gradeLevel;
+    if (updates.estimatedTime !== undefined) updateData.estimated_time = updates.estimatedTime;
+    if (updates.status !== undefined) updateData.status = updates.status;
+    
+    // updated_at은 트리거에서 자동 업데이트됨
+
     const { data, error } = await supabase
-      .from('workbooks')
-      .update({
-        title: updates.title,
-        description: updates.description,
-        status: updates.status,
-        updated_at: new Date().toISOString(),
-      })
+      .from('problem_sets')
+      .update(updateData)
       .eq('id', id)
       .select()
       .single();
@@ -669,7 +684,7 @@ export class DatabaseService {
 
   static async deleteWorkbook(id: string) {
     const { data, error } = await supabase
-      .from('workbooks')
+      .from('problem_sets')
       .update({ is_active: false })
       .eq('id', id)
       .select()
@@ -684,9 +699,9 @@ export class DatabaseService {
     // Get current max order if order not specified
     if (order === undefined) {
       const { data: maxOrderData } = await supabase
-        .from('workbook_problems')
+        .from('problem_set_problems')
         .select('order_index')
-        .eq('workbook_id', workbookId)
+        .eq('problem_set_id', workbookId)
         .order('order_index', { ascending: false })
         .limit(1)
         .single();
@@ -695,9 +710,9 @@ export class DatabaseService {
     }
 
     const { data, error } = await supabase
-      .from('workbook_problems')
+      .from('problem_set_problems')
       .insert([{
-        workbook_id: workbookId,
+        problem_set_id: workbookId,
         problem_id: problemId,
         order_index: order,
       }])
@@ -710,9 +725,9 @@ export class DatabaseService {
 
   static async removeProblemFromWorkbook(workbookId: string, problemId: string) {
     const { data, error } = await supabase
-      .from('workbook_problems')
+      .from('problem_set_problems')
       .delete()
-      .eq('workbook_id', workbookId)
+      .eq('problem_set_id', workbookId)
       .eq('problem_id', problemId)
       .select()
       .single();
@@ -724,9 +739,9 @@ export class DatabaseService {
   static async reorderWorkbookProblems(workbookId: string, problemOrders: { problemId: string; order: number }[]) {
     const promises = problemOrders.map(({ problemId, order }) =>
       supabase
-        .from('workbook_problems')
+        .from('problem_set_problems')
         .update({ order_index: order })
-        .eq('workbook_id', workbookId)
+        .eq('problem_set_id', workbookId)
         .eq('problem_id', problemId)
     );
 
@@ -742,12 +757,12 @@ export class DatabaseService {
 
   static async getWorkbookProblems(workbookId: string) {
     const { data, error } = await supabase
-      .from('workbook_problems')
+      .from('problem_set_problems')
       .select(`
         *,
         problem:problems(*)
       `)
-      .eq('workbook_id', workbookId)
+      .eq('problem_set_id', workbookId)
       .order('order_index', { ascending: true });
 
     if (error) throw error;
