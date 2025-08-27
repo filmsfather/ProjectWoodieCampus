@@ -1,5 +1,5 @@
 import { supabase } from '../config/supabase';
-import { User, Problem } from '../types';
+import { User, Problem, Workbook, WorkbookProblem } from '../types';
 
 // Export supabase client for direct use
 export { supabase };
@@ -539,5 +539,218 @@ export class DatabaseService {
       todayReviews: todayReviews?.length || 0,
       streak,
     };
+  }
+
+  // Workbook related operations
+  static async getWorkbooks(filters: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    createdBy?: string;
+    search?: string;
+  } = {}) {
+    const { page = 1, limit = 10, status, createdBy, search } = filters;
+    const offset = (page - 1) * limit;
+
+    let query = supabase
+      .from('workbooks')
+      .select(`
+        *,
+        created_by_user:users!workbooks_created_by_fkey(username, full_name),
+        problem_count:workbook_problems(count)
+      `)
+      .eq('is_active', true);
+
+    if (status) query = query.eq('status', status);
+    if (createdBy) query = query.eq('created_by', createdBy);
+    if (search) {
+      query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
+    }
+
+    const { data, error, count } = await query
+      .range(offset, offset + limit - 1)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    return {
+      data: data || [],
+      pagination: {
+        page,
+        limit,
+        total: count || 0,
+        totalPages: Math.ceil((count || 0) / limit),
+      },
+    };
+  }
+
+  static async getWorkbook(id: string) {
+    const { data, error } = await supabase
+      .from('workbooks')
+      .select(`
+        *,
+        created_by_user:users!workbooks_created_by_fkey(username, full_name)
+      `)
+      .eq('id', id)
+      .eq('is_active', true)
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  static async getWorkbookWithProblems(id: string) {
+    const { data, error } = await supabase
+      .from('workbooks')
+      .select(`
+        *,
+        created_by_user:users!workbooks_created_by_fkey(username, full_name),
+        problems:workbook_problems(
+          id,
+          order_index,
+          problem:problems(*)
+        )
+      `)
+      .eq('id', id)
+      .eq('is_active', true)
+      .single();
+
+    if (error) throw error;
+
+    // Sort problems by order
+    if (data?.problems) {
+      data.problems = data.problems.sort((a, b) => a.order_index - b.order_index);
+    }
+
+    return data;
+  }
+
+  static async createWorkbook(workbookData: {
+    title: string;
+    description?: string;
+    status?: string;
+    createdBy: string;
+  }) {
+    const { data, error } = await supabase
+      .from('workbooks')
+      .insert([{
+        title: workbookData.title,
+        description: workbookData.description,
+        status: workbookData.status || 'draft',
+        created_by: workbookData.createdBy,
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  static async updateWorkbook(id: string, updates: {
+    title?: string;
+    description?: string;
+    status?: string;
+  }) {
+    const { data, error } = await supabase
+      .from('workbooks')
+      .update({
+        title: updates.title,
+        description: updates.description,
+        status: updates.status,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  static async deleteWorkbook(id: string) {
+    const { data, error } = await supabase
+      .from('workbooks')
+      .update({ is_active: false })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  // Workbook-Problem relationship operations
+  static async addProblemToWorkbook(workbookId: string, problemId: string, order?: number) {
+    // Get current max order if order not specified
+    if (order === undefined) {
+      const { data: maxOrderData } = await supabase
+        .from('workbook_problems')
+        .select('order_index')
+        .eq('workbook_id', workbookId)
+        .order('order_index', { ascending: false })
+        .limit(1)
+        .single();
+      
+      order = (maxOrderData?.order_index || 0) + 1;
+    }
+
+    const { data, error } = await supabase
+      .from('workbook_problems')
+      .insert([{
+        workbook_id: workbookId,
+        problem_id: problemId,
+        order_index: order,
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  static async removeProblemFromWorkbook(workbookId: string, problemId: string) {
+    const { data, error } = await supabase
+      .from('workbook_problems')
+      .delete()
+      .eq('workbook_id', workbookId)
+      .eq('problem_id', problemId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  static async reorderWorkbookProblems(workbookId: string, problemOrders: { problemId: string; order: number }[]) {
+    const promises = problemOrders.map(({ problemId, order }) =>
+      supabase
+        .from('workbook_problems')
+        .update({ order_index: order })
+        .eq('workbook_id', workbookId)
+        .eq('problem_id', problemId)
+    );
+
+    const results = await Promise.all(promises);
+    const errors = results.filter(result => result.error);
+    
+    if (errors.length > 0) {
+      throw errors[0].error;
+    }
+
+    return results.map(result => result.data);
+  }
+
+  static async getWorkbookProblems(workbookId: string) {
+    const { data, error } = await supabase
+      .from('workbook_problems')
+      .select(`
+        *,
+        problem:problems(*)
+      `)
+      .eq('workbook_id', workbookId)
+      .order('order_index', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
   }
 }

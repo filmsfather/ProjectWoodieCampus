@@ -27,6 +27,26 @@ export interface Problem {
   updatedAt: Date;
 }
 
+// 문제집 타입
+export interface Workbook {
+  id: string;
+  title: string;
+  description?: string;
+  status: 'draft' | 'published' | 'archived';
+  createdBy: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// 문제집-문제 매핑 타입
+export interface WorkbookProblem {
+  id: string;
+  workbookId: string;
+  problemId: string;
+  order: number;
+  createdAt: Date;
+}
+
 // JWT 페이로드 타입
 export interface JwtPayload {
   userId: string;

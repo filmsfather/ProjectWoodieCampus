@@ -258,7 +258,7 @@
         "dependencies": [
           4
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -310,7 +310,7 @@
               "5.4"
             ],
             "details": "문제 유형 선택 드롭다운, 객관식 문제용 선택지 추가/삭제 인터페이스, 단답형 문제용 정답 입력 필드, 문제 내용 리치 텍스트 에디터, 이미지 삽입 버튼 연동, 유형별 폼 검증 로직을 구현합니다.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -321,7 +321,7 @@
               "5.5"
             ],
             "details": "실시간 미리보기 패널, 문제 유형별 렌더링 로직, 이미지 포함 문제 미리보기, 모바일/데스크톱 뷰 전환 기능, 미리보기 모달 창, 저장 전 최종 검토 단계를 구현합니다.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           }
         ]
@@ -336,7 +336,7 @@
         "dependencies": [
           5
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": []
       },
       {
@@ -394,7 +394,7 @@
     ],
     "metadata": {
       "created": "2025-08-26T06:14:02.321Z",
-      "updated": "2025-08-27T04:07:01.567Z",
+      "updated": "2025-08-27T04:28:49.278Z",
       "description": "Tasks for master context"
     }
   }

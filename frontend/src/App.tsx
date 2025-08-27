@@ -5,8 +5,11 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import ProblemsPage from './pages/ProblemsPage';
+import WorkbooksPage from './pages/WorkbooksPage';
+import WorkbookDetailPage from './pages/WorkbookDetailPage';
 import AdminPage from './pages/AdminPage';
 import { ImageUploadTestPage } from './pages/ImageUploadTestPage';
+import { CreateProblemPage } from './pages/CreateProblemPage';
 import { validateConfig } from './config';
 import './App.css';
 
@@ -33,6 +36,12 @@ function App() {
           
           <Route path="/problems" element={<Layout showSidebar={true} />}>
             <Route index element={<ProblemsPage />} />
+            <Route path="create" element={<CreateProblemPage />} />
+          </Route>
+          
+          <Route path="/workbooks" element={<Layout showSidebar={true} />}>
+            <Route index element={<WorkbooksPage />} />
+            <Route path=":id" element={<WorkbookDetailPage />} />
           </Route>
           
           <Route path="/admin" element={<Layout showSidebar={true} />}>

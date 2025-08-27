@@ -12,8 +12,13 @@ const Sidebar: React.FC = () => {
     },
     {
       path: '/problems',
-      label: '문제 풀기',
+      label: '문제 관리',
       icon: '📝',
+    },
+    {
+      path: '/workbooks',
+      label: '문제집 관리',
+      icon: '📚',
     },
     {
       path: '/review',
@@ -24,6 +29,11 @@ const Sidebar: React.FC = () => {
       path: '/progress',
       label: '학습 진도',
       icon: '📈',
+    },
+    {
+      path: '/admin',
+      label: '관리자',
+      icon: '👤',
     },
     {
       path: '/settings',
