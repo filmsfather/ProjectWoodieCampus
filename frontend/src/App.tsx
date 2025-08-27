@@ -10,6 +10,7 @@ import WorkbookDetailPage from './pages/WorkbookDetailPage';
 import AdminPage from './pages/AdminPage';
 import { ImageUploadTestPage } from './pages/ImageUploadTestPage';
 import { CreateProblemPage } from './pages/CreateProblemPage';
+import SolveProblemPage from './pages/SolveProblemPage';
 import { validateConfig } from './config';
 import './App.css';
 
@@ -37,6 +38,7 @@ function App() {
           <Route path="/problems" element={<Layout showSidebar={true} />}>
             <Route index element={<ProblemsPage />} />
             <Route path="create" element={<CreateProblemPage />} />
+            <Route path="solve/:problemId" element={<SolveProblemPage />} />
           </Route>
           
           <Route path="/workbooks" element={<Layout showSidebar={true} />}>

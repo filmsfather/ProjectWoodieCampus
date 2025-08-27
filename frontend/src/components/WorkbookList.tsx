@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { WorkbookApi, type Workbook } from '../services/workbookApi';
+import { SolutionApi, type WorkbookProgress } from '../services/solutionApi';
 
 interface WorkbookListProps {
   onEdit?: (workbook: Workbook) => void;
@@ -21,6 +22,7 @@ export const WorkbookList: React.FC<WorkbookListProps> = ({
   className = '',
 }) => {
   const [workbooks, setWorkbooks] = useState<Workbook[]>([]);
+  const [progressData, setProgressData] = useState<WorkbookProgress[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState(0);
@@ -39,21 +41,31 @@ export const WorkbookList: React.FC<WorkbookListProps> = ({
     setError(null);
 
     try {
-      const response = await WorkbookApi.getWorkbooks({
-        page: filters.page,
-        limit: filters.limit,
-        status: filters.status || undefined,
-        search: filters.search || undefined,
-      });
+      // 문제집 목록과 진도 데이터 동시 로딩
+      const [workbooksResponse, progressResponse] = await Promise.all([
+        WorkbookApi.getWorkbooks({
+          page: filters.page,
+          limit: filters.limit,
+          status: filters.status || undefined,
+          search: filters.search || undefined,
+        }),
+        SolutionApi.getAllWorkbooksProgress().catch(() => []), // 진도 로딩 실패해도 문제집은 표시
+      ]);
 
-      setWorkbooks(response.data);
-      setTotalPages(response.pagination.totalPages);
-      setTotalCount(response.pagination.total);
+      setWorkbooks(workbooksResponse.data);
+      setProgressData(progressResponse);
+      setTotalPages(workbooksResponse.pagination.totalPages);
+      setTotalCount(workbooksResponse.pagination.total);
     } catch (err) {
       setError(err instanceof Error ? err.message : '문제집 목록을 불러올 수 없습니다');
     } finally {
       setLoading(false);
     }
+  };
+
+  // 특정 문제집의 진도 조회
+  const getWorkbookProgress = (workbookId: string): WorkbookProgress | undefined => {
+    return progressData.find(p => p.workbookId === workbookId);
   };
 
   // 필터 변경 시 첫 페이지로 리셋
@@ -201,6 +213,36 @@ export const WorkbookList: React.FC<WorkbookListProps> = ({
                       <span>생성일: {new Date(workbook.createdAt).toLocaleDateString()}</span>
                     )}
                   </div>
+
+                  {/* 진도율 표시 */}
+                  {(() => {
+                    const progress = workbook.id ? getWorkbookProgress(workbook.id) : undefined;
+                    if (progress && progress.totalProblems > 0) {
+                      return (
+                        <div className="mt-3">
+                          <div className="flex justify-between items-center text-sm mb-1">
+                            <span className="text-gray-600">진도율</span>
+                            <span className="text-gray-700 font-medium">
+                              {progress.solvedProblems}/{progress.totalProblems} ({progress.progressPercentage}%)
+                            </span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div
+                              className={`h-2 rounded-full transition-all ${
+                                progress.progressPercentage >= 100
+                                  ? 'bg-green-500'
+                                  : progress.progressPercentage >= 50
+                                  ? 'bg-blue-500'
+                                  : 'bg-yellow-500'
+                              }`}
+                              style={{ width: `${Math.min(progress.progressPercentage, 100)}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
                 </div>
 
                 <div className="flex items-center gap-2 ml-4">

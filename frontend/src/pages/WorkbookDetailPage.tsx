@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { WorkbookApi, type Workbook } from '../services/workbookApi';
+import { WorkbookApi, type Workbook, type CreateWorkbookRequest } from '../services/workbookApi';
+import { SolutionApi, type WorkbookProgress } from '../services/solutionApi';
 import { WorkbookEditor } from '../components/WorkbookEditor';
 import { WorkbookForm } from '../components/WorkbookForm';
 
@@ -9,6 +10,7 @@ const WorkbookDetailPage: React.FC = () => {
   const navigate = useNavigate();
   
   const [workbook, setWorkbook] = useState<Workbook | null>(null);
+  const [progress, setProgress] = useState<WorkbookProgress | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
@@ -23,8 +25,14 @@ const WorkbookDetailPage: React.FC = () => {
 
     try {
       setLoading(true);
-      const workbookData = await WorkbookApi.getWorkbook(id);
+      // 문제집 정보와 진도 정보 동시 로딩
+      const [workbookData, progressData] = await Promise.all([
+        WorkbookApi.getWorkbook(id),
+        SolutionApi.getWorkbookProgress(id).catch(() => null), // 진도 로딩 실패해도 문제집은 표시
+      ]);
+      
       setWorkbook(workbookData);
+      setProgress(progressData);
     } catch (err) {
       setError(err instanceof Error ? err.message : '문제집을 불러올 수 없습니다');
     } finally {
@@ -44,7 +52,7 @@ const WorkbookDetailPage: React.FC = () => {
   // 문제집 생성 완료
   const handleCreateWorkbook = async (workbookData: Partial<Workbook>) => {
     try {
-      const newWorkbook = await WorkbookApi.createWorkbook(workbookData);
+      const newWorkbook = await WorkbookApi.createWorkbook(workbookData as CreateWorkbookRequest);
       setNotification({
         type: 'success',
         message: '문제집이 생성되었습니다.',
@@ -249,6 +257,38 @@ const WorkbookDetailPage: React.FC = () => {
                 <span>수정일: {new Date(workbook.updatedAt).toLocaleDateString()}</span>
               )}
             </div>
+
+            {/* 진도율 표시 */}
+            {progress && progress.totalProblems > 0 && (
+              <div className="mt-4">
+                <div className="flex justify-between items-center text-sm mb-2">
+                  <span className="text-gray-600 font-medium">학습 진도</span>
+                  <span className="text-gray-800 font-semibold">
+                    {progress.solvedProblems}/{progress.totalProblems} 문제 완료 ({progress.progressPercentage}%)
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3">
+                  <div
+                    className={`h-3 rounded-full transition-all ${
+                      progress.progressPercentage >= 100
+                        ? 'bg-green-500'
+                        : progress.progressPercentage >= 75
+                        ? 'bg-blue-500'
+                        : progress.progressPercentage >= 50
+                        ? 'bg-yellow-500'
+                        : 'bg-red-400'
+                    }`}
+                    style={{ width: `${Math.min(progress.progressPercentage, 100)}%` }}
+                  ></div>
+                </div>
+                {progress.progressPercentage >= 100 && (
+                  <div className="mt-2 flex items-center gap-2 text-sm text-green-700">
+                    <span>🎉</span>
+                    <span className="font-medium">모든 문제를 완료했습니다!</span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* 액션 버튼들 */}

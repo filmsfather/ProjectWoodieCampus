@@ -780,4 +780,87 @@ export class DatabaseService {
     if (error) throw error;
     return data || [];
   }
+
+  // 문제집의 총 문제 수 조회
+  static async getWorkbookProblemCount(workbookId: string): Promise<number> {
+    const { count, error } = await supabase
+      .from('problems')
+      .select('*', { count: 'exact' })
+      .eq('problem_set_id', workbookId);
+
+    if (error) throw error;
+    return count || 0;
+  }
+
+  // 사용자가 푼 문제집 내 문제들 조회
+  static async getWorkbookSolvedProblems(userId: string, workbookId: string) {
+    const { data, error } = await supabase
+      .from('solution_records')
+      .select(`
+        problem_id,
+        is_correct,
+        time_spent,
+        attempt_number,
+        submitted_at,
+        problem:problems!inner(
+          id,
+          title,
+          difficulty,
+          points,
+          problem_set_id
+        )
+      `)
+      .eq('user_id', userId)
+      .eq('is_correct', true)
+      .eq('problem.problem_set_id', workbookId)
+      .order('submitted_at', { ascending: false });
+
+    if (error) throw error;
+    
+    // 중복 문제 제거 (같은 문제를 여러 번 푼 경우 최신 것만)
+    const uniqueProblems = data?.reduce((acc, record) => {
+      if (!acc.find(item => item.problem_id === record.problem_id)) {
+        acc.push(record);
+      }
+      return acc;
+    }, [] as typeof data) || [];
+
+    return uniqueProblems;
+  }
+
+  // 모든 문제집 진도 요약 조회
+  static async getAllWorkbooksProgress(userId: string) {
+    const { data: workbooks, error: workbooksError } = await supabase
+      .from('problem_sets')
+      .select(`
+        id,
+        title,
+        description,
+        created_at
+      `);
+
+    if (workbooksError) throw workbooksError;
+
+    const progressData = await Promise.all(
+      workbooks?.map(async (workbook) => {
+        const totalProblems = await this.getWorkbookProblemCount(workbook.id);
+        const solvedProblems = await this.getWorkbookSolvedProblems(userId, workbook.id);
+        const progressPercentage = totalProblems > 0 
+          ? Math.round((solvedProblems.length / totalProblems) * 100)
+          : 0;
+
+        return {
+          workbookId: workbook.id,
+          title: workbook.title,
+          description: workbook.description,
+          totalProblems,
+          solvedProblems: solvedProblems.length,
+          progressPercentage,
+          createdAt: workbook.created_at,
+        };
+      }) || []
+    );
+
+    return progressData;
+  }
 }

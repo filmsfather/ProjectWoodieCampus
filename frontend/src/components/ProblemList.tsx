@@ -251,6 +251,13 @@ export const ProblemList: React.FC<ProblemListProps> = ({
                 </div>
 
                 <div className="flex items-center gap-2 ml-4">
+                  <Link
+                    to={`/problems/solve/${problem.id}`}
+                    className="px-3 py-2 text-white bg-green-600 hover:bg-green-700 rounded-lg border border-green-600 hover:border-green-700 transition-colors"
+                  >
+                    문제 풀기
+                  </Link>
+                  
                   {onEdit && (
                     <button
                       onClick={() => onEdit(problem)}
