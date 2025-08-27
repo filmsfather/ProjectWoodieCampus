@@ -319,8 +319,14 @@ export class DatabaseService {
 
     if (error) throw error;
 
+    // problem_count 데이터 변환
+    const processedData = (data || []).map(item => ({
+      ...item,
+      problem_count: item.problem_count?.[0]?.count || 0
+    }));
+
     return {
-      data: data || [],
+      data: processedData,
       pagination: {
         page,
         limit,
@@ -573,8 +579,14 @@ export class DatabaseService {
 
     if (error) throw error;
 
+    // problem_count 데이터 변환
+    const processedData = (data || []).map(item => ({
+      ...item,
+      problem_count: item.problem_count?.[0]?.count || 0
+    }));
+
     return {
-      data: data || [],
+      data: processedData,
       pagination: {
         page,
         limit,
