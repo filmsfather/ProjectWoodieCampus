@@ -16,7 +16,10 @@ const WorkbookDetailPage: React.FC = () => {
 
   // 문제집 정보 로드
   const loadWorkbook = async () => {
-    if (!id) return;
+    if (!id || id === 'create') {
+      setLoading(false);
+      return;
+    }
 
     try {
       setLoading(true);
@@ -30,7 +33,12 @@ const WorkbookDetailPage: React.FC = () => {
   };
 
   useEffect(() => {
-    loadWorkbook();
+    if (id === 'create') {
+      setEditMode(true);
+      setLoading(false);
+    } else {
+      loadWorkbook();
+    }
   }, [id]);
 
   // 문제집 수정 완료
