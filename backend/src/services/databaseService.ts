@@ -465,15 +465,14 @@ export class DatabaseService {
     if (completionRate >= 0.8) {
       // 이미 생성된 문제집 복습 스케줄이 있는지 확인
       const { data: existingSchedule, error: scheduleCheckError } = await supabase
-        .from('workbook_review_schedules')
+        .from('review_schedules')
         .select('id')
         .eq('user_id', userId)
         .eq('problem_set_id', problemSetId)
         .limit(1);
 
       if (scheduleCheckError && scheduleCheckError.code !== 'PGRST116') {
-        // 테이블이 없는 경우 생성
-        await this.createWorkbookReviewScheduleTable();
+        console.warn('문제집 복습 스케줄 조회 실패:', scheduleCheckError);
       }
 
       // 이미 스케줄이 없는 경우에만 생성
@@ -484,43 +483,6 @@ export class DatabaseService {
     }
   }
 
-  // 문제집 복습 스케줄 테이블 생성 (필요시)
-  static async createWorkbookReviewScheduleTable() {
-    try {
-      const createTableSQL = `
-        CREATE TABLE IF NOT EXISTS workbook_review_schedules (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-          problem_set_id UUID REFERENCES problem_sets(id) ON DELETE CASCADE,
-          
-          completion_rate DECIMAL(5,2) NOT NULL,
-          first_review_date DATE NOT NULL,
-          review_stage INTEGER DEFAULT 1 CHECK (review_stage >= 1 AND review_stage <= 4),
-          next_review_date DATE,
-          is_completed BOOLEAN DEFAULT false,
-          
-          created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-          updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-          
-          UNIQUE(user_id, problem_set_id)
-        );
-        
-        CREATE INDEX IF NOT EXISTS idx_workbook_review_schedules_user_next 
-          ON workbook_review_schedules(user_id, next_review_date) 
-          WHERE is_completed = false;
-      `;
-
-      const { error } = await supabase.rpc('exec_sql', {
-        sql_query: createTableSQL
-      });
-
-      if (error && !error.message?.includes('already exists')) {
-        throw error;
-      }
-    } catch (error) {
-      console.warn('문제집 복습 스케줄 테이블 생성 시도:', error);
-    }
-  }
 
   // 문제집 복습 일정 생성
   static async generateWorkbookReviewSchedule(userId: string, problemSetId: string, completionRate: number) {
@@ -528,14 +490,14 @@ export class DatabaseService {
     firstReviewDate.setDate(firstReviewDate.getDate() + 1); // 1일 후
 
     const { data, error } = await supabase
-      .from('workbook_review_schedules')
+      .from('review_schedules')
       .insert([{
         user_id: userId,
+        problem_id: null, // 문제집 복습이므로 개별 문제 ID는 null
         problem_set_id: problemSetId,
-        completion_rate: completionRate,
-        first_review_date: firstReviewDate.toISOString().split('T')[0],
-        next_review_date: firstReviewDate.toISOString().split('T')[0],
         review_stage: 1,
+        scheduled_date: firstReviewDate.toISOString().split('T')[0],
+        is_completed: false,
       }])
       .select()
       .single();
@@ -554,7 +516,7 @@ export class DatabaseService {
     const today = new Date().toISOString().split('T')[0];
 
     const { data, error } = await supabase
-      .from('workbook_review_schedules')
+      .from('review_schedules')
       .select(`
         *,
         problem_set:problem_sets(
@@ -562,13 +524,16 @@ export class DatabaseService {
           title,
           description,
           subject,
-          difficulty
+          grade_level,
+          estimated_time
         )
       `)
       .eq('user_id', userId)
       .eq('is_completed', false)
-      .lte('next_review_date', today)
-      .order('next_review_date', { ascending: true })
+      .is('problem_id', null) // 문제집 복습 (개별 문제가 아님)
+      .not('problem_set_id', 'is', null) // 문제집 ID가 있어야 함
+      .lte('scheduled_date', today)
+      .order('scheduled_date', { ascending: true })
       .order('review_stage', { ascending: true })
       .range(offset, offset + limit - 1);
 
@@ -576,7 +541,7 @@ export class DatabaseService {
 
     // 총 개수 조회
     const { count, error: countError } = await supabase
-      .from('workbook_review_schedules')
+      .from('review_schedules')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', userId)
       .eq('is_completed', false)
@@ -599,7 +564,7 @@ export class DatabaseService {
   static async completeWorkbookReview(scheduleId: string, success: boolean) {
     // 기존 스케줄 조회
     const { data: existingSchedule, error: fetchError } = await supabase
-      .from('workbook_review_schedules')
+      .from('review_schedules')
       .select('*')
       .eq('id', scheduleId)
       .single();
@@ -636,10 +601,11 @@ export class DatabaseService {
 
     // 스케줄 업데이트
     const { data, error } = await supabase
-      .from('workbook_review_schedules')
+      .from('review_schedules')
       .update({
         review_stage: newReviewStage,
-        next_review_date: nextReviewDate,
+        scheduled_date: nextReviewDate,
+        completed_date: isCompleted ? new Date().toISOString().split('T')[0] : null,
         is_completed: isCompleted,
         updated_at: new Date().toISOString(),
       })
@@ -803,9 +769,8 @@ export class DatabaseService {
           title,
           subject,
           difficulty,
-          question,
+          content,
           problem_type,
-          options,
           answer
         ),
         problem_set:problem_sets(
