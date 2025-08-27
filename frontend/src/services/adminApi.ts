@@ -46,7 +46,7 @@ export interface ApiResponse<T = any> {
 
 // API 클래스
 export class AdminApi {
-  private static baseUrl = config.apiUrl;
+  private static baseUrl = config.api.baseUrl;
 
   // 인증 토큰 가져오기
   private static getAuthToken(): string | null {
@@ -102,14 +102,14 @@ export class AdminApi {
     if (params.search) queryParams.append('search', params.search);
     if (params.isActive !== undefined) queryParams.append('isActive', params.isActive.toString());
 
-    const endpoint = `/api/admin/users${queryParams.toString() ? `?${queryParams}` : ''}`;
+    const endpoint = `/admin/users${queryParams.toString() ? `?${queryParams}` : ''}`;
     const response = await this.request<UsersResponse>(endpoint);
     return response.data!;
   }
 
   // 새 사용자 생성
   static async createUser(userData: CreateUserRequest): Promise<{ user: User }> {
-    const response = await this.request<{ user: User }>('/api/admin/users', {
+    const response = await this.request<{ user: User }>('/admin/users', {
       method: 'POST',
       body: JSON.stringify(userData),
     });
@@ -118,7 +118,7 @@ export class AdminApi {
 
   // 사용자 역할 변경
   static async updateUserRole(userId: string, roleData: UpdateUserRoleRequest): Promise<void> {
-    await this.request(`/api/admin/users/${userId}/role`, {
+    await this.request(`/admin/users/${userId}/role`, {
       method: 'PUT',
       body: JSON.stringify(roleData),
     });
@@ -126,21 +126,21 @@ export class AdminApi {
 
   // 사용자 계정 삭제 (비활성화)
   static async deleteUser(userId: string): Promise<void> {
-    await this.request(`/api/admin/users/${userId}`, {
+    await this.request(`/admin/users/${userId}`, {
       method: 'DELETE',
     });
   }
 
   // 사용자 계정 활성화
   static async activateUser(userId: string): Promise<void> {
-    await this.request(`/api/admin/users/${userId}/activate`, {
+    await this.request(`/admin/users/${userId}/activate`, {
       method: 'PUT',
     });
   }
 
   // 사용자 비밀번호 재설정
   static async resetUserPassword(userId: string, passwordData: ResetPasswordRequest): Promise<void> {
-    await this.request(`/api/admin/users/${userId}/reset-password`, {
+    await this.request(`/admin/users/${userId}/reset-password`, {
       method: 'POST',
       body: JSON.stringify(passwordData),
     });
