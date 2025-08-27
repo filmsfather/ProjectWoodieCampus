@@ -27,17 +27,12 @@ services:
   frontend:
     build:
       context: ./frontend
-      target: development
+      target: production
       args:
         - VITE_API_BASE_URL=/api
         - VITE_SUPABASE_URL=${SUPABASE_URL}
         - VITE_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
     container_name: woodie-frontend
-    environment:
-      - VITE_API_BASE_URL=/api
-      - VITE_SUPABASE_URL=${SUPABASE_URL}
-      - VITE_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
-      - VITE_DEV_MODE=false
     networks:
       - woodie-network
     restart: unless-stopped

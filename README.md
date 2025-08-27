@@ -17,7 +17,7 @@
 - Docker & Docker Compose
 - Node.js 20+ (로컬 개발시)
 
-### 개발 환경 실행
+### ⚡ 통합 배포 스크립트 (권장)
 
 ```bash
 # 1. 프로젝트 클론
@@ -25,13 +25,23 @@ git clone <repository-url>
 cd ProjectWoodieCampus
 
 # 2. 환경변수 설정
-cp .env.docker .env
+cp .env.production .env.prod
+nano .env.prod  # 실제 값으로 수정
 
-# 3. Docker Compose로 전체 스택 실행
-npm run dev
+# 3. 통합 배포 스크립트 실행
+./deploy.sh          # 인터랙티브 모드 (환경 선택)
+./deploy.sh dev      # 개발환경 직접 실행
+./deploy.sh prod     # 운영환경 직접 실행
+```
 
-# 또는 직접 Docker Compose 사용
+### 기존 방식 (Docker Compose 직접 사용)
+
+```bash
+# 개발 환경
 docker-compose up -d
+
+# 운영 환경  
+docker-compose -f docker-compose.prod.yml up -d
 ```
 
 ### 접속 URL
