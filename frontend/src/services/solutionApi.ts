@@ -59,7 +59,7 @@ export interface WorkbookProgress {
 export class SolutionApi {
   // 답안 제출
   static async submitSolution(submission: SolutionSubmission): Promise<SolutionResult> {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     
     const response = await fetch(`${API_BASE_URL}/solutions`, {
       method: 'POST',
@@ -93,7 +93,7 @@ export class SolutionApi {
       totalPages: number;
     };
   }> {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     const searchParams = new URLSearchParams();
     
     if (params.page) searchParams.append('page', params.page.toString());
@@ -117,7 +117,7 @@ export class SolutionApi {
 
   // 특정 문제의 사용자 풀이 상태 확인
   static async getProblemStatus(problemId: string): Promise<ProblemStatus> {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     
     const response = await fetch(`${API_BASE_URL}/solutions/status/${problemId}`, {
       headers: {
@@ -169,7 +169,7 @@ export class SolutionApi {
 
   // 문제집 진도 조회
   static async getWorkbookProgress(workbookId: string): Promise<WorkbookProgress> {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     
     const response = await fetch(`${API_BASE_URL}/solutions/workbook/${workbookId}/progress`, {
       headers: {
@@ -188,7 +188,7 @@ export class SolutionApi {
 
   // 모든 문제집 진도 요약 조회
   static async getAllWorkbooksProgress(): Promise<WorkbookProgress[]> {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     
     const response = await fetch(`${API_BASE_URL}/solutions/workbooks/progress`, {
       headers: {
