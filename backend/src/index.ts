@@ -16,12 +16,14 @@ import uploadRoutes from './routes/upload';
 import workbookRoutes from './routes/workbookRoutes';
 import solutionRoutes from './routes/solutionRoutes';
 import reviewRoutes from './routes/reviewRoutes';
+import schedulerRoutes from './routes/schedulerRoutes';
 
 // Import Supabase connection
 import { testSupabaseConnection } from './config/supabase';
 import { config, validateConfig } from './config';
 import { autoSeedAdminIfNeeded } from './scripts/seedAdmin';
 import { setupStorageBucket } from './scripts/setupStorage';
+import { SchedulerService } from './services/schedulerService';
 
 // Load environment variables
 dotenv.config();
@@ -77,6 +79,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/workbooks', workbookRoutes);
 app.use('/api/solutions', solutionRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/scheduler', schedulerRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
@@ -105,6 +108,9 @@ app.listen(PORT, async () => {
   
   // Auto-seed admin account if needed
   await autoSeedAdminIfNeeded();
+  
+  // Initialize scheduler service
+  SchedulerService.initialize();
 });
 
 export default app;

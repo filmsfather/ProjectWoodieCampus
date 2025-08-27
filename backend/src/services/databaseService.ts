@@ -5,6 +5,9 @@ import { User, Problem, ProblemSet, ProblemSetProblem } from '../types';
 export { supabase };
 
 export class DatabaseService {
+  // Export supabase client as static property for direct access
+  static supabase = supabase;
+  
   // User related operations
   static async createUser(userData: {
     username: string;

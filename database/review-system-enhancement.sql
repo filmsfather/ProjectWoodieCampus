@@ -1,5 +1,11 @@
 -- Review System Enhancement SQL
 -- 복습 시스템 성능 최적화 및 기능 확장
+-- 
+-- ✅ APPLIED TO SUPABASE: 2025-08-27
+-- ✅ VERSION: v0.9.0
+-- ✅ STATUS: COMPLETED - 이 스크립트는 이미 Supabase에 적용되었습니다
+-- 
+-- 이 파일은 마이그레이션 이력 보관용입니다. 재실행하지 마세요.
 
 -- 복습 이력 추적 테이블
 CREATE TABLE IF NOT EXISTS review_history (
