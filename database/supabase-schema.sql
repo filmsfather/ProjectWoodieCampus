@@ -39,6 +39,7 @@ CREATE TABLE problems (
     topic VARCHAR(100),
     problem_type VARCHAR(50) DEFAULT 'multiple_choice' CHECK (problem_type IN ('multiple_choice', 'short_answer', 'essay', 'true_false')),
     points INTEGER DEFAULT 1,
+    problem_set_id UUID REFERENCES problem_sets(id) ON DELETE SET NULL,
     created_by UUID REFERENCES users(id) ON DELETE CASCADE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -56,7 +57,8 @@ CREATE TABLE problem_sets (
     created_by UUID REFERENCES users(id) ON DELETE CASCADE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    is_active BOOLEAN DEFAULT true
+    is_active BOOLEAN DEFAULT true,
+    status VARCHAR(20) NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'published', 'archived'))
 );
 
 -- Problem Set Problems junction table - 문제집-문제 매핑
@@ -85,7 +87,7 @@ CREATE TABLE solution_records (
     -- 복습 관련 필드
     next_review_date TIMESTAMP WITH TIME ZONE,
     review_count INTEGER DEFAULT 0,
-    mastery_level INTEGER DEFAULT 0 CHECK (mastery_level >= 0 AND mastery_level <= 4)
+    mastery_level INTEGER DEFAULT 0 CHECK (mastery_level >= 0 AND mastery_level <= 10)
 );
 
 -- Review Schedules table - 복습 스케줄 (에빙하우스 망각곡선)
@@ -114,6 +116,7 @@ CREATE INDEX idx_problems_subject ON problems(subject);
 CREATE INDEX idx_problems_difficulty ON problems(difficulty);
 CREATE INDEX idx_problems_created_by ON problems(created_by);
 CREATE INDEX idx_problems_topic ON problems(topic);
+CREATE INDEX idx_problems_problem_set ON problems(problem_set_id);
 
 CREATE INDEX idx_problem_sets_subject ON problem_sets(subject);
 CREATE INDEX idx_problem_sets_created_by ON problem_sets(created_by);
