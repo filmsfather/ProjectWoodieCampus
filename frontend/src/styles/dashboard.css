@@ -1,0 +1,765 @@
+/* 대시보드 공통 스타일 */
+.dashboard-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 20px;
+}
+
+.dashboard-page.loading, .dashboard-page.error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 로딩 스피너 */
+.loading-spinner {
+  text-align: center;
+  padding: 40px;
+}
+
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 에러 메시지 */
+.error-message {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 400px;
+}
+
+.error-message h3 {
+  margin-bottom: 12px;
+  color: #dc3545;
+}
+
+.retry-btn, .login-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 16px;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.retry-btn:hover, .login-btn:hover {
+  background: #0056b3;
+}
+
+/* 대시보드 헤더 */
+.dashboard-header {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.dashboard-header h1 {
+  margin: 0 0 8px 0;
+  color: #2c3e50;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.dashboard-header p {
+  margin: 0;
+  color: #6c757d;
+  font-size: 1.1rem;
+}
+
+/* 대시보드 콘텐츠 */
+.dashboard-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 통계 섹션 */
+.stats-section, .content-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+/* 통계 카드 */
+.stat-card {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.stat-icon {
+  font-size: 2.5rem;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(0, 123, 255, 0.1);
+}
+
+.stat-content h3 {
+  margin: 0 0 4px 0;
+  color: #495057;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-number {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+  line-height: 1;
+}
+
+.stat-label {
+  color: #6c757d;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* 통계 카드 색상 변형 */
+.stat-card.primary .stat-icon { background: rgba(0, 123, 255, 0.1); }
+.stat-card.success .stat-icon { background: rgba(40, 167, 69, 0.1); }
+.stat-card.warning .stat-icon { background: rgba(255, 193, 7, 0.1); }
+.stat-card.info .stat-icon { background: rgba(23, 162, 184, 0.1); }
+.stat-card.secondary .stat-icon { background: rgba(108, 117, 125, 0.1); }
+
+/* 시스템 건강도 */
+.system-health {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.health-indicator {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.health-icon {
+  font-size: 2rem;
+}
+
+.health-content h3 {
+  margin: 0 0 4px 0;
+  color: #2c3e50;
+  font-size: 1.2rem;
+}
+
+.health-status {
+  font-weight: 600;
+  margin: 0;
+}
+
+.health-status.healthy { color: #28a745; }
+.health-status.warning { color: #ffc107; }
+.health-status.error { color: #dc3545; }
+
+/* 숙련도 분포 차트 */
+.mastery-distribution {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.mastery-distribution h2 {
+  margin: 0 0 20px 0;
+  color: #2c3e50;
+  font-size: 1.5rem;
+}
+
+.mastery-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mastery-bar {
+  height: 60px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f8f9fa;
+  position: relative;
+}
+
+.mastery-levels {
+  display: flex;
+  height: 100%;
+}
+
+.mastery-level {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-weight: 600;
+  font-size: 0.85rem;
+  position: relative;
+  min-width: 60px;
+  transition: all 0.3s ease;
+}
+
+.mastery-level:hover {
+  filter: brightness(1.1);
+  transform: scaleY(1.05);
+}
+
+.mastery-level.level-0 { background: #6c757d; }
+.mastery-level.level-1 { background: #ffc107; }
+.mastery-level.level-2 { background: #fd7e14; }
+.mastery-level.level-3 { background: #dc3545; }
+.mastery-level.completed { background: #28a745; }
+
+.level-label {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
+.level-count {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.mastery-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+
+.legend-color.level-0 { background: #6c757d; }
+.legend-color.level-1 { background: #ffc107; }
+.legend-color.level-2 { background: #fd7e14; }
+.legend-color.level-3 { background: #dc3545; }
+.legend-color.completed { background: #28a745; }
+
+/* 빠른 작업 */
+.quick-actions, .admin-actions {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.quick-actions h2, .admin-actions h2 {
+  margin: 0 0 20px 0;
+  color: #2c3e50;
+  font-size: 1.5rem;
+}
+
+.action-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  border: none;
+  border-radius: 12px;
+  background: white;
+  border: 2px solid #e9ecef;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.action-btn.primary { border-color: #007bff; }
+.action-btn.primary:hover { background: rgba(0, 123, 255, 0.05); }
+
+.action-btn.success { border-color: #28a745; }
+.action-btn.success:hover { background: rgba(40, 167, 69, 0.05); }
+
+.action-btn.info { border-color: #17a2b8; }
+.action-btn.info:hover { background: rgba(23, 162, 184, 0.05); }
+
+.action-btn.warning { border-color: #ffc107; }
+.action-btn.warning:hover { background: rgba(255, 193, 7, 0.05); }
+
+.action-icon {
+  font-size: 2rem;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(0, 123, 255, 0.1);
+}
+
+.action-content h4 {
+  margin: 0 0 4px 0;
+  color: #2c3e50;
+  font-size: 1.1rem;
+}
+
+.action-content p {
+  margin: 0;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+/* 목록 스타일 */
+.today-reviews, .my-workbooks, .recent-workbooks, .recent-problems, .recent-users, .system-logs, .recent-activities {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.today-reviews h2, .my-workbooks h2, .recent-workbooks h2, .recent-problems h2, .recent-users h2, .system-logs h2, .recent-activities h2 {
+  margin: 0 0 20px 0;
+  color: #2c3e50;
+  font-size: 1.5rem;
+}
+
+/* 복습 목록 */
+.review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.review-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  transition: border-color 0.2s;
+}
+
+.review-item:hover {
+  border-color: #007bff;
+}
+
+.review-content h4 {
+  margin: 0 0 4px 0;
+  color: #2c3e50;
+  font-size: 1.1rem;
+}
+
+.review-subject {
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin: 0 0 8px 0;
+}
+
+.review-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mastery-badge, .difficulty-badge, .subject-badge, .grade-badge, .time-badge, .problem-count-badge, .type-badge, .role-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.mastery-badge.level-0 { background: #6c757d; color: white; }
+.mastery-badge.level-1 { background: #ffc107; color: black; }
+.mastery-badge.level-2 { background: #fd7e14; color: white; }
+.mastery-badge.level-3 { background: #dc3545; color: white; }
+
+.difficulty-badge, .type-badge { background: #e9ecef; color: #495057; }
+.subject-badge { background: #007bff; color: white; }
+.grade-badge { background: #17a2b8; color: white; }
+.time-badge, .problem-count-badge { background: #28a745; color: white; }
+
+.role-badge.admin { background: #dc3545; color: white; }
+.role-badge.teacher { background: #ffc107; color: black; }
+.role-badge.student { background: #28a745; color: white; }
+
+.review-btn, .workbook-btn, .edit-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.review-btn:hover, .workbook-btn:hover, .edit-btn:hover {
+  background: #0056b3;
+}
+
+/* 문제집/문제 목록 */
+.workbook-list, .problem-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.workbook-item, .problem-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.workbook-item:hover, .problem-item:hover {
+  border-color: #007bff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.workbook-content h4, .problem-content h4 {
+  margin: 0 0 8px 0;
+  color: #2c3e50;
+  font-size: 1.2rem;
+}
+
+.workbook-description, .problem-preview {
+  color: #6c757d;
+  font-size: 0.95rem;
+  margin: 0 0 12px 0;
+  line-height: 1.4;
+}
+
+.workbook-meta, .problem-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* 사용자 목록 */
+.user-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.user-item {
+  padding: 16px;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  transition: border-color 0.2s;
+}
+
+.user-item:hover {
+  border-color: #007bff;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #007bff;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.user-content h4 {
+  margin: 0 0 4px 0;
+  color: #2c3e50;
+  font-size: 1.1rem;
+}
+
+.user-email {
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin: 0 0 8px 0;
+}
+
+.user-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.join-date {
+  color: #6c757d;
+  font-size: 0.8rem;
+}
+
+/* 활동 목록 */
+.activity-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.activity-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.activity-label {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.activity-value {
+  color: #2c3e50;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.activity-value.success { color: #28a745; }
+.activity-value.error { color: #dc3545; }
+
+.activity-list, .log-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.activity-item, .log-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 6px;
+  background: #f8f9fa;
+}
+
+.activity-time, .log-time {
+  color: #6c757d;
+  font-size: 0.85rem;
+  min-width: 60px;
+}
+
+.activity-desc, .log-message {
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.log-icon {
+  font-size: 1.2rem;
+  width: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.log-content {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 빈 상태 메시지 */
+.no-reviews, .no-workbooks, .no-problems, .no-users, .no-logs, .no-activities {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6c757d;
+}
+
+.no-reviews p, .no-workbooks p, .no-problems p, .no-users p, .no-logs p, .no-activities p {
+  margin: 8px 0;
+}
+
+/* Sidebar 사용자 정보 스타일 */
+.user-info {
+  padding: 16px 0;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #007bff;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.user-details {
+  flex: 1;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.95rem;
+  margin-bottom: 2px;
+}
+
+.user-role {
+  color: #6c757d;
+  font-size: 0.8rem;
+}
+
+.user-stats {
+  margin-bottom: 16px;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+}
+
+.stat-label {
+  color: #6c757d;
+}
+
+.stat-value {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.logout-btn {
+  width: 100%;
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.logout-btn:hover {
+  background: #c82333;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .dashboard-page {
+    padding: 12px;
+  }
+  
+  .stats-section, .content-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .action-buttons {
+    grid-template-columns: 1fr;
+  }
+  
+  .stat-card {
+    padding: 16px;
+  }
+  
+  .stat-icon {
+    font-size: 2rem;
+    width: 50px;
+    height: 50px;
+  }
+  
+  .stat-number {
+    font-size: 1.8rem;
+  }
+  
+  .dashboard-header {
+    padding: 16px;
+  }
+  
+  .dashboard-header h1 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .review-item, .workbook-item, .problem-item {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+  
+  .review-meta, .workbook-meta, .problem-meta {
+    margin-top: 8px;
+  }
+  
+  .mastery-legend {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

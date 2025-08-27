@@ -1,66 +1,79 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { AuthService } from '../services/authService';
+import StudentDashboard from '../components/dashboards/StudentDashboard';
+import TeacherDashboard from '../components/dashboards/TeacherDashboard';
+import AdminDashboard from '../components/dashboards/AdminDashboard';
+
+interface User {
+  id: string;
+  username: string;
+  email: string;
+  role: string;
+  fullName?: string;
+}
 
 const DashboardPage: React.FC = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // 현재 로그인된 사용자 정보 가져오기
+    const currentUser = AuthService.getCurrentUser();
+    if (currentUser) {
+      setUser(currentUser);
+    }
+    setLoading(false);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="dashboard-page loading">
+        <div className="loading-spinner">
+          <div className="spinner"></div>
+          <p>대시보드를 로드하고 있습니다...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="dashboard-page error">
+        <div className="error-message">
+          <h3>❌ 인증 오류</h3>
+          <p>로그인 정보를 찾을 수 없습니다.</p>
+          <button onClick={() => window.location.href = '/login'} className="login-btn">
+            로그인하기
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // 역할에 따른 대시보드 렌더링
+  const renderDashboard = () => {
+    switch (user.role) {
+      case 'student':
+        return <StudentDashboard userId={user.id} />;
+      case 'teacher':
+        return <TeacherDashboard userId={user.id} />;
+      case 'admin':
+        return <AdminDashboard userId={user.id} />;
+      default:
+        return (
+          <div className="dashboard-page error">
+            <div className="error-message">
+              <h3>❓ 알 수 없는 역할</h3>
+              <p>사용자 역할을 확인할 수 없습니다: {user.role}</p>
+            </div>
+          </div>
+        );
+    }
+  };
+
   return (
     <div className="dashboard-page">
-      <div className="dashboard-header">
-        <h1>대시보드</h1>
-        <p>오늘의 학습 현황을 확인하세요</p>
-      </div>
-      
-      <div className="dashboard-content">
-        <div className="stats-section">
-          <div className="stat-card">
-            <h3>오늘의 복습</h3>
-            <p className="stat-number">5</p>
-            <p className="stat-label">문제</p>
-          </div>
-          
-          <div className="stat-card">
-            <h3>학습 진도</h3>
-            <p className="stat-number">75%</p>
-            <p className="stat-label">완료</p>
-          </div>
-          
-          <div className="stat-card">
-            <h3>연속 학습</h3>
-            <p className="stat-number">7</p>
-            <p className="stat-label">일</p>
-          </div>
-        </div>
-        
-        <div className="recent-activities">
-          <h2>최근 활동</h2>
-          <div className="activity-list">
-            <div className="activity-item">
-              <span className="activity-time">10:30</span>
-              <span className="activity-desc">수학 문제집 완료</span>
-            </div>
-            <div className="activity-item">
-              <span className="activity-time">09:15</span>
-              <span className="activity-desc">영어 단어 복습</span>
-            </div>
-            <div className="activity-item">
-              <span className="activity-time">08:45</span>
-              <span className="activity-desc">과학 개념 정리</span>
-            </div>
-          </div>
-        </div>
-        
-        <div className="upcoming-reviews">
-          <h2>예정된 복습</h2>
-          <div className="review-list">
-            <div className="review-item">
-              <span className="review-subject">수학</span>
-              <span className="review-time">내일 오전 9시</span>
-            </div>
-            <div className="review-item">
-              <span className="review-subject">영어</span>
-              <span className="review-time">3일 후</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      {renderDashboard()}
     </div>
   );
 };

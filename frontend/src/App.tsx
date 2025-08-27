@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
+import PrivateRoute from './components/PrivateRoute';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
@@ -30,27 +31,55 @@ function App() {
             <Route path="login" element={<LoginPage />} />
           </Route>
           
-          {/* 인증이 필요한 라우트 */}
-          <Route path="/dashboard" element={<Layout showSidebar={true} />}>
+          {/* 인증이 필요한 라우트 - 모든 역할 접근 가능 */}
+          <Route path="/dashboard" element={
+            <PrivateRoute>
+              <Layout showSidebar={true} />
+            </PrivateRoute>
+          }>
             <Route index element={<DashboardPage />} />
           </Route>
           
-          <Route path="/problems" element={<Layout showSidebar={true} />}>
+          {/* 문제 관리 - 교사와 관리자만 접근 가능 */}
+          <Route path="/problems" element={
+            <PrivateRoute allowedRoles={['teacher', 'admin']}>
+              <Layout showSidebar={true} />
+            </PrivateRoute>
+          }>
             <Route index element={<ProblemsPage />} />
             <Route path="create" element={<CreateProblemPage />} />
-            <Route path="solve/:problemId" element={<SolveProblemPage />} />
+            <Route path="solve/:problemId" element={
+              <PrivateRoute>
+                <SolveProblemPage />
+              </PrivateRoute>
+            } />
           </Route>
           
-          <Route path="/workbooks" element={<Layout showSidebar={true} />}>
+          {/* 문제집 관리 - 모든 역할 접근 가능 */}
+          <Route path="/workbooks" element={
+            <PrivateRoute>
+              <Layout showSidebar={true} />
+            </PrivateRoute>
+          }>
             <Route index element={<WorkbooksPage />} />
             <Route path=":id" element={<WorkbookDetailPage />} />
           </Route>
           
-          <Route path="/admin" element={<Layout showSidebar={true} />}>
+          {/* 관리자 페이지 - 관리자만 접근 가능 */}
+          <Route path="/admin" element={
+            <PrivateRoute allowedRoles={['admin']}>
+              <Layout showSidebar={true} />
+            </PrivateRoute>
+          }>
             <Route index element={<AdminPage />} />
           </Route>
 
-          <Route path="/upload-test" element={<Layout showSidebar={true} />}>
+          {/* 테스트 페이지 - 관리자와 교사만 접근 가능 */}
+          <Route path="/upload-test" element={
+            <PrivateRoute allowedRoles={['admin', 'teacher']}>
+              <Layout showSidebar={true} />
+            </PrivateRoute>
+          }>
             <Route index element={<ImageUploadTestPage />} />
           </Route>
           
