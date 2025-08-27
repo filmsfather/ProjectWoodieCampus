@@ -395,7 +395,7 @@ const SolveProblemPage: React.FC = () => {
                     </p>
                     {submissionResult.masteryLevel > 0 && (
                       <p className={submissionResult.isCorrect ? 'text-green-700' : 'text-red-700'}>
-                        숙련도: {submissionResult.masteryLevel}/10
+                        숙련도: {submissionResult.masteryLevel}/4
                       </p>
                     )}
                   </div>

@@ -87,7 +87,7 @@ CREATE TABLE solution_records (
     -- 복습 관련 필드
     next_review_date TIMESTAMP WITH TIME ZONE,
     review_count INTEGER DEFAULT 0,
-    mastery_level INTEGER DEFAULT 0 CHECK (mastery_level >= 0 AND mastery_level <= 10)
+    mastery_level INTEGER DEFAULT 0 CHECK (mastery_level >= 0 AND mastery_level <= 4)
 );
 
 -- Review Schedules table - 복습 스케줄 (에빙하우스 망각곡선)
