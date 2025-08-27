@@ -390,7 +390,7 @@ export class DatabaseService {
       .insert([{
         user_id: recordData.userId,
         problem_id: recordData.problemId,
-        problem_set_id: recordData.problemSetId,
+        problem_set_id: recordData.problemSetId || null,
         user_answer: recordData.userAnswer,
         is_correct: recordData.isCorrect,
         time_spent: recordData.timeSpent,
@@ -408,7 +408,7 @@ export class DatabaseService {
       await DatabaseService.createReviewSchedule({
         userId: recordData.userId,
         problemId: recordData.problemId,
-        problemSetId: recordData.problemSetId || '',
+        problemSetId: recordData.problemSetId || null,
         reviewStage: masteryLevel + 1,
         scheduledDate: nextReviewDate.split('T')[0], // YYYY-MM-DD 형식으로 변환
       });
@@ -509,7 +509,7 @@ export class DatabaseService {
   static async createReviewSchedule(scheduleData: {
     userId: string;
     problemId: string;
-    problemSetId: string;
+    problemSetId: string | null;
     reviewStage: number;
     scheduledDate: string;
   }) {
