@@ -391,8 +391,9 @@ export class DatabaseService {
     page?: number;
     limit?: number;
     problemSetId?: string;
+    problemId?: string;
   } = {}) {
-    const { page = 1, limit = 10, problemSetId } = filters;
+    const { page = 1, limit = 10, problemSetId, problemId } = filters;
     const offset = (page - 1) * limit;
 
     let query = supabase
@@ -405,6 +406,7 @@ export class DatabaseService {
       .eq('user_id', userId);
 
     if (problemSetId) query = query.eq('problem_set_id', problemSetId);
+    if (problemId) query = query.eq('problem_id', problemId);
 
     const { data, error, count } = await query
       .range(offset, offset + limit - 1)

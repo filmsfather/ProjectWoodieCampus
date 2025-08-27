@@ -19,8 +19,8 @@
 
 ### **액션 1: EC2 인스턴스 준비**
 ```bash
-# SSH로 EC2 인스턴스 접속
-ssh -i your-key.pem ubuntu@your-ec2-ip
+# SSH로 EC2 인스턴스 접속 (실제 명령어)
+ssh -i ProjectWoodieCampus.pem ubuntu@43.200.169.149
 
 # 시스템 업데이트
 sudo apt update && sudo apt upgrade -y
@@ -79,9 +79,9 @@ SUPABASE_SERVICE_ROLE_KEY=실제_supabase_service_role_키
 # Admin Account
 ADMIN_PASSWORD=강력한_관리자_비밀번호
 
-# CORS & API URLs (EC2 퍼블릭 IP로 변경)
-CORS_ORIGIN=http://YOUR_EC2_PUBLIC_IP
-VITE_API_BASE_URL=http://YOUR_EC2_PUBLIC_IP
+# CORS & API URLs (현재 EC2 퍼블릭 IP: 43.200.169.149)
+CORS_ORIGIN=http://43.200.169.149
+VITE_API_BASE_URL=http://43.200.169.149
 ```
 
 **✅ 확인**: 모든 `your-`, `실제_` 값들이 실제 값으로 변경되었는지 확인
@@ -125,9 +125,9 @@ docker-compose -f docker-compose.prod.yml logs frontend
 ```
 
 브라우저에서 접속:
-- **프론트엔드**: `http://YOUR_EC2_PUBLIC_IP`
-- **백엔드 헬스체크**: `http://YOUR_EC2_PUBLIC_IP/health`
-- **API**: `http://YOUR_EC2_PUBLIC_IP/api`
+- **프론트엔드**: `http://43.200.169.149`
+- **백엔드 헬스체크**: `http://43.200.169.149/health`
+- **API**: `http://43.200.169.149/api`
 
 **✅ 확인**: 웹사이트가 정상적으로 로드되는지 확인
 
