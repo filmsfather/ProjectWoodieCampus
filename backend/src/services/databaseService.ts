@@ -619,7 +619,7 @@ export class DatabaseService {
 
     // Sort problems by order
     if (data?.problems) {
-      data.problems = data.problems.sort((a, b) => a.order_index - b.order_index);
+      data.problems = data.problems.sort((a: any, b: any) => a.order_index - b.order_index);
     }
 
     return data;
