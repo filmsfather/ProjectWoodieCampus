@@ -23,7 +23,7 @@ export const config = {
   cors: {
     origin: process.env.CORS_ORIGIN ? 
       process.env.CORS_ORIGIN.split(',') : 
-      ['http://localhost:3000', 'http://localhost:5173'], // React, Vite dev servers
+      ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5174'], // React, Vite dev servers
   }
 };
 

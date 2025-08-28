@@ -42,7 +42,10 @@ app.set('trust proxy', 1);
 
 // Security middleware
 app.use(SecurityMiddleware.securityHeaders);
-app.use(SecurityMiddleware.validateUserAgent);
+// 개발 환경에서는 User-Agent 검증 건너뛰기 (curl, Postman 등 테스트 도구 허용)
+if (config.server.env !== 'development') {
+  app.use(SecurityMiddleware.validateUserAgent);
+}
 app.use(SecurityMiddleware.validateInput);
 app.use(SecurityMiddleware.slowDownAttacks);
 app.use(SecurityMiddleware.apiRateLimit);

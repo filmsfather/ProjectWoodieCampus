@@ -31,4 +31,33 @@ router.post('/users/:id/reset-password',
   AdminController.resetUserPassword
 );
 
+// =================== 반 관리 API (관리자 전용) ===================
+
+// 반 관리 API
+// GET /api/admin/classes - 모든 반 목록 조회
+router.get('/classes', AdminController.getAllClasses);
+
+// POST /api/admin/classes - 새 반 생성
+router.post('/classes', AdminController.createClass);
+
+// PUT /api/admin/classes/:id - 반 정보 수정
+router.put('/classes/:id', AdminController.updateClass);
+
+// DELETE /api/admin/classes/:id - 반 삭제
+router.delete('/classes/:id', AdminController.deleteClass);
+
+// 선생님-반 배정 관리 API
+// POST /api/admin/teachers/:teacherId/classes/:classId - 선생님을 반에 배정
+router.post('/teachers/:teacherId/classes/:classId', AdminController.assignTeacherToClass);
+
+// DELETE /api/admin/teachers/:teacherId/classes/:classId - 선생님을 반에서 제거
+router.delete('/teachers/:teacherId/classes/:classId', AdminController.removeTeacherFromClass);
+
+// 학생-반 배정 관리 API
+// POST /api/admin/classes/:classId/students/:studentId - 학생을 반에 배정
+router.post('/classes/:classId/students/:studentId', AdminController.assignStudentToClass);
+
+// DELETE /api/admin/classes/:classId/students/:studentId - 학생을 반에서 제거
+router.delete('/classes/:classId/students/:studentId', AdminController.removeStudentFromClass);
+
 export default router;

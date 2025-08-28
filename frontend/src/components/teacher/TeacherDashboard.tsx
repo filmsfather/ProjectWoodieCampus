@@ -9,6 +9,7 @@ import {
   BookOpenIcon
 } from '@heroicons/react/24/outline';
 import { teacherApi, classApi } from '../../services/teacherApi';
+import { AdminApi } from '../../services/adminApi';
 import type { Class, Student, ClassStats } from '../../services/teacherApi';
 import { useAuth } from '../../hooks/useAuth';
 import CreateClassModal from './CreateClassModal';
@@ -55,7 +56,12 @@ const TeacherDashboard: React.FC = () => {
 
   const handleCreateClass = async (classData: any) => {
     try {
-      await teacherApi.createClass(classData);
+      // 관리자만 반 생성 가능
+      if (user?.role === 'admin') {
+        await AdminApi.createClass(classData);
+      } else {
+        throw new Error('관리자만 반을 생성할 수 있습니다.');
+      }
       await loadClasses();
       setShowCreateModal(false);
     } catch (error) {
@@ -66,7 +72,12 @@ const TeacherDashboard: React.FC = () => {
 
   const handleEditClass = async (classId: string, classData: any) => {
     try {
-      await teacherApi.updateClass(classId, classData);
+      // 관리자만 반 수정 가능
+      if (user?.role === 'admin') {
+        await AdminApi.updateClass(classId, classData);
+      } else {
+        throw new Error('관리자만 반을 수정할 수 있습니다.');
+      }
       await loadClasses();
       setShowEditModal(false);
       setSelectedClass(null);
@@ -82,7 +93,13 @@ const TeacherDashboard: React.FC = () => {
     }
 
     try {
-      await teacherApi.deleteClass(classId);
+      // 관리자만 반 삭제 가능
+      if (user?.role === 'admin') {
+        await AdminApi.deleteClass(classId);
+      } else {
+        alert('관리자만 반을 삭제할 수 있습니다.');
+        return;
+      }
       await loadClasses();
     } catch (error) {
       console.error('Failed to delete class:', error);
@@ -119,13 +136,15 @@ const TeacherDashboard: React.FC = () => {
               안녕하세요, {user?.full_name || user?.username}님! 담당하시는 반을 관리하세요.
             </p>
           </div>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            <PlusIcon className="h-5 w-5 mr-2" />
-            새 반 만들기
-          </button>
+          {user?.role === 'admin' && (
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              <PlusIcon className="h-5 w-5 mr-2" />
+              새 반 만들기
+            </button>
+          )}
         </div>
       </div>
 
@@ -247,22 +266,24 @@ const TeacherDashboard: React.FC = () => {
                     <h3 className="text-lg font-medium text-gray-900 truncate">
                       {cls.name}
                     </h3>
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => openEditModal(cls)}
-                        className="p-1 text-gray-400 hover:text-gray-600"
-                        title="반 정보 수정"
-                      >
-                        <PencilIcon className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteClass(cls.id)}
-                        className="p-1 text-gray-400 hover:text-red-600"
-                        title="반 삭제"
-                      >
-                        <TrashIcon className="h-4 w-4" />
-                      </button>
-                    </div>
+                    {user?.role === 'admin' && (
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => openEditModal(cls)}
+                          className="p-1 text-gray-400 hover:text-gray-600"
+                          title="반 정보 수정"
+                        >
+                          <PencilIcon className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteClass(cls.id)}
+                          className="p-1 text-gray-400 hover:text-red-600"
+                          title="반 삭제"
+                        >
+                          <TrashIcon className="h-4 w-4" />
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   <div className="mt-2 space-y-2">

@@ -1,4 +1,5 @@
 import { config } from '../config';
+import type { Class, CreateClassData, UpdateClassData, Student } from './teacherApi';
 
 // 타입 정의
 export interface User {
@@ -143,6 +144,73 @@ export class AdminApi {
     await this.request(`/admin/users/${userId}/reset-password`, {
       method: 'POST',
       body: JSON.stringify(passwordData),
+    });
+  }
+
+  // =================== 반 관리 (관리자 전용) ===================
+
+  // 모든 반 목록 조회
+  static async getAllClasses(): Promise<Class[]> {
+    const response = await this.request<Class[]>('/admin/classes');
+    return response.data || [];
+  }
+
+  // 새 반 생성
+  static async createClass(classData: CreateClassData): Promise<Class> {
+    const response = await this.request<Class>('/admin/classes', {
+      method: 'POST',
+      body: JSON.stringify(classData),
+    });
+    return response.data!;
+  }
+
+  // 반 정보 수정
+  static async updateClass(classId: string, classData: UpdateClassData): Promise<Class> {
+    const response = await this.request<Class>(`/admin/classes/${classId}`, {
+      method: 'PUT',
+      body: JSON.stringify(classData),
+    });
+    return response.data!;
+  }
+
+  // 반 삭제 (소프트 삭제)
+  static async deleteClass(classId: string): Promise<void> {
+    await this.request(`/admin/classes/${classId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // =================== 선생님-반 배정 (관리자 전용) ===================
+
+  // 교사를 반에 배정
+  static async assignTeacherToClass(teacherId: string, classId: string): Promise<any> {
+    const response = await this.request(`/admin/teachers/${teacherId}/classes/${classId}`, {
+      method: 'POST',
+    });
+    return response.data;
+  }
+
+  // 교사를 반에서 제거
+  static async removeTeacherFromClass(teacherId: string, classId: string): Promise<void> {
+    await this.request(`/admin/teachers/${teacherId}/classes/${classId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // =================== 학생-반 배정 (관리자 전용) ===================
+
+  // 학생을 반에 배정
+  static async assignStudentToClass(classId: string, studentId: string): Promise<any> {
+    const response = await this.request(`/admin/classes/${classId}/students/${studentId}`, {
+      method: 'POST',
+    });
+    return response.data;
+  }
+
+  // 학생을 반에서 제거
+  static async removeStudentFromClass(classId: string, studentId: string): Promise<void> {
+    await this.request(`/admin/classes/${classId}/students/${studentId}`, {
+      method: 'DELETE',
     });
   }
 }
