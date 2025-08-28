@@ -9,7 +9,11 @@ interface MenuItem {
   roles?: string[];
 }
 
-const Sidebar: React.FC = () => {
+interface SidebarProps {
+  onLinkClick?: () => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ onLinkClick }) => {
   const location = useLocation();
   const [currentUser, setCurrentUser] = useState<any>(null);
   
@@ -69,65 +73,85 @@ const Sidebar: React.FC = () => {
 
   const menuItems = getMenuItems();
 
+  const handleLinkClick = () => {
+    onLinkClick?.();
+  };
+
   return (
-    <aside className="sidebar">
-      <nav className="sidebar-nav">
-        <ul className="nav-list">
-          {menuItems.map((item) => (
-            <li key={item.path} className="nav-item">
-              <Link
-                to={item.path}
-                className={`nav-link ${
-                  location.pathname === item.path ? 'active' : ''
-                }`}
-              >
-                <span className="nav-icon">{item.icon}</span>
-                <span className="nav-label">{item.label}</span>
-              </Link>
-            </li>
-          ))}
+    <aside className="h-full flex flex-col bg-white">
+      {/* 내비게이션 메뉴 */}
+      <nav className="flex-1 px-4 py-6">
+        <ul className="space-y-2">
+          {menuItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <li key={item.path}>
+                <Link
+                  to={item.path}
+                  onClick={handleLinkClick}
+                  className={`
+                    flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors
+                    ${isActive 
+                      ? 'bg-role-primary/10 text-role-primary border-r-2 border-role-primary' 
+                      : 'text-neutral-700 hover:bg-neutral-100 hover:text-role-primary'
+                    }
+                  `}
+                >
+                  <span className="text-lg flex-shrink-0">{item.icon}</span>
+                  <span>{item.label}</span>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </nav>
       
-      <div className="sidebar-footer">
+      {/* 사이드바 하단 */}
+      <div className="border-t border-neutral-200 p-4">
         {currentUser && (
-          <div className="user-info">
-            <div className="user-profile">
-              <div className="user-avatar">
+          <div className="space-y-4">
+            {/* 사용자 프로필 */}
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-role-primary text-white rounded-full flex items-center justify-center font-medium">
                 {currentUser.fullName?.charAt(0) || currentUser.username?.charAt(0) || '👤'}
               </div>
-              <div className="user-details">
-                <div className="user-name">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-neutral-900 truncate">
                   {currentUser.fullName || currentUser.username}
-                </div>
-                <div className="user-role">
+                </p>
+                <p className="text-xs text-neutral-600">
                   {currentUser.role === 'admin' && '관리자'}
                   {currentUser.role === 'teacher' && '교사'}
                   {currentUser.role === 'student' && '학생'}
-                </div>
+                </p>
               </div>
             </div>
             
+            {/* 학생 전용 통계 */}
             {currentUser.role === 'student' && (
-              <div className="user-stats">
-                <div className="stat-item">
-                  <span className="stat-label">오늘의 복습</span>
-                  <span className="stat-value">-</span>
+              <div className="bg-neutral-50 rounded-md p-3 space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-neutral-600">오늘의 복습</span>
+                  <span className="text-xs font-medium text-neutral-900">-</span>
                 </div>
-                <div className="stat-item">
-                  <span className="stat-label">연속 학습</span>
-                  <span className="stat-value">-</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-neutral-600">연속 학습</span>
+                  <span className="text-xs font-medium text-neutral-900">-</span>
                 </div>
               </div>
             )}
 
+            {/* 로그아웃 버튼 */}
             <button 
-              className="logout-btn"
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-neutral-600 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
               onClick={() => {
                 AuthService.logout();
                 window.location.href = '/login';
               }}
             >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
               로그아웃
             </button>
           </div>

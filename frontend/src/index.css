@@ -4,6 +4,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Safe area inset support for mobile devices */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .safe-area-inset-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .h-safe-area-inset-bottom {
+    height: env(safe-area-inset-bottom);
+  }
+}
+
 :root {
   font-family: 'Noto Sans KR', system-ui, sans-serif;
   line-height: 1.5;
