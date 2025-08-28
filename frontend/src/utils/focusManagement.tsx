@@ -1,4 +1,5 @@
 // Focus Management Utilities
+import React from 'react';
 
 /**
  * Get all focusable elements within a container

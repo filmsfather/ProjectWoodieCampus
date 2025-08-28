@@ -2,11 +2,11 @@ import React, { lazy, Suspense } from 'react';
 import { Skeleton } from '../components/ui/Skeleton';
 
 // 라우트별 코드 스플리팅을 위한 지연 로딩 컴포넌트
-const LazyStudentDashboard = lazy(() => import('../pages/student/Dashboard'));
-const LazyTeacherDashboard = lazy(() => import('../pages/teacher/Dashboard'));
-const LazyAdminDashboard = lazy(() => import('../pages/admin/Dashboard'));
-const LazyClassManagement = lazy(() => import('../pages/teacher/ClassManagement'));
-const LazySubjectManagement = lazy(() => import('../pages/admin/SubjectManagement'));
+const LazyStudentDashboard = lazy(() => import('../pages/DashboardPage'));
+const LazyTeacherDashboard = lazy(() => import('../pages/TeacherPage'));
+const LazyAdminDashboard = lazy(() => import('../pages/AdminPage'));
+const LazyClassManagement = lazy(() => import('../pages/TeacherPage'));
+const LazySubjectManagement = lazy(() => import('../pages/AdminPage'));
 
 // 로딩 상태를 위한 스켈레톤 컴포넌트
 function DashboardSkeleton() {
@@ -99,11 +99,11 @@ export const SubjectManagement: React.FC<LazyComponentProps> = ({ fallback = <Ta
 
 // 프리로딩 유틸리티
 export const preloadRoutes = {
-  student: () => import('../pages/student/Dashboard'),
-  teacher: () => import('../pages/teacher/Dashboard'),
-  admin: () => import('../pages/admin/Dashboard'),
-  classManagement: () => import('../pages/teacher/ClassManagement'),
-  subjectManagement: () => import('../pages/admin/SubjectManagement'),
+  student: () => import('../pages/DashboardPage'),
+  teacher: () => import('../pages/TeacherPage'),
+  admin: () => import('../pages/AdminPage'),
+  classManagement: () => import('../pages/TeacherPage'),
+  subjectManagement: () => import('../pages/AdminPage'),
 };
 
 // 사용자 역할에 따른 프리로딩
@@ -131,7 +131,7 @@ export function createLazyComponent<T = {}>(
   const LazyComponent = lazy(importFn);
   
   return React.forwardRef<any, T>((props, ref) => (
-    <Suspense fallback={fallbackComponent ? <fallbackComponent /> : <Skeleton />}>
+    <Suspense fallback={fallbackComponent ? React.createElement(fallbackComponent) : <Skeleton />}>
       <LazyComponent {...props} ref={ref} />
     </Suspense>
   ));
