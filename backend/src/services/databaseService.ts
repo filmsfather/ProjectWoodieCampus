@@ -11,7 +11,7 @@ export class DatabaseService {
   // User related operations
   static async createUser(userData: {
     username: string;
-    email: string;
+    email: string | null;
     passwordHash: string;
     role?: string;
     fullName?: string;
@@ -20,7 +20,7 @@ export class DatabaseService {
       .from('users')
       .insert([{
         username: userData.username,
-        email: userData.email,
+        email: userData.email, // null 가능
         password_hash: userData.passwordHash,
         role: userData.role || 'student',
         full_name: userData.fullName,
@@ -1386,5 +1386,357 @@ export class DatabaseService {
     );
 
     return progressData;
+  }
+
+  // Class management methods for Task 11.1
+
+  // Create a new class
+  static async createClass(classData: {
+    name: string;
+    teacher_id?: string;
+    grade_level?: string;
+    subject?: string;
+    description?: string;
+  }) {
+    const { data, error } = await supabase
+      .from('classes')
+      .insert([classData])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  // Get all classes
+  static async getClasses() {
+    const { data, error } = await supabase
+      .from('classes')
+      .select(`
+        *,
+        teacher:users(id, username, full_name),
+        student_count:users(count)
+      `)
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data;
+  }
+
+  // Get classes by teacher ID
+  static async getClassesByTeacher(teacherId: string) {
+    const { data, error } = await supabase
+      .from('teacher_classes')
+      .select(`
+        class:classes(
+          id,
+          name,
+          grade_level,
+          subject,
+          description,
+          created_at,
+          student_count:users(count)
+        )
+      `)
+      .eq('teacher_id', teacherId)
+      .eq('classes.is_active', true);
+
+    if (error) throw error;
+    return data?.map(item => item.class) || [];
+  }
+
+  // Get students in a class
+  static async getStudentsByClass(classId: string) {
+    const { data, error } = await supabase
+      .from('users')
+      .select('id, username, email, full_name, created_at, last_login')
+      .eq('class_id', classId)
+      .eq('role', 'student')
+      .eq('is_active', true)
+      .order('full_name', { ascending: true });
+
+    if (error) throw error;
+    return data;
+  }
+
+  // Assign teacher to class
+  static async assignTeacherToClass(teacherId: string, classId: string) {
+    const { data, error } = await supabase
+      .from('teacher_classes')
+      .insert([{
+        teacher_id: teacherId,
+        class_id: classId
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  // Remove teacher from class
+  static async removeTeacherFromClass(teacherId: string, classId: string) {
+    const { error } = await supabase
+      .from('teacher_classes')
+      .delete()
+      .eq('teacher_id', teacherId)
+      .eq('class_id', classId);
+
+    if (error) throw error;
+    return { success: true };
+  }
+
+  // Assign student to class
+  static async assignStudentToClass(studentId: string, classId: string) {
+    const { data, error } = await supabase
+      .from('users')
+      .update({ 
+        class_id: classId,
+        class_assignments: supabase.raw(`
+          CASE 
+            WHEN class_assignments IS NULL THEN '[{"class_id": "' || ? || '", "assigned_at": "' || NOW() || '"}]'::jsonb
+            ELSE class_assignments || '[{"class_id": "' || ? || '", "assigned_at": "' || NOW() || '"}]'::jsonb
+          END
+        `, [classId, classId])
+      })
+      .eq('id', studentId)
+      .eq('role', 'student')
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  // Subject management methods
+
+  // Create a new subject
+  static async createSubject(subjectData: {
+    name: string;
+    description?: string;
+    grade_level?: string;
+    created_by: string;
+  }) {
+    const { data, error } = await supabase
+      .from('subjects')
+      .insert([subjectData])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  // Get all subjects
+  static async getSubjects() {
+    const { data, error } = await supabase
+      .from('subjects')
+      .select(`
+        *,
+        creator:users(id, username, full_name)
+      `)
+      .eq('is_active', true)
+      .order('name', { ascending: true });
+
+    if (error) throw error;
+    return data;
+  }
+
+  // Update subject
+  static async updateSubject(subjectId: string, updateData: {
+    name?: string;
+    description?: string;
+    grade_level?: string;
+  }) {
+    const { data, error } = await supabase
+      .from('subjects')
+      .update(updateData)
+      .eq('id', subjectId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  // Delete subject (soft delete)
+  static async deleteSubject(subjectId: string) {
+    const { data, error } = await supabase
+      .from('subjects')
+      .update({ is_active: false })
+      .eq('id', subjectId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  // Workbook assignment methods
+
+  // Create workbook assignment
+  static async createWorkbookAssignment(assignmentData: {
+    workbook_id: string;
+    assigned_by: string;
+    assigned_to_type: 'student' | 'class';
+    assigned_to_id: string;
+    due_date?: string;
+  }) {
+    const { data, error } = await supabase
+      .from('workbook_assignments')
+      .insert([assignmentData])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  // Get workbook assignments for a student
+  static async getWorkbookAssignmentsForStudent(studentId: string) {
+    const { data: directAssignments, error: directError } = await supabase
+      .from('workbook_assignments')
+      .select(`
+        *,
+        workbook:problem_sets(
+          id,
+          title,
+          description,
+          subject,
+          estimated_time
+        ),
+        assigner:users(id, username, full_name)
+      `)
+      .eq('assigned_to_type', 'student')
+      .eq('assigned_to_id', studentId)
+      .eq('is_active', true);
+
+    if (directError) throw directError;
+
+    // Get class assignments for this student
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('class_id')
+      .eq('id', studentId)
+      .single();
+
+    if (userError) throw userError;
+
+    let classAssignments = [];
+    if (user?.class_id) {
+      const { data: classData, error: classError } = await supabase
+        .from('workbook_assignments')
+        .select(`
+          *,
+          workbook:problem_sets(
+            id,
+            title,
+            description,
+            subject,
+            estimated_time
+          ),
+          assigner:users(id, username, full_name)
+        `)
+        .eq('assigned_to_type', 'class')
+        .eq('assigned_to_id', user.class_id)
+        .eq('is_active', true);
+
+      if (classError) throw classError;
+      classAssignments = classData || [];
+    }
+
+    return [...(directAssignments || []), ...classAssignments];
+  }
+
+  // Get workbook assignments created by a teacher
+  static async getWorkbookAssignmentsByTeacher(teacherId: string) {
+    const { data, error } = await supabase
+      .from('workbook_assignments')
+      .select(`
+        *,
+        workbook:problem_sets(
+          id,
+          title,
+          description,
+          subject,
+          estimated_time
+        ),
+        assigned_to_class:classes(id, name),
+        assigned_to_student:users(id, username, full_name)
+      `)
+      .eq('assigned_by', teacherId)
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data;
+  }
+
+  // Get progress statistics for a class
+  static async getClassProgressStats(classId: string) {
+    const students = await this.getStudentsByClass(classId);
+    
+    const progressStats = await Promise.all(
+      students?.map(async (student) => {
+        const assignments = await this.getWorkbookAssignmentsForStudent(student.id);
+        const completedCount = await this.getCompletedAssignmentsCount(student.id);
+        
+        return {
+          student,
+          totalAssignments: assignments.length,
+          completedAssignments: completedCount,
+          progressPercentage: assignments.length > 0 
+            ? Math.round((completedCount / assignments.length) * 100)
+            : 0
+        };
+      }) || []
+    );
+
+    return progressStats;
+  }
+
+  // Helper method to get completed assignments count for a student
+  private static async getCompletedAssignmentsCount(studentId: string): Promise<number> {
+    const assignments = await this.getWorkbookAssignmentsForStudent(studentId);
+    let completedCount = 0;
+
+    for (const assignment of assignments) {
+      const workbookProgress = await this.getWorkbookProgress(studentId, assignment.workbook_id);
+      if (workbookProgress.progressPercentage === 100) {
+        completedCount++;
+      }
+    }
+
+    return completedCount;
+  }
+
+  // Update user with email made optional
+  static async updateUserWithOptionalEmail(userId: string, updateData: {
+    username?: string;
+    email?: string | null;
+    full_name?: string;
+    role?: string;
+    class_id?: string | null;
+    is_active?: boolean;
+    password_hash?: string;
+  }) {
+    // Filter out undefined values
+    const cleanedData = Object.entries(updateData).reduce((acc, [key, value]) => {
+      if (value !== undefined) {
+        acc[key] = value;
+      }
+      return acc;
+    }, {} as any);
+
+    const { data, error } = await supabase
+      .from('users')
+      .update(cleanedData)
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
   }
 }

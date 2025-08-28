@@ -97,7 +97,7 @@ export class AuthService {
   // 사용자 등록 (관리자가 생성)
   static async register(userData: {
     username: string;
-    email: string;
+    email?: string | null;
     password: string;
     role?: string;
     fullName?: string;
@@ -114,13 +114,16 @@ export class AuthService {
         }
       }
 
-      try {
-        await DatabaseService.getUserByEmail(userData.email);
-        throw new Error('이미 존재하는 이메일입니다');
-      } catch (error) {
-        // 사용자를 찾지 못한 경우가 정상 (중복이 아님)
-        if (error instanceof Error && !error.message.includes('사용자를 찾을 수 없습니다')) {
-          throw error;
+      // 이메일이 제공된 경우에만 중복 검사
+      if (userData.email) {
+        try {
+          await DatabaseService.getUserByEmail(userData.email);
+          throw new Error('이미 존재하는 이메일입니다');
+        } catch (error) {
+          // 사용자를 찾지 못한 경우가 정상 (중복이 아님)
+          if (error instanceof Error && !error.message.includes('사용자를 찾을 수 없습니다')) {
+            throw error;
+          }
         }
       }
 
@@ -130,7 +133,7 @@ export class AuthService {
       // 사용자 생성
       const newUser = await DatabaseService.createUser({
         username: userData.username,
-        email: userData.email,
+        email: userData.email || null,
         passwordHash,
         role: userData.role || 'student',
         fullName: userData.fullName,

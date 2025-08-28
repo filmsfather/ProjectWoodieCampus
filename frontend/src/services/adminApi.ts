@@ -4,7 +4,7 @@ import { config } from '../config';
 export interface User {
   id: string;
   username: string;
-  email: string;
+  email?: string | null;
   role: 'admin' | 'teacher' | 'student';
   fullName?: string;
   isActive: boolean;
@@ -14,7 +14,7 @@ export interface User {
 
 export interface CreateUserRequest {
   username: string;
-  email: string;
+  email?: string;
   password: string;
   role?: 'admin' | 'teacher' | 'student';
   fullName?: string;

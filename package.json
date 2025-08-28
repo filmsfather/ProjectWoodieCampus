@@ -1,6 +1,6 @@
 {
   "name": "woodie-campus",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "description": "Woodie Campus - 에빙하우스 망각곡선 기반 학습 플랫폼",
   "private": true,
   "scripts": {

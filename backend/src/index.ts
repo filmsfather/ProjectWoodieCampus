@@ -17,6 +17,7 @@ import workbookRoutes from './routes/workbookRoutes';
 import solutionRoutes from './routes/solutionRoutes';
 import reviewRoutes from './routes/reviewRoutes';
 import schedulerRoutes from './routes/schedulerRoutes';
+import subjectRoutes from './routes/subjects';
 
 // Import Supabase connection
 import { testSupabaseConnection } from './config/supabase';
@@ -80,6 +81,7 @@ app.use('/api/workbooks', workbookRoutes);
 app.use('/api/solutions', solutionRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/scheduler', schedulerRoutes);
+app.use('/api/subjects', subjectRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

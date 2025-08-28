@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AdminApi } from '../../services/adminApi';
 import { WorkbookApi } from '../../services/workbookApi';
 import { ProblemApi } from '../../services/problemApi';
+import SubjectManagement from '../admin/SubjectManagement';
 
 interface AdminDashboardProps {
   userId: string;
@@ -33,6 +34,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ }) => {
   const [systemLogs, setSystemLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState<'dashboard' | 'subjects'>('dashboard');
 
   useEffect(() => {
     loadDashboardData();
@@ -237,6 +239,24 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ }) => {
     );
   }
 
+  // 섹션에 따른 렌더링
+  if (activeSection === 'subjects') {
+    return (
+      <div className="admin-dashboard">
+        <div className="dashboard-header">
+          <button 
+            className="back-button"
+            onClick={() => setActiveSection('dashboard')}
+          >
+            ← 대시보드로 돌아가기
+          </button>
+          <h1>교과목 관리</h1>
+        </div>
+        <SubjectManagement />
+      </div>
+    );
+  }
+
   return (
     <div className="admin-dashboard">
       <div className="dashboard-header">
@@ -363,6 +383,20 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ }) => {
               <div className="action-content">
                 <h4>문제 관리</h4>
                 <p>모든 문제를 확인합니다</p>
+              </div>
+            </button>
+            
+            <button 
+              className="action-btn secondary"
+              onClick={() => {
+                // 교과목 관리 섹션을 표시하도록 상태 변경
+                setActiveSection('subjects');
+              }}
+            >
+              <span className="action-icon">📖</span>
+              <div className="action-content">
+                <h4>교과목 관리</h4>
+                <p>교과목을 생성하고 관리합니다</p>
               </div>
             </button>
             

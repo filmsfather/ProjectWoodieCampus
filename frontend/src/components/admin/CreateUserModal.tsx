@@ -41,10 +41,12 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({ onClose, onUserCreate
   const validateForm = (): string | null => {
     if (!formData.username.trim()) return '사용자명을 입력하세요';
     if (formData.username.length < 3) return '사용자명은 최소 3자 이상이어야 합니다';
-    if (!formData.email.trim()) return '이메일을 입력하세요';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) return '유효한 이메일을 입력하세요';
+    // 이메일이 제공된 경우에만 유효성 검사
+    if (formData.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      return '유효한 이메일을 입력하세요';
+    }
     if (!formData.password.trim()) return '비밀번호를 입력하세요';
-    if (formData.password.length < 8) return '비밀번호는 최소 8자 이상이어야 합니다';
+    if (formData.password.length < 4) return '비밀번호는 최소 4자 이상이어야 합니다';
     return null;
   };
 
@@ -107,7 +109,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({ onClose, onUserCreate
           {/* 이메일 */}
           <div className="form-group">
             <label htmlFor="email">
-              이메일 <span className="required">*</span>
+              이메일 <span className="optional">(선택사항)</span>
             </label>
             <input
               type="email"
@@ -115,8 +117,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({ onClose, onUserCreate
               name="email"
               value={formData.email}
               onChange={handleInputChange}
-              placeholder="이메일 주소 입력"
-              required
+              placeholder="이메일 주소 입력 (선택사항)"
               disabled={loading}
             />
           </div>
@@ -185,7 +186,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({ onClose, onUserCreate
               </button>
             </div>
             <small className="form-hint">
-              최소 8자 이상, 영문/숫자/특수문자 조합 권장
+              최소 4자 이상, 영문/숫자/특수문자 조합 권장
             </small>
           </div>
 

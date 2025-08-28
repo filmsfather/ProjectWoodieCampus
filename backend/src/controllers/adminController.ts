@@ -9,30 +9,32 @@ export class AdminController {
     try {
       const { username, email, password, role, fullName } = req.body;
 
-      // 입력 검증
-      if (!username || !email || !password) {
+      // 입력 검증 - 이메일은 선택사항으로 변경
+      if (!username || !password) {
         const response: ApiResponse = {
           success: false,
-          message: '사용자명, 이메일, 비밀번호는 필수 입력 항목입니다',
+          message: '사용자명, 비밀번호는 필수 입력 항목입니다',
         };
         return res.status(400).json(response);
       }
 
-      // 이메일 형식 검증
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        const response: ApiResponse = {
-          success: false,
-          message: '유효하지 않은 이메일 형식입니다',
-        };
-        return res.status(400).json(response);
+      // 이메일 형식 검증 (이메일이 제공된 경우에만)
+      if (email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          const response: ApiResponse = {
+            success: false,
+            message: '유효하지 않은 이메일 형식입니다',
+          };
+          return res.status(400).json(response);
+        }
       }
 
       // 비밀번호 강도 검증
-      if (password.length < 8) {
+      if (password.length < 4) {
         const response: ApiResponse = {
           success: false,
-          message: '비밀번호는 최소 8자 이상이어야 합니다',
+          message: '비밀번호는 최소 4자 이상이어야 합니다',
         };
         return res.status(400).json(response);
       }
@@ -269,10 +271,10 @@ export class AdminController {
         return res.status(400).json(response);
       }
 
-      if (newPassword.length < 8) {
+      if (newPassword.length < 4) {
         const response: ApiResponse = {
           success: false,
-          message: '비밀번호는 최소 8자 이상이어야 합니다',
+          message: '비밀번호는 최소 4자 이상이어야 합니다',
         };
         return res.status(400).json(response);
       }
