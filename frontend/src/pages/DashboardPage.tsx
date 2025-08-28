@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AuthService } from '../services/authService';
 import StudentDashboard from '../components/dashboards/StudentDashboard';
-import TeacherDashboard from '../components/dashboards/TeacherDashboard';
+import TeacherDashboard from '../components/teacher/TeacherDashboard';
 import AdminDashboard from '../components/dashboards/AdminDashboard';
 
 interface User {
@@ -56,7 +56,7 @@ const DashboardPage: React.FC = () => {
       case 'student':
         return <StudentDashboard userId={user.id} />;
       case 'teacher':
-        return <TeacherDashboard userId={user.id} />;
+        return <TeacherDashboard />;
       case 'admin':
         return <AdminDashboard userId={user.id} />;
       default:

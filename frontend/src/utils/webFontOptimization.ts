@@ -2,32 +2,11 @@ import React from 'react';
 
 // 웹 폰트 최적화 유틸리티
 
-// 폰트 프리로딩
+// Google Fonts 동적 로딩
 export function preloadWebFonts() {
-  const fonts = [
-    {
-      family: 'Noto Sans KR',
-      weights: ['400', '500', '600', '700'],
-      display: 'swap'
-    },
-    {
-      family: 'Inter',
-      weights: ['400', '500', '600'],
-      display: 'swap'
-    }
-  ];
-
-  fonts.forEach(font => {
-    font.weights.forEach(weight => {
-      const link = document.createElement('link');
-      link.rel = 'preload';
-      link.as = 'font';
-      link.type = 'font/woff2';
-      link.crossOrigin = 'anonymous';
-      link.href = `https://fonts.gstatic.com/s/notosanskr/v28/PbykFmXiEBPT4ITbgNA5Cgm20xz64px_1hVWr0wuPNGmlQNMEfD4.woff2`;
-      document.head.appendChild(link);
-    });
-  });
+  // Google Fonts CSS가 이미 HTML에서 로드되므로 별도 프리로딩 불필요
+  // font-display: swap이 이미 Google Fonts URL에 포함됨
+  return;
 }
 
 // 폰트 로딩 상태 감지

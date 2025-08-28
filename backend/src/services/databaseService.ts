@@ -1436,7 +1436,7 @@ export class DatabaseService {
           subject,
           description,
           created_at,
-          student_count:users(count)
+          student_count:users!users_class_id_fkey(count)
         )
       `)
       .eq('teacher_id', teacherId)
