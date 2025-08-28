@@ -118,9 +118,9 @@
 }
 
 [data-role="admin"] {
-  --color-role-primary: #AA4632;
-  --color-role-primary-dark: #9a3e2a;
-  --color-role-primary-light: #ba563a;
+  --color-role-primary: #4a5440;
+  --color-role-primary-dark: #3a4430;
+  --color-role-primary-light: #5a6450;
 }
 
 /* 역할 기반 동적 스타일 */

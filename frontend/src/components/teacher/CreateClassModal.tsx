@@ -48,8 +48,34 @@ const CreateClassModal: React.FC<CreateClassModalProps> = ({ onClose, onSubmit }
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+    <div 
+      className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        zIndex: 9999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}
+    >
+      <div 
+        className="relative mx-auto p-5 border w-96 shadow-lg rounded-md bg-white"
+        style={{
+          backgroundColor: 'white',
+          borderRadius: '8px',
+          padding: '20px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+          maxWidth: '400px',
+          width: '90%',
+          maxHeight: '90vh',
+          overflowY: 'auto'
+        }}
+      >
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-medium text-gray-900">새 반 만들기</h3>
           <button

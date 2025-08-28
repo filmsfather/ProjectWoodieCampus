@@ -2,131 +2,124 @@
   "master": {
     "tasks": [
       {
-        "id": 13,
-        "title": "디자인 토큰 및 기본 레이아웃 시스템 구축",
-        "description": "CSS 변수 기반 디자인 토큰과 컨테이너, 그리드 프리미티브 구현",
-        "details": "1. CSS 변수로 디자인 토큰 정의 (색상, 간격, 반경, 글꼴, 섀도우)\n2. 컨테이너 규격 (max-width 단계별, 좌우 패딩) 토큰화\n3. 8pt 스페이싱 스케일 정의\n4. 반응형 브레이크포인트 4단계(xs/sm/md/lg) 토큰화\n5. Stack, Inline, Grid, Cluster 레이아웃 컴포넌트 구현\n6. 카드/위젯 세로 스트레치 기본값, 내부 간격 8pt 스케일 적용\n7. auto-fit/minmax 기반 자동 배치 그리드 시스템\n8. 역할별 테마 전환을 위한 data-role 속성 기반 토큰 시스템",
-        "testStrategy": "다양한 뷰포트 크기(360/768/1024/1280px)에서 레이아웃 렌더링 테스트, 토큰 값 변경 시 전체 UI 반영 확인, 각 레이아웃 컴포넌트의 간격 및 정렬 검증",
+        "id": 18,
+        "title": "문제집 배포 대상 선택 시스템 구현",
+        "description": "개별 학생, 커스텀 그룹, 반 전체 중 배포 대상을 선택할 수 있는 UI 및 백엔드 로직 구현",
+        "details": "1. 배포 대상 선택 UI 컴포넌트 생성: 라디오 버튼 또는 드롭다운으로 '개별 학생', '커스텀 그룹', '반 전체' 선택 옵션 제공\n2. 개별 학생 선택 시: 학생 목록 체크박스 또는 다중 선택 가능한 드롭다운\n3. 커스텀 그룹 선택 시: 기존 그룹 목록 표시 또는 새 그룹 생성 기능\n4. 반 전체 선택 시: 해당 반의 모든 학생 자동 포함\n5. 백엔드 API: POST /api/workbooks/{id}/assign 엔드포인트 구현\n6. 데이터베이스 스키마: workbook_assignments 테이블에 target_type('individual', 'group', 'class'), target_ids(JSON 배열) 필드 추가\n7. 권한 검증: 교사만 자신이 담당하는 반/학생에게 배포 가능하도록 제한",
+        "testStrategy": "1. 각 배포 대상 선택 옵션별 UI 렌더링 테스트\n2. 학생/그룹 선택 시 올바른 데이터 전송 확인\n3. API 엔드포인트 단위 테스트: 각 target_type별 데이터 저장 검증\n4. 권한 테스트: 다른 반 학생 배포 시도 시 오류 반환 확인\n5. E2E 테스트: 전체 배포 프로세스 시나리오 검증",
         "priority": "high",
         "dependencies": [],
-        "status": "done",
+        "status": "pending",
         "subtasks": [
           {
             "id": 1,
-            "title": "CSS 변수 기반 디자인 토큰 시스템 구축",
-            "description": "색상, 간격, 반경, 글꼴, 섀도우 등 모든 디자인 요소를 CSS 변수로 토큰화하고 8pt 스페이싱 스케일 및 반응형 브레이크포인트를 정의",
+            "title": "배포 대상 선택 UI 컴포넌트 구현",
+            "description": "개별 학생, 커스텀 그룹, 반 전체 선택을 위한 라디오 버튼 기반 UI 컴포넌트 개발",
             "dependencies": [],
-            "details": "src/styles/tokens/ 디렉토리 생성 후 colors.css, spacing.css, typography.css, shadows.css, breakpoints.css 파일로 분리. CSS 커스텀 속성(:root)으로 --color-primary, --spacing-xs(4px), --spacing-sm(8px), --spacing-md(16px) 등 정의. 브레이크포인트는 --breakpoint-xs(320px), --breakpoint-sm(768px), --breakpoint-md(1024px), --breakpoint-lg(1280px)로 설정. 모든 토큰은 rem 단위 기준으로 구성하고 index.css에서 통합 import",
-            "status": "done",
-            "testStrategy": "토큰 값 변경 시 전체 UI 반영 확인, CSS 변수 접근성 테스트, 다크/라이트 테마 전환 검증"
+            "details": "React 컴포넌트로 배포 대상 타입 선택 라디오 버튼 그룹 구현. 선택된 타입에 따라 하위 선택 옵션이 동적으로 표시되도록 상태 관리. 접근성을 고려한 ARIA 라벨 및 키보드 내비게이션 지원",
+            "status": "pending",
+            "testStrategy": ""
           },
           {
             "id": 2,
-            "title": "컨테이너 및 레이아웃 기본 토큰 구현",
-            "description": "컨테이너 max-width 단계별 설정, 좌우 패딩 토큰화, data-role 속성 기반 역할별 테마 시스템 구축",
+            "title": "개별 학생 및 커스텀 그룹 선택 기능 구현",
+            "description": "학생 목록 다중 선택 체크박스와 그룹 관리 기능 개발",
             "dependencies": [
-              "13.1"
+              "18.1"
             ],
-            "details": "src/styles/layout.css 파일 생성하여 .container 클래스에 --container-sm(540px), --container-md(720px), --container-lg(960px), --container-xl(1140px) max-width 토큰 적용. --padding-container-x로 좌우 패딩 설정. data-role='student|teacher|admin' 속성에 따라 CSS 변수 오버라이드하는 테마 시스템 구현. 각 역할별 primary 색상, 액센트 색상 등 차별화",
-            "status": "done",
-            "testStrategy": "컨테이너 크기별 반응형 동작 확인, 역할별 테마 전환 테스트, 패딩 일관성 검증"
+            "details": "학생 목록 API 연동 후 체크박스 기반 다중 선택 UI 구현. 기존 커스텀 그룹 목록 표시 및 새 그룹 생성 모달 구현. 검색 및 필터링 기능으로 사용자 편의성 향상. 선택된 대상 미리보기 기능 추가",
+            "status": "pending",
+            "testStrategy": ""
           },
           {
             "id": 3,
-            "title": "Stack, Inline, Grid 레이아웃 컴포넌트 구현",
-            "description": "기본 레이아웃 프리미티브인 Stack(세로), Inline(가로), Grid(격자) 컴포넌트를 React로 구현",
+            "title": "반 전체 선택 로직 및 자동 포함 시스템 구현",
+            "description": "반 전체 선택 시 해당 반 모든 학생을 자동으로 포함하는 로직 구현",
             "dependencies": [
-              "13.1",
-              "13.2"
+              "18.1"
             ],
-            "details": "src/components/layout/ 폴더에 Stack.tsx, Inline.tsx, Grid.tsx 구현. Stack은 gap prop으로 8pt 스케일 간격 설정(xs,sm,md,lg,xl), Inline은 wrap, align, justify props 지원. Grid는 columns prop으로 반복 열 수 또는 템플릿 문자열 지원. 모든 컴포넌트는 as prop으로 다형성 지원하고 CSS 변수 기반 스타일링 적용. TypeScript 제네릭으로 타입 안전성 보장",
-            "status": "done",
-            "testStrategy": "각 레이아웃 컴포넌트별 props 조합 테스트, 중첩 레이아웃 동작 확인, 반응형 동작 검증"
+            "details": "교사가 담당하는 반 목록 조회 API 연동. 반 선택 시 해당 반의 모든 활성 학생을 자동으로 대상에 포함하는 로직 구현. 학생 수 및 선택된 학생 목록 미리보기 표시. 비활성 학생 처리 로직 포함",
+            "status": "pending",
+            "testStrategy": ""
           },
           {
             "id": 4,
-            "title": "Cluster 레이아웃 및 카드 스트레치 시스템",
-            "description": "Cluster(유연한 배치) 컴포넌트 구현 및 카드/위젯의 세로 스트레치 기본값과 내부 간격 표준화",
-            "dependencies": [
-              "13.3"
-            ],
-            "details": "src/components/layout/Cluster.tsx 구현으로 flexbox 기반 유연한 아이템 배치 지원. justify, align, gap, wrap props 제공. Card.tsx 컴포넌트에 height: 100%, display: flex, flex-direction: column 기본 스타일 적용하여 세로 스트레치 구현. 카드 내부 header, body, footer 영역에 --spacing-md(16px) 간격 적용. CardContent, CardActions 등 서브 컴포넌트로 구조화",
-            "status": "done",
-            "testStrategy": "카드 높이 균등화 동작 확인, Cluster 배치 옵션별 테스트, 내부 간격 8pt 스케일 준수 검증"
+            "title": "문제집 배포 API 및 데이터베이스 스키마 구현",
+            "description": "POST /api/workbooks/{id}/assign 엔드포인트 및 workbook_assignments 테이블 구현",
+            "dependencies": [],
+            "details": "workbook_assignments 테이블에 target_type(ENUM), target_ids(JSON), created_at, updated_at 필드 추가. Express.js 기반 POST API 엔드포인트 구현. 요청 데이터 유효성 검증 미들웨어 추가. 트랜잭션 처리로 데이터 일관성 보장",
+            "status": "pending",
+            "testStrategy": ""
           },
           {
             "id": 5,
-            "title": "auto-fit/minmax 기반 자동 배치 그리드 시스템",
-            "description": "CSS Grid의 auto-fit과 minmax를 활용한 자동 반응형 그리드 시스템 구현",
+            "title": "교사 권한 검증 및 보안 시스템 구현",
+            "description": "교사가 담당하는 반/학생에게만 배포할 수 있도록 하는 권한 검증 로직 구현",
             "dependencies": [
-              "13.3",
-              "13.4"
+              "18.4"
             ],
-            "details": "src/components/layout/AutoGrid.tsx 구현으로 CSS Grid의 grid-template-columns: repeat(auto-fit, minmax(var(--min-column-width), 1fr)) 활용. minWidth prop(기본값 280px)으로 최소 열 너비 설정, gap prop으로 간격 조절. 아이템 수에 따라 자동으로 열 수가 조정되도록 구현. equalHeight prop으로 같은 행 아이템 높이 균등화 옵션 제공. 반응형 브레이크포인트별로 minWidth 값을 다르게 설정할 수 있는 responsive prop 지원",
-            "status": "done",
-            "testStrategy": "아이템 수 변화 시 자동 열 조정 확인, 뷰포트 크기별 반응형 동작 테스트, 높이 균등화 검증"
+            "details": "JWT 토큰 기반 교사 인증 확인. 교사-반-학생 관계 테이블 조회로 배포 권한 검증. 다른 교사의 학생/반에 배포 시도 시 403 에러 반환. 권한 검증 미들웨어 구현으로 재사용성 확보. 로그 시스템으로 권한 위반 시도 추적",
+            "status": "pending",
+            "testStrategy": ""
           }
         ]
       },
       {
-        "id": 14,
-        "title": "반응형 내비게이션 및 적응형 레이아웃 구현",
-        "description": "데스크톱/모바일 환경에 맞춘 헤더, 사이드바, 바텀바 전환 시스템",
-        "details": "1. Layout.tsx 공통 레이아웃 쉘 구현\n2. 데스크톱: 상단 헤더 + 좌측 사이드바 레이아웃\n3. 모바일: 상단 헤더 + 바텀 탭/드로어 레이아웃\n4. 역할 탭(학생/교사/관리자)별 내비게이션 영역 동적 교체\n5. 스티키 헤더, 하단 CTA 바 구현\n6. safe-area-inset CSS 속성으로 세이프 에어리어 대응\n7. 브레이크포인트 기반 내비게이션 자동 전환 로직\n8. 드로어/모달 포커스 트랩 및 ESC 키 닫기 기능",
-        "testStrategy": "다양한 디바이스에서 내비게이션 전환 동작 확인, 포커스 순서 및 키보드 접근성 테스트, 세이프 에어리어가 있는 디바이스에서 UI 확인",
+        "id": 19,
+        "title": "문제집 배포 일정 관리 시스템 구현",
+        "description": "즉시 배포 또는 예약 배포 기능을 제공하는 스케줄링 시스템 구현",
+        "details": "1. 배포 일정 선택 UI: '즉시 배포' 라디오 버튼과 '예약 배포' 라디오 버튼\n2. 예약 배포 선택 시: 날짜/시간 선택 컴포넌트(DateTimePicker) 표시\n3. 백엔드 스케줄러: Node.js cron 또는 node-schedule 라이브러리 사용\n4. 데이터베이스 스키마: workbook_assignments 테이블에 scheduled_at(DATETIME), is_scheduled(BOOLEAN) 필드 추가\n5. 스케줄 작업 큐: 예약된 배포를 관리하는 작업 큐 시스템 구현\n6. 배포 실행 로직: 예약 시간 도달 시 자동으로 배포 상태를 'active'로 변경\n7. 스케줄 취소/수정 기능: 예약된 배포의 취소 또는 시간 수정 API",
+        "testStrategy": "1. 즉시 배포 시 실시간 배포 상태 변경 확인\n2. 예약 배포 설정 시 데이터베이스에 올바른 스케줄 정보 저장 검증\n3. 스케줄러 동작 테스트: 설정된 시간에 배포 실행 확인\n4. 스케줄 취소/수정 기능 테스트\n5. 다중 예약 배포 처리 성능 테스트",
         "priority": "high",
         "dependencies": [
-          13
+          18
         ],
-        "status": "done",
+        "status": "pending",
         "subtasks": []
       },
       {
-        "id": 15,
-        "title": "유동형 타이포그래피 및 스페이싱 시스템",
-        "description": "뷰포트 기반 타이포그래피 스케일링과 8pt 스페이싱 표준화",
-        "details": "1. CSS clamp() 함수로 유동형 타이포그래피 구현 (최소/최대 가드 포함)\n2. 제목/본문 크기의 뷰포트별 부드러운 스케일링\n3. 모든 마진/패딩을 8pt 기반 토큰으로 제한\n4. 컴포넌트 내부 간격 규칙 표준화 (카드 헤더/본문/푸터: 12/16/12)\n5. 임의 수치 사용 금지를 위한 ESLint 규칙 추가\n6. 텍스트 길이 대비를 위한 여유 폭 가드 구현\n7. 버튼/카드 타이틀 2줄 허용, ellipsis 처리 규칙\n8. 숫자/날짜 포맷의 우측 정렬/고정 폭 규칙",
-        "testStrategy": "다양한 뷰포트에서 타이포그래피 스케일링 확인, 긴 텍스트 처리 시나리오 테스트, 8pt 스케일 준수 검증, 다국어 텍스트 길이 변화 대응 테스트",
+        "id": 20,
+        "title": "문제집 기한 설정 및 관리 시스템 구현",
+        "description": "문제집별 시작일과 마감일을 설정하고 관리하는 시스템 구현",
+        "details": "1. 기한 설정 UI: 시작일과 마감일을 선택할 수 있는 DatePicker 컴포넌트\n2. 유효성 검증: 시작일 < 마감일 조건 확인, 과거 날짜 선택 방지\n3. 데이터베이스 스키마: workbook_assignments 테이블에 start_date, due_date 필드 추가\n4. 기한 상태 관리: 'upcoming'(시작 전), 'active'(진행 중), 'overdue'(기한 초과), 'completed'(완료) 상태\n5. 자동 상태 업데이트: 매일 자정에 실행되는 크론 작업으로 기한 상태 자동 업데이트\n6. 기한 알림 시스템: 마감일 임박 시 알림 발송 로직\n7. 기한 연장 기능: 교사가 개별 학생의 기한을 연장할 수 있는 기능",
+        "testStrategy": "1. 날짜 선택 UI 유효성 검증 테스트\n2. 기한 상태 자동 업데이트 크론 작업 테스트\n3. 기한별 문제집 필터링 및 정렬 기능 테스트\n4. 기한 연장 권한 및 로직 테스트\n5. 알림 발송 조건 및 타이밍 테스트",
         "priority": "medium",
         "dependencies": [
-          13
+          19
         ],
-        "status": "done",
+        "status": "pending",
         "subtasks": []
       },
       {
-        "id": 16,
-        "title": "카드 및 대시보드 자동정렬 시스템",
-        "description": "카드 최소/최대폭 토큰화와 높이 균등화, 콘텐츠 초과 처리",
-        "details": "1. 카드 S/M/L 규격 토큰 정의 및 열 수 자동 계산 로직\n2. CSS Grid의 auto-fit, minmax를 활용한 반응형 카드 배치\n3. 같은 행 카드의 높이 균등화 (align-stretch + 내부 flexbox)\n4. 하단 버튼 정렬을 위한 카드 내부 레이아웃 구조 표준화\n5. 제목 1-2줄, 설명 2-3줄 ellipsis 및 툴팁 구현\n6. 콘텐츠 초과 시 일관된 처리 규칙 적용\n7. 카드 수 변화(1개/3개/12개)에 따른 자동 정렬 테스트\n8. 스켈레톤, 로딩, 빈 상태 UI 포함",
-        "testStrategy": "카드 수량별 자동 정렬 확인, 긴 제목/설명 처리 테스트, 높이 균등화 동작 검증, 권한별 카드 표시/숨김 시 레이아웃 안정성 확인",
-        "priority": "medium",
+        "id": 21,
+        "title": "학생 문제집 접근 권한 제어 시스템 구현",
+        "description": "학생이 배포된 문제집만 접근할 수 있도록 하는 권한 제어 시스템 구현",
+        "details": "1. 학생 대시보드 문제집 목록: 배포된 문제집만 표시하는 필터링 로직\n2. API 권한 검증: GET /api/workbooks/{id} 엔드포인트에서 학생 접근 권한 확인\n3. 데이터베이스 쿼리 최적화: JOIN을 활용한 배포된 문제집 조회 쿼리\n4. 프론트엔드 라우팅 가드: 미배포 문제집 URL 직접 접근 시 403 에러 페이지 표시\n5. 문제집 상태별 접근 제어: 'upcoming' 상태 문제집은 시작일 전까지 접근 제한\n6. 실시간 접근 권한 업데이트: WebSocket 또는 Server-Sent Events로 배포 상태 변경 시 즉시 반영\n7. 캐싱 전략: Redis를 활용한 학생별 접근 가능 문제집 목록 캐싱",
+        "testStrategy": "1. 배포되지 않은 문제집 접근 시 403 에러 반환 확인\n2. 학생별 문제집 목록 필터링 정확성 테스트\n3. 시작일 전 문제집 접근 제한 테스트\n4. 다른 학생 계정으로 타인 배포 문제집 접근 시도 테스트\n5. 실시간 권한 업데이트 동작 확인\n6. 캐싱 무효화 및 업데이트 로직 테스트",
+        "priority": "high",
         "dependencies": [
-          13,
-          15
+          20
         ],
-        "status": "done",
+        "status": "pending",
         "subtasks": []
       },
       {
-        "id": 17,
-        "title": "반응형 미디어, 폼, 접근성 통합 시스템",
-        "description": "이미지 처리, 폼 레이아웃, 접근성, 성능 최적화 종합 구현",
-        "details": "1. aspect-ratio + object-fit 기반 반응형 이미지 시스템\n2. 지연 로딩/프리패치 정책 구현 (Fold 위/아래 우선순위)\n3. 폼 레이아웃: 모바일 스택, 데스크톱 2열 그리드\n4. 리스트/테이블: 모바일 카드, 데스크톱 테이블+고정 헤더\n5. 포커스 순서 규칙 (헤더→본문→사이드→푸터) 및 스킵 링크\n6. 명도 대비 AA 기준, 상태색 토큰 적용\n7. 이미지/차트 크기 힌트로 CLS 최소화\n8. 대용량 목록 가상 스크롤, 라우트 단위 코드 스플리팅\n9. 빈 상태 일관 템플릿 (아이콘, 문구, CTA 패턴 통일)\n10. 뷰포트 매트릭스 기반 시각 회귀 테스트 체계",
-        "testStrategy": "다양한 이미지 상태(로딩/에러) 테스트, 폼 검증 시나리오, 키보드 내비게이션 전체 플로우 확인, CLS 점수 측정, 대용량 데이터 렌더링 성능 테스트, 권한별 UI 상태 매트릭스 검증",
+        "id": 22,
+        "title": "문제집 배포 현황 및 관리 대시보드 구현",
+        "description": "교사가 배포한 문제집의 현황을 조회하고 관리할 수 있는 대시보드 구현",
+        "details": "1. 배포 현황 테이블: 문제집명, 배포 대상, 배포일, 기한, 완료율 등 정보 표시\n2. 필터링 옵션: 배포 상태(활성/예약/완료), 기한 상태, 배포 대상별 필터\n3. 학생별 진행률 상세 보기: 개별 학생의 문제 풀이 현황 모달\n4. 일괄 기한 연장 기능: 여러 학생의 기한을 한 번에 연장\n5. 배포 취소/수정 기능: 활성 상태 배포의 기한 수정 또는 취소\n6. 통계 차트: Chart.js를 활용한 완료율, 평균 점수 시각화\n7. 엑셀 내보내기: 배포 현황 및 학생 성과 데이터 엑셀 파일 생성\n8. 알림 설정: 기한 임박, 미제출 학생 알림 설정",
+        "testStrategy": "1. 배포 현황 데이터 정확성 및 실시간 업데이트 확인\n2. 필터링 및 정렬 기능 동작 테스트\n3. 일괄 작업(기한 연장, 배포 취소) 기능 테스트\n4. 통계 차트 데이터 정확성 및 렌더링 테스트\n5. 엑셀 내보내기 기능 및 파일 형식 검증\n6. 권한별 접근 제어 테스트(교사만 접근 가능)",
         "priority": "medium",
         "dependencies": [
-          14,
-          15,
-          16
+          21
         ],
-        "status": "done",
+        "status": "pending",
         "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-08-26T06:14:02.321Z",
-      "updated": "2025-08-28T13:01:41.846Z",
+      "updated": "2025-08-28T13:32:52.004Z",
       "description": "Tasks for master context"
     }
   }
