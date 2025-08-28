@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import PrivateRoute from './components/PrivateRoute';
+import ErrorBoundary from './components/ErrorBoundary';
 import { validateConfig } from './config';
 import { AccessibilityManager } from './utils/accessibility';
 import './App.css';
@@ -37,8 +38,9 @@ function App() {
   return (
     <Router>
       <div className="app">
-        <Suspense fallback={<LoadingSpinner />}>
-          <Routes>
+        <ErrorBoundary>
+          <Suspense fallback={<LoadingSpinner />}>
+            <Routes>
             {/* 공개 라우트 */}
             <Route path="/" element={<Layout showSidebar={false} />}>
               <Route index element={<HomePage />} />
@@ -109,7 +111,8 @@ function App() {
             {/* 404 리다이렉트 */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </Suspense>
+          </Suspense>
+        </ErrorBoundary>
       </div>
     </Router>
   );

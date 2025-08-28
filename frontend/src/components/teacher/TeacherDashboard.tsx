@@ -8,7 +8,8 @@ import {
   AcademicCapIcon,
   BookOpenIcon
 } from '@heroicons/react/24/outline';
-import { teacherApi, classApi, Class, Student, ClassStats } from '../../services/teacherApi';
+import { teacherApi, classApi } from '../../services/teacherApi';
+import type { Class, Student, ClassStats } from '../../services/teacherApi';
 import { useAuth } from '../../hooks/useAuth';
 import CreateClassModal from './CreateClassModal';
 import EditClassModal from './EditClassModal';

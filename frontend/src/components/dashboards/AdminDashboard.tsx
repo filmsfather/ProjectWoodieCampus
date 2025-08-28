@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AdminApi } from '../../services/adminApi';
 import { WorkbookApi } from '../../services/workbookApi';
 import { ProblemApi } from '../../services/problemApi';
-import SubjectManagement from '../admin/SubjectManagement';
+// import SubjectManagement from '../admin/SubjectManagement';
 
 interface AdminDashboardProps {
   userId: string;
@@ -252,7 +252,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ }) => {
           </button>
           <h1>교과목 관리</h1>
         </div>
-        <SubjectManagement />
+        {/* <SubjectManagement /> */}
+        <div style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+          교과목 관리 기능은 임시로 비활성화되었습니다.
+        </div>
       </div>
     );
   }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import { CreateClassData } from '../../services/teacherApi';
+import type { CreateClassData } from '../../services/teacherApi';
 
 interface CreateClassModalProps {
   onClose: () => void;

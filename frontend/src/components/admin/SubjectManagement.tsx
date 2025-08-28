@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { SubjectApi, Subject, CreateSubjectRequest } from '../../services/subjectApi';
+import { SubjectApi } from '../../services/subjectApi';
+import type { Subject, CreateSubjectRequest, UpdateSubjectRequest } from '../../services/subjectApi';
 import './SubjectManagement.css';
 
 const SubjectManagement: React.FC = () => {

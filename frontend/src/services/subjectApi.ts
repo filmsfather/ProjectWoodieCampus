@@ -45,6 +45,9 @@ export interface Workbook {
   };
 }
 
+// Export all interfaces
+export type { Subject, CreateSubjectRequest, UpdateSubjectRequest, Workbook };
+
 export class SubjectApi {
   private static baseUrl = config.api.baseUrl;
 

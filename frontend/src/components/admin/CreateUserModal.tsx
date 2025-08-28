@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AdminApi, generateRandomPassword, type CreateUserRequest } from '../../services/adminApi';
-import { classApi, Class } from '../../services/teacherApi';
+import { classApi } from '../../services/teacherApi';
+import type { Class } from '../../services/teacherApi';
 
 interface CreateUserModalProps {
   onClose: () => void;

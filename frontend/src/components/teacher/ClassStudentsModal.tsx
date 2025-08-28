@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { XMarkIcon, UserPlusIcon, UserMinusIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
-import { Class, Student, classApi } from '../../services/teacherApi';
-import { adminApi } from '../../services/adminApi';
+import { classApi } from '../../services/teacherApi';
+import type { Class, Student } from '../../services/teacherApi';
+import { AdminApi } from '../../services/adminApi';
 import { useAuth } from '../../hooks/useAuth';
 
 interface ClassStudentsModalProps {
@@ -37,7 +38,7 @@ const ClassStudentsModal: React.FC<ClassStudentsModalProps> = ({
 
       // 관리자인 경우 모든 학생 목록도 로드 (반 배정용)
       if (user?.role === 'admin') {
-        const { users: allUsers } = await adminApi.getAllUsers();
+        const { users: allUsers } = await AdminApi.getAllUsers();
         const studentUsers = allUsers.filter(u => u.role === 'student');
         setAllStudents(studentUsers);
         
