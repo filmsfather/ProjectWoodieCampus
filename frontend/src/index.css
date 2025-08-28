@@ -4,6 +4,84 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 유동형 타이포그래피 및 스페이싱 유틸리티 */
+@layer utilities {
+  /* 텍스트 ellipsis 처리 */
+  .text-ellipsis-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+  }
+  
+  .text-ellipsis-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+  
+  /* 읽기 최적화 레이아웃 */
+  .reading-width {
+    max-width: 65ch;
+  }
+  
+  .reading-leading {
+    line-height: 1.6;
+  }
+  
+  /* 숫자/날짜 포맷 */
+  .numeric-mono {
+    font-family: 'SF Mono', Monaco, Cascadia Code, monospace;
+    font-feature-settings: 'tnum';
+    text-align: right;
+  }
+  
+  /* 카드 표준 간격 */
+  .card-header-spacing {
+    padding: 12px; /* card-header */
+  }
+  
+  .card-content-spacing {
+    padding: 16px; /* card-content */
+  }
+  
+  .card-footer-spacing {
+    padding: 12px; /* card-footer */
+  }
+  
+  /* 버튼 표준 간격 */
+  .btn-spacing {
+    padding: 16px 32px;
+  }
+  
+  .btn-spacing-sm {
+    padding: 8px 24px;
+  }
+  
+  .btn-spacing-lg {
+    padding: 24px 48px;
+  }
+  
+  /* 섹션 표준 간격 */
+  .section-spacing {
+    margin-bottom: 32px;
+  }
+  
+  .element-spacing {
+    margin-bottom: 24px;
+  }
+  
+  /* 텍스트-아이콘 조합 */
+  .text-with-icon {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+}
+
 /* Safe area inset support for mobile devices */
 @supports (padding: env(safe-area-inset-bottom)) {
   .safe-area-inset-bottom {

@@ -62,6 +62,7 @@ export default {
         mono: ['SF Mono', 'Monaco', 'Cascadia Code', 'monospace'],
       },
       fontSize: {
+        // 고정 크기 (기존 호환성)
         xs: '12px',
         sm: '14px',
         base: '16px',
@@ -72,20 +73,59 @@ export default {
         '4xl': '32px',
         '5xl': '36px',
         '6xl': '48px',
+        
+        // 유동형 타이포그래피 (CSS clamp 기반)
+        'fluid-xs': 'clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem)', // 12px~14px
+        'fluid-sm': 'clamp(0.875rem, 0.8rem + 0.375vw, 1rem)', // 14px~16px
+        'fluid-base': 'clamp(1rem, 0.9rem + 0.5vw, 1.125rem)', // 16px~18px
+        'fluid-lg': 'clamp(1.125rem, 1rem + 0.625vw, 1.25rem)', // 18px~20px
+        'fluid-xl': 'clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem)', // 20px~24px
+        'fluid-2xl': 'clamp(1.5rem, 1.3rem + 1vw, 1.875rem)', // 24px~30px
+        'fluid-3xl': 'clamp(1.875rem, 1.6rem + 1.375vw, 2.25rem)', // 30px~36px
+        'fluid-4xl': 'clamp(2.25rem, 1.9rem + 1.75vw, 2.75rem)', // 36px~44px
+        'fluid-5xl': 'clamp(2.75rem, 2.3rem + 2.25vw, 3.5rem)', // 44px~56px
+        'fluid-6xl': 'clamp(3.5rem, 2.8rem + 3.5vw, 4.5rem)', // 56px~72px
       },
       spacing: {
-        1: '8px',
-        2: '16px',
-        3: '24px',
-        4: '32px',
-        5: '40px',
-        6: '48px',
-        8: '64px',
-        10: '80px',
-        12: '96px',
-        16: '128px',
-        20: '160px',
-        24: '192px',
+        // 8pt 기반 스페이싱 시스템
+        0: '0px',
+        0.5: '4px',   // 0.5 단위 (하프 스텝)
+        1: '8px',     // 기본 단위
+        1.5: '12px',  // 1.5 단위 (텍스트-아이콘 간격용)
+        2: '16px',    // 2 단위
+        2.5: '20px',  // 2.5 단위
+        3: '24px',    // 3 단위
+        3.5: '28px',  // 3.5 단위
+        4: '32px',    // 4 단위
+        5: '40px',    // 5 단위
+        6: '48px',    // 6 단위
+        7: '56px',    // 7 단위
+        8: '64px',    // 8 단위
+        9: '72px',    // 9 단위
+        10: '80px',   // 10 단위
+        11: '88px',   // 11 단위
+        12: '96px',   // 12 단위
+        14: '112px',  // 14 단위
+        16: '128px',  // 16 단위
+        18: '144px',  // 18 단위
+        20: '160px',  // 20 단위
+        22: '176px',  // 22 단위
+        24: '192px',  // 24 단위
+        28: '224px',  // 28 단위
+        32: '256px',  // 32 단위
+        36: '288px',  // 36 단위
+        40: '320px',  // 40 단위
+        44: '352px',  // 44 단위
+        48: '384px',  // 48 단위
+        
+        // 컴포넌트별 특수 간격
+        'card-padding': '16px',      // 카드 기본 패딩
+        'card-header': '12px',       // 카드 헤더 간격
+        'card-content': '16px',      // 카드 콘텐츠 간격
+        'card-footer': '12px',       // 카드 푸터 간격
+        'section-gap': '32px',       // 섹션 간격
+        'element-gap': '24px',       // 엘리먼트 간격
+        'text-icon-gap': '12px',     // 텍스트-아이콘 간격
       },
       borderRadius: {
         sm: '4px',
@@ -126,8 +166,27 @@ export default {
         popover: '1060',
         tooltip: '1070',
         toast: '1080',
-      }
+      },
+      // 텍스트 길이 제한 및 ellipsis 처리
+      lineClamp: {
+        1: '1',
+        2: '2',
+        3: '3',
+        4: '4',
+        5: '5',
+        6: '6',
+      },
+      // 최대 너비 (읽기 최적화)
+      maxWidth: {
+        'container': '1200px',
+        'reading': '65ch',    // 읽기 최적 너비 (65자)
+        'button': '200px',    // 버튼 최대 너비
+        'card-title': '300px', // 카드 제목 최대 너비
+      },
     },
   },
-  plugins: [],
+  plugins: [
+    // 텍스트 ellipsis 플러그인 (line-clamp 지원)
+    require('@tailwindcss/line-clamp'),
+  ],
 }

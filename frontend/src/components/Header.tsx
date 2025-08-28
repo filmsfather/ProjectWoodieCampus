@@ -58,7 +58,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, showMenuButton = false }) 
           )}
           
           <Link to={isAuthenticated ? "/dashboard" : "/"} className="flex items-center">
-            <h1 className="text-xl font-bold text-role-primary">Woodie Campus</h1>
+            <h1 className="text-fluid-xl font-bold text-role-primary">Woodie Campus</h1>
           </Link>
         </div>
         
@@ -68,20 +68,20 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, showMenuButton = false }) 
             <>
               <Link 
                 to="/dashboard" 
-                className="text-sm font-medium text-neutral-700 hover:text-role-primary transition-colors"
+                className="text-fluid-sm font-medium text-neutral-700 hover:text-role-primary transition-colors"
               >
                 대시보드
               </Link>
               <Link 
                 to="/problems" 
-                className="text-sm font-medium text-neutral-700 hover:text-role-primary transition-colors"
+                className="text-fluid-sm font-medium text-neutral-700 hover:text-role-primary transition-colors"
               >
                 문제
               </Link>
               {(currentUser?.role === 'admin' || currentUser?.role === 'teacher') && (
                 <Link 
                   to="/admin" 
-                  className="text-sm font-medium text-neutral-700 hover:text-role-primary transition-colors"
+                  className="text-fluid-sm font-medium text-neutral-700 hover:text-role-primary transition-colors"
                 >
                   관리
                 </Link>

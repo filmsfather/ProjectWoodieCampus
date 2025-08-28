@@ -10,9 +10,9 @@ interface CardProps<T extends React.ElementType = 'div'> {
 }
 
 const paddingMap = {
-  sm: 'p-4',
-  md: 'p-6',
-  lg: 'p-8',
+  sm: 'p-3',      // 24px - 8pt 기반
+  md: 'p-4',      // 32px - 표준 카드 패딩 (16px 대신 32px)
+  lg: 'p-6',      // 48px - 8pt 기반
 };
 
 export default function Card<T extends React.ElementType = 'div'>({
@@ -56,12 +56,18 @@ export function CardHeader({
   className = '' 
 }: CardHeaderProps) {
   return (
-    <div className={`flex items-start justify-between ${className}`}>
-      <div className="flex items-center gap-3 flex-1">
-        {icon && <div className="text-2xl flex-shrink-0">{icon}</div>}
+    <div className={`flex items-start justify-between card-header-spacing ${className}`}>
+      <div className="text-with-icon flex-1">
+        {icon && <div className="text-fluid-xl flex-shrink-0">{icon}</div>}
         <Stack gap="xs" className="flex-1 min-w-0">
-          <h3 className="font-semibold text-neutral-900 text-lg">{title}</h3>
-          {subtitle && <p className="text-sm text-neutral-600">{subtitle}</p>}
+          <h3 className="font-semibold text-neutral-900 text-fluid-lg text-ellipsis-2 max-w-card-title">
+            {title}
+          </h3>
+          {subtitle && (
+            <p className="text-fluid-sm text-neutral-600 reading-leading text-ellipsis-1">
+              {subtitle}
+            </p>
+          )}
         </Stack>
       </div>
       {actions && <div className="flex-shrink-0 ml-4">{actions}</div>}
@@ -77,7 +83,7 @@ interface CardContentProps {
 
 export function CardContent({ children, className = '' }: CardContentProps) {
   return (
-    <div className={`flex-1 ${className}`}>
+    <div className={`flex-1 card-content-spacing reading-leading ${className}`}>
       {children}
     </div>
   );
@@ -103,7 +109,7 @@ export function CardActions({
   };
 
   return (
-    <div className={`flex items-center gap-2 mt-4 ${justifyMap[justify]} ${className}`}>
+    <div className={`flex items-center gap-2 card-footer-spacing ${justifyMap[justify]} ${className}`}>
       {children}
     </div>
   );
