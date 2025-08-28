@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { ReviewApi } from '../../services/reviewApi';
 import { WorkbookApi } from '../../services/workbookApi';
 import type { ReviewProgress, ReviewTarget, DailyStats } from '../../services/reviewApi';
+import { Stack, Grid, Cluster } from '../layout/index';
+import { StatCard, Card, CardHeader, CardContent } from '../ui';
 
 interface StudentDashboardProps {
   userId: string;
@@ -72,241 +74,274 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ }) => {
 
   if (loading) {
     return (
-      <div className="student-dashboard loading">
-        <div className="loading-spinner">
-          <div className="spinner"></div>
-          <p>대시보드를 로드하고 있습니다...</p>
-        </div>
+      <div className="min-h-96 flex items-center justify-center">
+        <Stack align="center" gap="sm" className="text-center">
+          <div className="w-10 h-10 border-4 border-neutral-200 border-t-primary rounded-full animate-spin"></div>
+          <p className="text-neutral-600">대시보드를 로드하고 있습니다...</p>
+        </Stack>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="student-dashboard error">
-        <div className="error-message">
-          <h3>❌ 오류 발생</h3>
-          <p>{error}</p>
-          <button onClick={loadDashboardData} className="retry-btn">다시 시도</button>
-        </div>
+      <div className="min-h-96 flex items-center justify-center">
+        <Stack align="center" gap="md" className="text-center max-w-md mx-auto p-6">
+          <h3 className="text-xl font-semibold text-error">❌ 오류 발생</h3>
+          <p className="text-neutral-700">{error}</p>
+          <button 
+            onClick={loadDashboardData} 
+            className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+          >
+            다시 시도
+          </button>
+        </Stack>
       </div>
     );
   }
 
   return (
-    <div className="student-dashboard">
-      <div className="dashboard-header">
-        <h1>학습 대시보드</h1>
-        <p>오늘의 학습 현황을 확인하고 복습을 진행하세요</p>
-      </div>
+    <Stack gap="lg" className="max-w-container mx-auto p-6">
+      {/* 헤더 */}
+      <Stack gap="xs">
+        <h1 className="text-3xl font-bold text-neutral-900">학습 대시보드</h1>
+        <p className="text-neutral-600">오늘의 학습 현황을 확인하고 복습을 진행하세요</p>
+      </Stack>
       
-      <div className="dashboard-content">
-        {/* 오늘의 통계 */}
-        <div className="stats-section">
-          <div className="stat-card primary">
-            <div className="stat-icon">📚</div>
-            <div className="stat-content">
-              <h3>오늘의 복습</h3>
-              <p className="stat-number">{reviewProgress?.todayTotal || 0}</p>
-              <p className="stat-label">문제</p>
-            </div>
-          </div>
-          
-          <div className="stat-card success">
-            <div className="stat-icon">✅</div>
-            <div className="stat-content">
-              <h3>학습 진도</h3>
-              <p className="stat-number">{calculateCompletionRate()}%</p>
-              <p className="stat-label">완료</p>
-            </div>
-          </div>
-          
-          <div className="stat-card warning">
-            <div className="stat-icon">🔥</div>
-            <div className="stat-content">
-              <h3>연속 학습</h3>
-              <p className="stat-number">{getStreakDays()}</p>
-              <p className="stat-label">일</p>
-            </div>
-          </div>
+      {/* 통계 카드 그리드 */}
+      <Grid columns={4} gap="md" className="md:grid-cols-2 sm:grid-cols-1">
+        <StatCard
+          title="오늘의 복습"
+          value={reviewProgress?.todayTotal || 0}
+          subtitle="문제"
+          icon="📚"
+          variant="role"
+        />
+        
+        <StatCard
+          title="학습 진도"
+          value={`${calculateCompletionRate()}%`}
+          subtitle="완료"
+          icon="✅"
+          variant="success"
+        />
+        
+        <StatCard
+          title="연속 학습"
+          value={getStreakDays()}
+          subtitle="일"
+          icon="🔥"
+          variant="warning"
+        />
 
-          {dailyStats && (
-            <div className="stat-card info">
-              <div className="stat-icon">🎯</div>
-              <div className="stat-content">
-                <h3>오늘의 정답률</h3>
-                <p className="stat-number">
-                  {dailyStats.totalReviewsCompleted > 0 
-                    ? Math.round((dailyStats.correctAnswers / dailyStats.totalReviewsCompleted) * 100)
-                    : 0}%
-                </p>
-                <p className="stat-label">정확도</p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* 숙련도 분포 차트 */}
-        {reviewProgress && (
-          <div className="mastery-distribution">
-            <h2>학습 진행 현황</h2>
-            <div className="mastery-chart">
-              <div className="mastery-bar">
-                <div className="mastery-levels">
-                  <div className="mastery-level level-0" 
-                       style={{width: `${(reviewProgress.masteryDistribution.level0 / Math.max(reviewProgress.todayTotal, 1)) * 100}%`}}>
-                    <span className="level-label">처음 학습</span>
-                    <span className="level-count">{reviewProgress.masteryDistribution.level0}</span>
-                  </div>
-                  <div className="mastery-level level-1" 
-                       style={{width: `${(reviewProgress.masteryDistribution.level1 / Math.max(reviewProgress.todayTotal, 1)) * 100}%`}}>
-                    <span className="level-label">1일차</span>
-                    <span className="level-count">{reviewProgress.masteryDistribution.level1}</span>
-                  </div>
-                  <div className="mastery-level level-2" 
-                       style={{width: `${(reviewProgress.masteryDistribution.level2 / Math.max(reviewProgress.todayTotal, 1)) * 100}%`}}>
-                    <span className="level-label">3일차</span>
-                    <span className="level-count">{reviewProgress.masteryDistribution.level2}</span>
-                  </div>
-                  <div className="mastery-level level-3" 
-                       style={{width: `${(reviewProgress.masteryDistribution.level3 / Math.max(reviewProgress.todayTotal, 1)) * 100}%`}}>
-                    <span className="level-label">7일차</span>
-                    <span className="level-count">{reviewProgress.masteryDistribution.level3}</span>
-                  </div>
-                  <div className="mastery-level completed" 
-                       style={{width: `${(reviewProgress.masteryDistribution.completed / Math.max(reviewProgress.todayTotal, 1)) * 100}%`}}>
-                    <span className="level-label">완료</span>
-                    <span className="level-count">{reviewProgress.masteryDistribution.completed}</span>
-                  </div>
-                </div>
-              </div>
-              <div className="mastery-legend">
-                <div className="legend-item">
-                  <span className="legend-color level-0"></span>
-                  <span>처음 학습</span>
-                </div>
-                <div className="legend-item">
-                  <span className="legend-color level-1"></span>
-                  <span>1일 복습</span>
-                </div>
-                <div className="legend-item">
-                  <span className="legend-color level-2"></span>
-                  <span>3일 복습</span>
-                </div>
-                <div className="legend-item">
-                  <span className="legend-color level-3"></span>
-                  <span>7일 복습</span>
-                </div>
-                <div className="legend-item">
-                  <span className="legend-color completed"></span>
-                  <span>학습 완료</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* 오늘의 복습 목록 */}
-        <div className="today-reviews">
-          <h2>오늘의 복습</h2>
-          {todayReviews.length > 0 ? (
-            <div className="review-list">
-              {todayReviews.map((review) => (
-                <div key={review.id} className="review-item">
-                  <div className="review-content">
-                    <h4>{review.problem?.title || '문제 제목 없음'}</h4>
-                    <p className="review-subject">{review.problem?.subject}</p>
-                    <div className="review-meta">
-                      <span className={`mastery-badge level-${review.mastery_level}`}>
-                        레벨 {review.mastery_level}
-                      </span>
-                      <span className="difficulty-badge">
-                        {review.problem?.difficulty || '보통'}
-                      </span>
-                    </div>
-                  </div>
-                  <button 
-                    className="review-btn"
-                    onClick={() => window.location.href = `/problems/solve/${review.problem_id}`}
-                  >
-                    복습하기
-                  </button>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="no-reviews">
-              <p>🎉 오늘 복습할 문제가 없습니다!</p>
-              <p>새로운 문제를 풀어보세요.</p>
-            </div>
-          )}
-        </div>
-
-        {/* 내 문제집 목록 */}
-        <div className="my-workbooks">
-          <h2>내 문제집</h2>
-          {recentWorkbooks.length > 0 ? (
-            <div className="workbook-list">
-              {recentWorkbooks.slice(0, 5).map((workbook) => (
-                <div key={workbook.id} className="workbook-item">
-                  <div className="workbook-content">
-                    <h4>{workbook.title}</h4>
-                    <p className="workbook-description">{workbook.description}</p>
-                    <div className="workbook-meta">
-                      <span className="subject-badge">{workbook.subject}</span>
-                      <span className="grade-badge">
-                        {workbook.grade_level ? `${workbook.grade_level}학년` : '전체'}
-                      </span>
-                      <span className="time-badge">
-                        {workbook.estimated_time ? `${workbook.estimated_time}분` : '시간 미정'}
-                      </span>
-                    </div>
-                  </div>
-                  <button 
-                    className="workbook-btn"
-                    onClick={() => window.location.href = `/workbooks/${workbook.id}`}
-                  >
-                    풀기
-                  </button>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="no-workbooks">
-              <p>📝 아직 문제집이 없습니다.</p>
-              <p>문제집을 만들어 학습을 시작하세요!</p>
-            </div>
-          )}
-        </div>
-
-        {/* 최근 활동 */}
         {dailyStats && (
-          <div className="recent-activities">
-            <h2>오늘의 학습 활동</h2>
-            <div className="activity-summary">
-              <div className="activity-stat">
-                <span className="activity-label">완료한 복습</span>
-                <span className="activity-value">{dailyStats.totalReviewsCompleted}개</span>
-              </div>
-              <div className="activity-stat">
-                <span className="activity-label">정답</span>
-                <span className="activity-value success">{dailyStats.correctAnswers}개</span>
-              </div>
-              <div className="activity-stat">
-                <span className="activity-label">오답</span>
-                <span className="activity-value error">{dailyStats.incorrectAnswers}개</span>
-              </div>
-              {dailyStats.averageTimeSpent > 0 && (
-                <div className="activity-stat">
-                  <span className="activity-label">평균 소요시간</span>
-                  <span className="activity-value">{Math.round(dailyStats.averageTimeSpent)}초</span>
-                </div>
-              )}
-            </div>
-          </div>
+          <StatCard
+            title="오늘의 정답률"
+            value={`${dailyStats.totalReviewsCompleted > 0 
+              ? Math.round((dailyStats.correctAnswers / dailyStats.totalReviewsCompleted) * 100)
+              : 0}%`}
+            subtitle="정확도"
+            icon="🎯"
+            variant="info"
+          />
         )}
-      </div>
-    </div>
+      </Grid>
+
+      {/* 숙련도 분포 차트 */}
+      {reviewProgress && (
+        <Card>
+          <CardHeader 
+            title="학습 진행 현황" 
+          />
+          <CardContent>
+            <Stack gap="md">
+            
+            {/* 진행률 바 */}
+            <div className="w-full bg-neutral-100 rounded-lg h-12 flex overflow-hidden">
+              <div 
+                className="bg-neutral-300 flex items-center justify-center text-xs font-medium text-neutral-700"
+                style={{width: `${(reviewProgress.masteryDistribution.level0 / Math.max(reviewProgress.todayTotal, 1)) * 100}%`}}
+              >
+                {reviewProgress.masteryDistribution.level0 > 0 && reviewProgress.masteryDistribution.level0}
+              </div>
+              <div 
+                className="bg-yellow-200 flex items-center justify-center text-xs font-medium text-yellow-800"
+                style={{width: `${(reviewProgress.masteryDistribution.level1 / Math.max(reviewProgress.todayTotal, 1)) * 100}%`}}
+              >
+                {reviewProgress.masteryDistribution.level1 > 0 && reviewProgress.masteryDistribution.level1}
+              </div>
+              <div 
+                className="bg-blue-200 flex items-center justify-center text-xs font-medium text-blue-800"
+                style={{width: `${(reviewProgress.masteryDistribution.level2 / Math.max(reviewProgress.todayTotal, 1)) * 100}%`}}
+              >
+                {reviewProgress.masteryDistribution.level2 > 0 && reviewProgress.masteryDistribution.level2}
+              </div>
+              <div 
+                className="bg-purple-200 flex items-center justify-center text-xs font-medium text-purple-800"
+                style={{width: `${(reviewProgress.masteryDistribution.level3 / Math.max(reviewProgress.todayTotal, 1)) * 100}%`}}
+              >
+                {reviewProgress.masteryDistribution.level3 > 0 && reviewProgress.masteryDistribution.level3}
+              </div>
+              <div 
+                className="bg-success text-white flex items-center justify-center text-xs font-medium"
+                style={{width: `${(reviewProgress.masteryDistribution.completed / Math.max(reviewProgress.todayTotal, 1)) * 100}%`}}
+              >
+                {reviewProgress.masteryDistribution.completed > 0 && reviewProgress.masteryDistribution.completed}
+              </div>
+            </div>
+            
+            {/* 범례 */}
+            <Cluster gap="md" wrap className="text-sm">
+              <Cluster gap="xs" align="center">
+                <div className="w-3 h-3 rounded bg-neutral-300"></div>
+                <span>처음 학습</span>
+              </Cluster>
+              <Cluster gap="xs" align="center">
+                <div className="w-3 h-3 rounded bg-yellow-200"></div>
+                <span>1일 복습</span>
+              </Cluster>
+              <Cluster gap="xs" align="center">
+                <div className="w-3 h-3 rounded bg-blue-200"></div>
+                <span>3일 복습</span>
+              </Cluster>
+              <Cluster gap="xs" align="center">
+                <div className="w-3 h-3 rounded bg-purple-200"></div>
+                <span>7일 복습</span>
+              </Cluster>
+              <Cluster gap="xs" align="center">
+                <div className="w-3 h-3 rounded bg-success"></div>
+                <span>학습 완료</span>
+              </Cluster>
+            </Cluster>
+            </Stack>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* 오늘의 복습 목록 */}
+      <Card>
+        <CardHeader title="오늘의 복습" />
+        <CardContent>
+          <Stack gap="md">
+          
+          {todayReviews.length > 0 ? (
+            <Stack gap="sm">
+              {todayReviews.map((review) => (
+                <div key={review.id} className="border border-neutral-200 rounded-lg p-4 hover:border-primary-light transition-colors">
+                  <Cluster justify="between" align="center" className="w-full">
+                    <Stack gap="xs" className="flex-1">
+                      <h4 className="font-medium text-neutral-900">{review.problem?.title || '문제 제목 없음'}</h4>
+                      <p className="text-sm text-neutral-600">{review.problem?.subject}</p>
+                      <Cluster gap="xs">
+                        <span className={`px-2 py-1 rounded text-xs font-medium ${
+                          review.mastery_level === 0 ? 'bg-neutral-100 text-neutral-700' :
+                          review.mastery_level === 1 ? 'bg-yellow-100 text-yellow-800' :
+                          review.mastery_level === 2 ? 'bg-blue-100 text-blue-800' :
+                          'bg-purple-100 text-purple-800'
+                        }`}>
+                          레벨 {review.mastery_level}
+                        </span>
+                        <span className="px-2 py-1 rounded text-xs bg-neutral-100 text-neutral-700">
+                          {review.problem?.difficulty || '보통'}
+                        </span>
+                      </Cluster>
+                    </Stack>
+                    <button 
+                      className="px-4 py-2 role-primary rounded-lg transition-colors text-sm font-medium"
+                      onClick={() => window.location.href = `/problems/solve/${review.problem_id}`}
+                    >
+                      복습하기
+                    </button>
+                  </Cluster>
+                </div>
+              ))}
+            </Stack>
+          ) : (
+            <Stack gap="xs" align="center" className="py-8 text-center">
+              <p className="text-lg">🎉 오늘 복습할 문제가 없습니다!</p>
+              <p className="text-neutral-600">새로운 문제를 풀어보세요.</p>
+            </Stack>
+          )}
+          </Stack>
+        </CardContent>
+      </Card>
+
+      {/* 내 문제집 목록 */}
+      <Card>
+        <CardHeader title="내 문제집" />
+        <CardContent>
+          <Stack gap="md">
+          
+          {recentWorkbooks.length > 0 ? (
+            <Grid columns={2} gap="md" className="md:grid-cols-1">
+              {recentWorkbooks.slice(0, 5).map((workbook) => (
+                <div key={workbook.id} className="border border-neutral-200 rounded-lg p-4 hover:border-primary-light transition-colors">
+                  <Cluster justify="between" align="start" className="w-full">
+                    <Stack gap="xs" className="flex-1">
+                      <h4 className="font-medium text-neutral-900">{workbook.title}</h4>
+                      <p className="text-sm text-neutral-600">{workbook.description}</p>
+                      <Cluster gap="xs" wrap>
+                        <span className="px-2 py-1 rounded text-xs role-primary">
+                          {workbook.subject}
+                        </span>
+                        <span className="px-2 py-1 rounded text-xs bg-neutral-100 text-neutral-700">
+                          {workbook.grade_level ? `${workbook.grade_level}학년` : '전체'}
+                        </span>
+                        <span className="px-2 py-1 rounded text-xs bg-neutral-100 text-neutral-700">
+                          {workbook.estimated_time ? `${workbook.estimated_time}분` : '시간 미정'}
+                        </span>
+                      </Cluster>
+                    </Stack>
+                    <button 
+                      className="px-4 py-2 bg-secondary text-white rounded-lg hover:bg-secondary-dark transition-colors text-sm font-medium whitespace-nowrap ml-4"
+                      onClick={() => window.location.href = `/workbooks/${workbook.id}`}
+                    >
+                      풀기
+                    </button>
+                  </Cluster>
+                </div>
+              ))}
+            </Grid>
+          ) : (
+            <Stack gap="xs" align="center" className="py-8 text-center">
+              <p className="text-lg">📝 아직 문제집이 없습니다.</p>
+              <p className="text-neutral-600">문제집을 만들어 학습을 시작하세요!</p>
+            </Stack>
+          )}
+          </Stack>
+        </CardContent>
+      </Card>
+
+      {/* 최근 활동 */}
+      {dailyStats && (
+        <Card>
+          <CardHeader title="오늘의 학습 활동" />
+          <CardContent>
+            
+            <Grid columns={4} gap="md" className="md:grid-cols-2 sm:grid-cols-1">
+              <Stack gap="xs" align="center" className="text-center">
+                <span className="text-sm text-neutral-600">완료한 복습</span>
+                <span className="text-2xl font-bold text-role-primary">{dailyStats.totalReviewsCompleted}개</span>
+              </Stack>
+              <Stack gap="xs" align="center" className="text-center">
+                <span className="text-sm text-neutral-600">정답</span>
+                <span className="text-2xl font-bold text-success">{dailyStats.correctAnswers}개</span>
+              </Stack>
+              <Stack gap="xs" align="center" className="text-center">
+                <span className="text-sm text-neutral-600">오답</span>
+                <span className="text-2xl font-bold text-error">{dailyStats.incorrectAnswers}개</span>
+              </Stack>
+              {dailyStats.averageTimeSpent > 0 && (
+                <Stack gap="xs" align="center" className="text-center">
+                  <span className="text-sm text-neutral-600">평균 소요시간</span>
+                  <span className="text-2xl font-bold text-role-primary">{Math.round(dailyStats.averageTimeSpent)}초</span>
+                </Stack>
+              )}
+            </Grid>
+          </CardContent>
+        </Card>
+      )}
+    </Stack>
   );
 };
 

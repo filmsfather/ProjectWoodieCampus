@@ -29,15 +29,39 @@ const LoadingSpinner = () => (
 );
 
 function App() {
-  // 환경변수 검증 및 접근성 초기화
+  const [userRole, setUserRole] = React.useState<string>('student');
+
+  // 환경변수 검증 및 접근성 초기화, 사용자 역할 체크
   React.useEffect(() => {
     validateConfig();
     AccessibilityManager.getInstance();
+    
+    // 로컬스토리지에서 사용자 정보 확인
+    const checkUserRole = () => {
+      try {
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+          const user = JSON.parse(userStr);
+          setUserRole(user.role || 'student');
+        }
+      } catch (error) {
+        console.error('사용자 정보 파싱 오류:', error);
+      }
+    };
+
+    checkUserRole();
+    
+    // 로그인/로그아웃 시 역할 업데이트를 위한 이벤트 리스너
+    window.addEventListener('storage', checkUserRole);
+    
+    return () => {
+      window.removeEventListener('storage', checkUserRole);
+    };
   }, []);
 
   return (
     <Router>
-      <div className="app">
+      <div className="app" data-role={userRole}>
         <ErrorBoundary>
           <Suspense fallback={<LoadingSpinner />}>
             <Routes>

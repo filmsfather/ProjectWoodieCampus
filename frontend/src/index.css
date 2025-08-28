@@ -1,16 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Noto Sans KR', system-ui, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
+  
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* 역할별 테마 시스템 */
+[data-role="student"] {
+  --color-role-primary: #5A6450;
+  --color-role-primary-dark: #4a5440;
+  --color-role-primary-light: #6a7460;
+}
+
+[data-role="teacher"] {
+  --color-role-primary: #6E7864;
+  --color-role-primary-dark: #5e6854;
+  --color-role-primary-light: #7e8874;
+}
+
+[data-role="admin"] {
+  --color-role-primary: #AA4632;
+  --color-role-primary-dark: #9a3e2a;
+  --color-role-primary-light: #ba563a;
+}
+
+/* 역할 기반 동적 스타일 */
+.role-primary {
+  background-color: var(--color-role-primary, #5A6450);
+  color: white;
+}
+
+.role-primary:hover {
+  background-color: var(--color-role-primary-dark, #4a5440);
+}
+
+.text-role-primary {
+  color: var(--color-role-primary, #5A6450);
+}
+
+.border-role-primary {
+  border-color: var(--color-role-primary, #5A6450);
+}
+
+.bg-role-primary-light {
+  background-color: var(--color-role-primary-light, #6a7460);
 }
 
 a {
