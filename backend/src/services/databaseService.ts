@@ -1493,12 +1493,6 @@ export class DatabaseService {
       .from('users')
       .update({ 
         class_id: classId,
-        class_assignments: supabase.raw(`
-          CASE 
-            WHEN class_assignments IS NULL THEN '[{"class_id": "' || ? || '", "assigned_at": "' || NOW() || '"}]'::jsonb
-            ELSE class_assignments || '[{"class_id": "' || ? || '", "assigned_at": "' || NOW() || '"}]'::jsonb
-          END
-        `, [classId, classId])
       })
       .eq('id', studentId)
       .eq('role', 'student')
@@ -1701,9 +1695,11 @@ export class DatabaseService {
     const assignments = await this.getWorkbookAssignmentsForStudent(studentId);
     let completedCount = 0;
 
+    const allProgress = await this.getAllWorkbooksProgress(studentId);
+    
     for (const assignment of assignments) {
-      const workbookProgress = await this.getWorkbookProgress(studentId, assignment.workbook_id);
-      if (workbookProgress.progressPercentage === 100) {
+      const workbookProgress = allProgress.find(p => p.workbookId === assignment.workbook_id);
+      if (workbookProgress && workbookProgress.progressPercentage === 100) {
         completedCount++;
       }
     }

@@ -111,3 +111,6 @@ export class AuthMiddleware {
     next();
   }
 }
+
+// 기본 인증 미들웨어를 기본 export로 제공
+export const authMiddleware = AuthMiddleware.authenticateToken;

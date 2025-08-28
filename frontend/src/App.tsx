@@ -14,6 +14,7 @@ const ProblemsPage = React.lazy(() => import('./pages/ProblemsPage'));
 const WorkbooksPage = React.lazy(() => import('./pages/WorkbooksPage'));
 const WorkbookDetailPage = React.lazy(() => import('./pages/WorkbookDetailPage'));
 const AdminPage = React.lazy(() => import('./pages/AdminPage'));
+const TeacherPage = React.lazy(() => import('./pages/TeacherPage'));
 const ImageUploadTestPage = React.lazy(() => import('./pages/ImageUploadTestPage').then(module => ({ default: module.ImageUploadTestPage })));
 const CreateProblemPage = React.lazy(() => import('./pages/CreateProblemPage').then(module => ({ default: module.CreateProblemPage })));
 const SolveProblemPage = React.lazy(() => import('./pages/SolveProblemPage'));
@@ -85,6 +86,15 @@ function App() {
               </PrivateRoute>
             }>
               <Route index element={<AdminPage />} />
+            </Route>
+
+            {/* 교사 페이지 - 교사와 관리자만 접근 가능 */}
+            <Route path="/teacher" element={
+              <PrivateRoute allowedRoles={['teacher', 'admin']}>
+                <Layout showSidebar={true} />
+              </PrivateRoute>
+            }>
+              <Route index element={<TeacherPage />} />
             </Route>
 
             {/* 테스트 페이지 - 관리자와 교사만 접근 가능 */}

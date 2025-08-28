@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AdminApi, generateRandomPassword, type CreateUserRequest } from '../../services/adminApi';
+import { classApi, Class } from '../../services/teacherApi';
 
 interface CreateUserModalProps {
   onClose: () => void;
@@ -14,9 +15,24 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({ onClose, onUserCreate
     role: 'student',
     fullName: '',
   });
+  const [selectedClassId, setSelectedClassId] = useState<string>('');
+  const [classes, setClasses] = useState<Class[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    loadClasses();
+  }, []);
+
+  const loadClasses = async () => {
+    try {
+      const allClasses = await classApi.getAllClasses();
+      setClasses(allClasses);
+    } catch (error) {
+      console.error('Failed to load classes:', error);
+    }
+  };
 
   // 폼 입력 핸들러
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -64,7 +80,13 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({ onClose, onUserCreate
       setLoading(true);
       setError(null);
 
-      await AdminApi.createUser(formData);
+      const user = await AdminApi.createUser(formData);
+      
+      // 학생이고 반을 선택했다면 반에 배정
+      if (formData.role === 'student' && selectedClassId) {
+        await classApi.addStudentToClass(selectedClassId, user.id);
+      }
+      
       onUserCreated();
     } catch (err) {
       setError(err instanceof Error ? err.message : '사용자 생성에 실패했습니다');
@@ -151,6 +173,31 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({ onClose, onUserCreate
               <option value="admin">관리자</option>
             </select>
           </div>
+
+          {/* 반 배정 (학생인 경우만) */}
+          {formData.role === 'student' && (
+            <div className="form-group">
+              <label htmlFor="classId">
+                반 배정 <span className="optional">(선택사항)</span>
+              </label>
+              <select
+                id="classId"
+                value={selectedClassId}
+                onChange={(e) => setSelectedClassId(e.target.value)}
+                disabled={loading}
+              >
+                <option value="">반 선택 안함</option>
+                {classes.map((cls) => (
+                  <option key={cls.id} value={cls.id}>
+                    {cls.name} {cls.grade_level && `(${cls.grade_level}학년)`}
+                  </option>
+                ))}
+              </select>
+              <small className="form-hint">
+                나중에 반을 배정하거나 변경할 수 있습니다
+              </small>
+            </div>
+          )}
 
           {/* 비밀번호 */}
           <div className="form-group">

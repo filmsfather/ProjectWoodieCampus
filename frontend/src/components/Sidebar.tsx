@@ -39,6 +39,12 @@ const Sidebar: React.FC = () => {
       roles: ['student', 'teacher', 'admin'],
     },
     {
+      path: '/teacher',
+      label: '반 관리',
+      icon: '🏫',
+      roles: ['teacher', 'admin'],
+    },
+    {
       path: '/admin',
       label: '사용자 관리',
       icon: '👤',
