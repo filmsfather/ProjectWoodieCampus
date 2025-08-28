@@ -1,14 +1,17 @@
 import React from 'react';
 
 type SpacingSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'none';
+type CardSize = 'sm' | 'md' | 'lg';
 
 interface AutoGridProps<T extends React.ElementType = 'div'> {
   as?: T;
   minWidth?: string;
+  cardSize?: CardSize;  // 카드 규격 프리셋
   gap?: SpacingSize;
   gapX?: SpacingSize;
   gapY?: SpacingSize;
   equalHeight?: boolean;
+  stretch?: boolean;  // 카드 높이 균등화
   responsive?: {
     sm?: string;
     md?: string;
@@ -46,13 +49,22 @@ const gapYMap: Record<SpacingSize, string> = {
   xl: 'gap-y-6',
 };
 
+// 카드 규격 프리셋
+const cardSizeMap: Record<CardSize, { minWidth: string; maxWidth: string }> = {
+  sm: { minWidth: '240px', maxWidth: '280px' },
+  md: { minWidth: '280px', maxWidth: '320px' },
+  lg: { minWidth: '320px', maxWidth: '400px' },
+};
+
 export default function AutoGrid<T extends React.ElementType = 'div'>({
   as,
-  minWidth = '280px',
+  minWidth,
+  cardSize,
   gap,
   gapX,
   gapY,
   equalHeight = false,
+  stretch = false,
   responsive,
   className = '',
   children,
@@ -60,21 +72,27 @@ export default function AutoGrid<T extends React.ElementType = 'div'>({
 }: AutoGridProps<T> & Omit<React.ComponentPropsWithoutRef<T>, keyof AutoGridProps<T>>) {
   const Component = as || 'div';
   
+  // 카드 규격이 지정된 경우 해당 값 사용, 아니면 기본값 또는 props 값 사용
+  const effectiveMinWidth = cardSize ? cardSizeMap[cardSize].minWidth : (minWidth || '280px');
+  const effectiveMaxWidth = cardSize ? cardSizeMap[cardSize].maxWidth : undefined;
+  
   const classes = [
     'grid',
     gap && gapMap[gap],
     gapX && gapXMap[gapX], 
     gapY && gapYMap[gapY],
-    equalHeight && 'grid-rows-[masonry]',
+    stretch && 'items-stretch', // 카드 높이 균등화
     className
   ].filter(Boolean).join(' ');
 
   // CSS Grid auto-fit 스타일 생성
-  const getGridTemplate = (width: string) => 
-    `repeat(auto-fit, minmax(${width}, 1fr))`;
+  const getGridTemplate = (minW: string, maxW?: string) => {
+    const maxWidth = maxW || '1fr';
+    return `repeat(auto-fit, minmax(${minW}, ${maxWidth}))`;
+  };
 
   const style: React.CSSProperties = {
-    gridTemplateColumns: getGridTemplate(minWidth),
+    gridTemplateColumns: getGridTemplate(effectiveMinWidth, effectiveMaxWidth),
     ...(!gap && !gapX && !gapY && { gap: '24px' }) // 기본 gap
   };
 

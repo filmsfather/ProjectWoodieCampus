@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { ReviewApi } from '../../services/reviewApi';
 import { WorkbookApi } from '../../services/workbookApi';
 import type { ReviewProgress, ReviewTarget, DailyStats } from '../../services/reviewApi';
-import { Stack, Grid, Cluster } from '../layout/index';
-import { StatCard, Card, CardHeader, CardContent } from '../ui';
+import { Stack, Grid, Cluster, AutoGrid } from '../layout/index';
+import { StatCard, Card, CardHeader, CardContent, SkeletonGrid, EmptyState, EmptyIcons } from '../ui';
 
 interface StudentDashboardProps {
   userId: string;
@@ -74,28 +74,38 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ }) => {
 
   if (loading) {
     return (
-      <div className="min-h-96 flex items-center justify-center">
-        <Stack align="center" gap="sm" className="text-center">
-          <div className="w-10 h-10 border-4 border-neutral-200 border-t-primary rounded-full animate-spin"></div>
-          <p className="text-neutral-600">대시보드를 로드하고 있습니다...</p>
+      <Stack gap="lg" className="max-w-container mx-auto p-6">
+        {/* 헤더 스켈레톤 */}
+        <Stack gap="xs">
+          <div className="h-8 bg-neutral-200 rounded animate-pulse w-48"></div>
+          <div className="h-5 bg-neutral-200 rounded animate-pulse w-96"></div>
         </Stack>
-      </div>
+        
+        {/* 통계 카드 스켈레톤 */}
+        <SkeletonGrid count={4} cardSize="md" />
+        
+        {/* 나머지 카드들 스켈레톤 */}
+        <SkeletonGrid count={3} cardSize="lg" />
+      </Stack>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-96 flex items-center justify-center">
-        <Stack align="center" gap="md" className="text-center max-w-md mx-auto p-6">
-          <h3 className="text-xl font-semibold text-error">❌ 오류 발생</h3>
-          <p className="text-neutral-700">{error}</p>
-          <button 
-            onClick={loadDashboardData} 
-            className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
-          >
-            다시 시도
-          </button>
-        </Stack>
+      <div className="max-w-container mx-auto p-6">
+        <EmptyState
+          icon="❌"
+          title="오류 발생"
+          description={error}
+          action={
+            <button 
+              onClick={loadDashboardData} 
+              className="btn-spacing bg-role-primary text-white rounded-lg hover:bg-role-primary/90 transition-colors font-medium"
+            >
+              다시 시도
+            </button>
+          }
+        />
       </div>
     );
   }
@@ -104,12 +114,12 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ }) => {
     <Stack gap="lg" className="max-w-container mx-auto p-6">
       {/* 헤더 */}
       <Stack gap="xs">
-        <h1 className="text-3xl font-bold text-neutral-900">학습 대시보드</h1>
-        <p className="text-neutral-600">오늘의 학습 현황을 확인하고 복습을 진행하세요</p>
+        <h1 className="text-fluid-4xl font-bold text-neutral-900">학습 대시보드</h1>
+        <p className="text-fluid-base text-neutral-600 reading-leading">오늘의 학습 현황을 확인하고 복습을 진행하세요</p>
       </Stack>
       
       {/* 통계 카드 그리드 */}
-      <Grid columns={4} gap="md" className="md:grid-cols-2 sm:grid-cols-1">
+      <AutoGrid cardSize="md" gap="md" stretch>
         <StatCard
           title="오늘의 복습"
           value={reviewProgress?.todayTotal || 0}
@@ -145,7 +155,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ }) => {
             variant="info"
           />
         )}
-      </Grid>
+      </AutoGrid>
 
       {/* 숙련도 분포 차트 */}
       {reviewProgress && (
@@ -257,10 +267,11 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ }) => {
               ))}
             </Stack>
           ) : (
-            <Stack gap="xs" align="center" className="py-8 text-center">
-              <p className="text-lg">🎉 오늘 복습할 문제가 없습니다!</p>
-              <p className="text-neutral-600">새로운 문제를 풀어보세요.</p>
-            </Stack>
+            <EmptyState
+              icon="🎉"
+              title="오늘 복습할 문제가 없습니다!"
+              description="새로운 문제를 풀어보세요."
+            />
           )}
           </Stack>
         </CardContent>
@@ -303,10 +314,19 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ }) => {
               ))}
             </Grid>
           ) : (
-            <Stack gap="xs" align="center" className="py-8 text-center">
-              <p className="text-lg">📝 아직 문제집이 없습니다.</p>
-              <p className="text-neutral-600">문제집을 만들어 학습을 시작하세요!</p>
-            </Stack>
+            <EmptyState
+              icon={EmptyIcons.document}
+              title="아직 문제집이 없습니다"
+              description="문제집을 만들어 학습을 시작하세요!"
+              action={
+                <button
+                  className="btn-spacing bg-role-primary text-white rounded-lg hover:bg-role-primary/90 transition-colors font-medium"
+                  onClick={() => window.location.href = '/workbooks/create'}
+                >
+                  문제집 만들기
+                </button>
+              }
+            />
           )}
           </Stack>
         </CardContent>

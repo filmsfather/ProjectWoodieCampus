@@ -26,7 +26,7 @@ export default function Card<T extends React.ElementType = 'div'>({
   const Component = as || 'div';
   
   const classes = [
-    'bg-white rounded-lg shadow-subtle border border-neutral-200 h-full',
+    'bg-white rounded-lg shadow-subtle border border-neutral-200 h-full flex flex-col',
     paddingMap[padding],
     hover && 'hover:border-role-primary transition-colors',
     className
@@ -109,7 +109,7 @@ export function CardActions({
   };
 
   return (
-    <div className={`flex items-center gap-2 card-footer-spacing ${justifyMap[justify]} ${className}`}>
+    <div className={`flex items-center gap-2 mt-auto card-footer-spacing ${justifyMap[justify]} ${className}`}>
       {children}
     </div>
   );
