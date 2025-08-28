@@ -7,6 +7,9 @@ interface CardProps<T extends React.ElementType = 'div'> {
   children: React.ReactNode;
   hover?: boolean;
   padding?: 'sm' | 'md' | 'lg';
+  loading?: boolean;
+  minHeight?: number;
+  aspectRatio?: string;
 }
 
 const paddingMap = {
@@ -21,6 +24,9 @@ export default function Card<T extends React.ElementType = 'div'>({
   children,
   hover = false,
   padding = 'md',
+  loading = false,
+  minHeight,
+  aspectRatio,
   ...props
 }: CardProps<T> & Omit<React.ComponentPropsWithoutRef<T>, keyof CardProps<T>>) {
   const Component = as || 'div';
@@ -32,10 +38,53 @@ export default function Card<T extends React.ElementType = 'div'>({
     className
   ].filter(Boolean).join(' ');
 
+  // CLS 방지를 위한 스타일
+  const containerStyle: React.CSSProperties = {
+    minHeight: minHeight ? `${minHeight}px` : undefined,
+    aspectRatio: aspectRatio || undefined,
+  };
+
   return (
-    <Component className={classes} {...props}>
-      {children}
+    <Component className={classes} style={containerStyle} {...props}>
+      {loading ? (
+        <CardLoadingSkeleton padding={padding} />
+      ) : (
+        children
+      )}
     </Component>
+  );
+}
+
+// 카드 로딩 스켈레톤 컴포넌트
+interface CardLoadingSkeletonProps {
+  padding?: 'sm' | 'md' | 'lg';
+}
+
+function CardLoadingSkeleton({ padding = 'md' }: CardLoadingSkeletonProps) {
+  return (
+    <div className="animate-pulse">
+      {/* 헤더 스켈레톤 */}
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex-1">
+          <div className="h-6 bg-neutral-200 rounded w-3/4 mb-2"></div>
+          <div className="h-4 bg-neutral-200 rounded w-1/2"></div>
+        </div>
+        <div className="w-8 h-8 bg-neutral-200 rounded-full flex-shrink-0"></div>
+      </div>
+      
+      {/* 콘텐츠 스켈레톤 */}
+      <div className="flex-1 space-y-3">
+        <div className="h-4 bg-neutral-200 rounded w-full"></div>
+        <div className="h-4 bg-neutral-200 rounded w-5/6"></div>
+        <div className="h-4 bg-neutral-200 rounded w-4/6"></div>
+      </div>
+      
+      {/* 액션 스켈레톤 */}
+      <div className="flex justify-end gap-2 mt-4">
+        <div className="w-16 h-8 bg-neutral-200 rounded"></div>
+        <div className="w-20 h-8 bg-neutral-200 rounded"></div>
+      </div>
+    </div>
   );
 }
 

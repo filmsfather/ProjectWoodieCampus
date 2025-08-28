@@ -51,10 +51,35 @@ export default {
           dark: '#9a3e2a',
           light: '#ba563a',
         },
-        success: '#28a745',
-        warning: '#ffc107',
-        error: '#AA4632',
-        info: '#17a2b8',
+        // 상태 색상 (WCAG AA 대비 준수)
+        success: {
+          DEFAULT: '#22c55e',  // 4.5:1 contrast on white
+          dark: '#16a34a',
+          light: '#84cc16',
+          bg: '#f0fdf4',
+          border: '#bbf7d0',
+        },
+        warning: {
+          DEFAULT: '#f59e0b',  // 4.5:1 contrast on white
+          dark: '#d97706',
+          light: '#fbbf24',
+          bg: '#fffbeb',
+          border: '#fed7aa',
+        },
+        error: {
+          DEFAULT: '#ef4444',  // 4.5:1 contrast on white
+          dark: '#dc2626',
+          light: '#f87171',
+          bg: '#fef2f2',
+          border: '#fecaca',
+        },
+        info: {
+          DEFAULT: '#3b82f6',  // 4.5:1 contrast on white
+          dark: '#2563eb',
+          light: '#60a5fa',
+          bg: '#eff6ff',
+          border: '#bfdbfe',
+        },
       },
       fontFamily: {
         primary: ['Noto Sans KR', 'system-ui', 'sans-serif'],

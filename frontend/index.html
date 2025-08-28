@@ -46,6 +46,36 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
+    <!-- 웹 폰트 최적화 - CLS 방지 -->
+    <link rel="preload" href="https://fonts.gstatic.com/s/notosanskr/v28/PbykFmXiEBPT4ITbgNA5Cgm20xz64px_1hVWr0wuPNGmlQNMEfD4.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2" as="font" type="font/woff2" crossorigin>
+    
+    <!-- 폰트 로딩 최적화 CSS -->
+    <style>
+      /* 폰트 로딩 중 CLS 방지 */
+      .fonts-loading {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+      
+      .fonts-loaded {
+        font-family: 'Noto Sans KR', system-ui, sans-serif;
+      }
+      
+      /* 폰트 로딩 상태 표시 */
+      .fonts-loading * {
+        font-display: swap;
+      }
+      
+      /* 초기 렌더링 최적화 */
+      html {
+        font-display: swap;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+    </style>
+    
     <!-- Favicons -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
