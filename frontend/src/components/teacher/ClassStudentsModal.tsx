@@ -38,7 +38,7 @@ const ClassStudentsModal: React.FC<ClassStudentsModalProps> = ({
 
       // 관리자인 경우 모든 학생 목록도 로드 (반 배정용)
       if (user?.role === 'admin') {
-        const { users: allUsers } = await AdminApi.getAllUsers();
+        const { users: allUsers } = await AdminApi.getUsers();
         const studentUsers = allUsers.filter(u => u.role === 'student');
         setAllStudents(studentUsers);
         
@@ -119,8 +119,8 @@ const ClassStudentsModal: React.FC<ClassStudentsModalProps> = ({
 
   return (
     <>
-      <div className="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
-        <div className="relative mx-auto p-5 border w-full max-w-4xl shadow-lg rounded-md bg-white max-h-[90vh] overflow-y-auto">
+      <div className="modal-backdrop fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center p-4" style={{ zIndex: 10000 }}>
+        <div className="modal relative mx-auto p-5 border w-full max-w-4xl shadow-lg rounded-md bg-white max-h-[90vh] overflow-y-auto">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-medium text-gray-900">
               {cls.name} - 학생 관리
@@ -209,8 +209,8 @@ const ClassStudentsModal: React.FC<ClassStudentsModalProps> = ({
 
       {/* 학생 추가 모달 */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 overflow-y-auto h-full w-full flex items-center justify-center p-4" style={{ zIndex: 10000 }}>
-          <div className="relative mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white max-h-[90vh] overflow-y-auto">
+        <div className="modal-backdrop fixed inset-0 bg-black bg-opacity-60 overflow-y-auto h-full w-full flex items-center justify-center p-4" style={{ zIndex: 10001 }}>
+          <div className="modal relative mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-medium text-gray-900">
                 학생 추가
