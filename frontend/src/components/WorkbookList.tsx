@@ -115,96 +115,264 @@ export const WorkbookList: React.FC<WorkbookListProps> = ({
   return (
     <div className={`workbook-list ${className}`}>
       {/* 필터 및 검색 */}
-      <div className="mb-6 space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-900">문제집 목록</h2>
-          <Link
-            to="/workbooks/create"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
-          >
-            + 새 문제집 만들기
-          </Link>
-        </div>
-
-        {/* 필터 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label htmlFor="status-filter" className="block text-sm font-medium text-gray-700 mb-1">
-              상태
-            </label>
-            <select
-              id="status-filter"
-              value={filters.status}
-              onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      <div className="mb-6">
+        <div 
+          className="transition-all duration-300"
+          style={{
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            boxShadow: 'var(--shadow-sm)',
+            border: '1px solid var(--color-border-light)',
+            borderRadius: 'var(--radius-lg)',
+            padding: 'var(--space-6)'
+          }}
+        >
+          <div className="flex items-center justify-between mb-6">
+            <h2 
+              style={{
+                fontSize: 'var(--font-size-xl)',
+                fontWeight: '600',
+                color: 'var(--color-text-primary)'
+              }}
             >
-              <option value="">전체</option>
-              <option value="draft">임시 저장</option>
-              <option value="published">배포됨</option>
-              <option value="archived">보관됨</option>
-            </select>
+              문제집 목록
+            </h2>
+            <Link
+              to="/workbooks/create"
+              className="transition-all duration-200 hover:scale-105"
+              style={{
+                padding: 'var(--space-2) var(--space-4)',
+                background: 'linear-gradient(135deg, #8b4513 0%, #654321 100%)',
+                color: 'white',
+                fontWeight: '500',
+                borderRadius: 'var(--radius-md)',
+                textDecoration: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 'var(--space-2)',
+                boxShadow: 'var(--shadow-sm)'
+              }}
+            >
+              + 새 문제집 만들기
+            </Link>
           </div>
 
-          <div className="md:col-span-2">
-            <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
-              검색
-            </label>
-            <input
-              type="text"
-              id="search"
-              value={filters.search}
-              onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="문제집 제목 또는 설명 검색"
-            />
+          {/* 필터 */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label 
+                htmlFor="status-filter" 
+                className="block mb-2"
+                style={{
+                  fontSize: 'var(--font-size-sm)',
+                  fontWeight: '500',
+                  color: 'var(--color-text-secondary)'
+                }}
+              >
+                상태
+              </label>
+              <select
+                id="status-filter"
+                value={filters.status}
+                onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
+                className="w-full transition-all duration-200 focus:scale-[1.02]"
+                style={{
+                  padding: 'var(--space-3)',
+                  backgroundColor: 'rgba(255,255,255,0.8)',
+                  border: '1px solid var(--color-border-light)',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: 'var(--font-size-sm)',
+                  color: 'var(--color-text-primary)',
+                  outline: 'none'
+                }}
+              >
+                <option value="">전체</option>
+                <option value="draft">임시 저장</option>
+                <option value="published">배포됨</option>
+                <option value="archived">보관됨</option>
+              </select>
+            </div>
+
+            <div className="md:col-span-2">
+              <label 
+                htmlFor="search" 
+                className="block mb-2"
+                style={{
+                  fontSize: 'var(--font-size-sm)',
+                  fontWeight: '500',
+                  color: 'var(--color-text-secondary)'
+                }}
+              >
+                검색
+              </label>
+              <input
+                type="text"
+                id="search"
+                value={filters.search}
+                onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                className="w-full transition-all duration-200 focus:scale-[1.02]"
+                style={{
+                  padding: 'var(--space-3)',
+                  backgroundColor: 'rgba(255,255,255,0.8)',
+                  border: '1px solid var(--color-border-light)',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: 'var(--font-size-sm)',
+                  color: 'var(--color-text-primary)',
+                  outline: 'none'
+                }}
+                placeholder="문제집 제목 또는 설명 검색"
+              />
+            </div>
           </div>
         </div>
       </div>
 
       {/* 에러 메시지 */}
       {error && (
-        <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-          {error}
+        <div className="mb-6">
+          <div 
+            className="transition-all duration-300"
+            style={{
+              background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(255,255,255,0.9) 100%)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              border: '1px solid rgba(239, 68, 68, 0.2)',
+              borderRadius: 'var(--radius-md)',
+              padding: 'var(--space-4)',
+              color: '#dc2626',
+              fontWeight: '500'
+            }}
+          >
+            {error}
+          </div>
         </div>
       )}
 
       {/* 로딩 */}
       {loading && (
-        <div className="text-center py-8">
-          <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-2"></div>
-          <p className="text-gray-600">문제집 목록을 불러오는 중...</p>
+        <div 
+          className="text-center"
+          style={{ padding: 'var(--space-8)' }}
+        >
+          <div 
+            className="animate-spin rounded-full mx-auto mb-4"
+            style={{
+              height: '48px',
+              width: '48px',
+              border: '2px solid var(--color-neutral-200)',
+              borderBottom: '2px solid #8b4513'
+            }}
+          ></div>
+          <p style={{ color: 'var(--color-text-secondary)', fontWeight: '500' }}>
+            문제집 목록을 불러오는 중...
+          </p>
         </div>
       )}
 
       {/* 문제집 목록 */}
       {!loading && workbooks.length === 0 ? (
-        <div className="text-center py-8">
-          <p className="text-gray-500">등록된 문제집이 없습니다.</p>
-          <Link
-            to="/workbooks/create"
-            className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        <div 
+          className="text-center"
+          style={{ padding: 'var(--space-8)' }}
+        >
+          <div 
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: 'var(--shadow-sm)',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: 'var(--radius-lg)',
+              padding: 'var(--space-8)'
+            }}
           >
-            첫 번째 문제집 만들기
-          </Link>
+            <div style={{ fontSize: '4rem', marginBottom: 'var(--space-4)' }}>📚</div>
+            <p style={{ 
+              color: 'var(--color-text-secondary)', 
+              fontSize: 'var(--font-size-lg)',
+              marginBottom: 'var(--space-6)'
+            }}>
+              등록된 문제집이 없습니다.
+            </p>
+            <Link
+              to="/workbooks/create"
+              className="transition-all duration-200 hover:scale-105"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 'var(--space-2)',
+                padding: 'var(--space-3) var(--space-6)',
+                background: 'linear-gradient(135deg, #8b4513 0%, #654321 100%)',
+                color: 'white',
+                fontWeight: '500',
+                borderRadius: 'var(--radius-md)',
+                textDecoration: 'none',
+                boxShadow: 'var(--shadow-sm)'
+              }}
+            >
+              첫 번째 문제집 만들기
+            </Link>
+          </div>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
           {workbooks.map((workbook) => (
-            <div key={workbook.id} className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+            <div 
+              key={workbook.id} 
+              className="group transition-all duration-300 hover:scale-[1.01] hover:shadow-lg"
+              style={{
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                border: '1px solid var(--color-border-light)',
+                borderRadius: 'var(--radius-lg)',
+                padding: 'var(--space-6)',
+                boxShadow: 'var(--shadow-sm)'
+              }}
+            >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-lg font-semibold text-gray-900">{workbook.title}</h3>
-                    <span className={`px-2 py-1 text-xs rounded-full ${WorkbookApi.getStatusColor(workbook.status)}`}>
+                  <div className="flex items-center gap-3 mb-3">
+                    <h3 style={{
+                      fontSize: 'var(--font-size-lg)',
+                      fontWeight: '600',
+                      color: 'var(--color-text-primary)'
+                    }}>
+                      {workbook.title}
+                    </h3>
+                    <span 
+                      style={{
+                        padding: 'var(--space-1) var(--space-3)',
+                        backgroundColor: workbook.status === 'published' ? 'rgba(34, 197, 94, 0.1)' :
+                                         workbook.status === 'draft' ? 'rgba(245, 158, 11, 0.1)' :
+                                         'rgba(107, 114, 128, 0.1)',
+                        color: workbook.status === 'published' ? '#059669' :
+                               workbook.status === 'draft' ? '#d97706' :
+                               '#6b7280',
+                        fontSize: 'var(--font-size-xs)',
+                        fontWeight: '500',
+                        borderRadius: 'var(--radius-full)'
+                      }}
+                    >
                       {WorkbookApi.getStatusName(workbook.status)}
                     </span>
                   </div>
 
                   {workbook.description && (
-                    <p className="text-gray-700 mb-3 line-clamp-2">{workbook.description}</p>
+                    <p className="line-clamp-2 mb-3" style={{ 
+                      color: 'var(--color-text-primary)', 
+                      fontSize: 'var(--font-size-sm)',
+                      lineHeight: '1.5'
+                    }}>
+                      {workbook.description}
+                    </p>
                   )}
 
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
+                  <div className="flex items-center gap-4 mb-3" style={{
+                    fontSize: 'var(--font-size-sm)',
+                    color: 'var(--color-text-secondary)'
+                  }}>
                     <span>문제 수: {workbook.problem_count || 0}개</span>
                     {workbook.created_by_user && (
                       <span>작성자: {workbook.created_by_user.full_name || workbook.created_by_user.username}</span>
@@ -219,23 +387,36 @@ export const WorkbookList: React.FC<WorkbookListProps> = ({
                     const progress = workbook.id ? getWorkbookProgress(workbook.id) : undefined;
                     if (progress && progress.totalProblems > 0) {
                       return (
-                        <div className="mt-3">
-                          <div className="flex justify-between items-center text-sm mb-1">
-                            <span className="text-gray-600">진도율</span>
-                            <span className="text-gray-700 font-medium">
+                        <div style={{ marginTop: 'var(--space-3)' }}>
+                          <div className="flex justify-between items-center mb-1" style={{
+                            fontSize: 'var(--font-size-sm)'
+                          }}>
+                            <span style={{ color: 'var(--color-text-secondary)' }}>진도율</span>
+                            <span style={{ 
+                              color: 'var(--color-text-primary)', 
+                              fontWeight: '500'
+                            }}>
                               {progress.solvedProblems}/{progress.totalProblems} ({progress.progressPercentage}%)
                             </span>
                           </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div 
+                            className="w-full rounded-full"
+                            style={{
+                              height: '8px',
+                              backgroundColor: 'var(--color-neutral-200)'
+                            }}
+                          >
                             <div
-                              className={`h-2 rounded-full transition-all ${
-                                progress.progressPercentage >= 100
-                                  ? 'bg-green-500'
+                              className="rounded-full transition-all duration-300"
+                              style={{
+                                height: '8px',
+                                width: `${Math.min(progress.progressPercentage, 100)}%`,
+                                background: progress.progressPercentage >= 100
+                                  ? 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)'
                                   : progress.progressPercentage >= 50
-                                  ? 'bg-blue-500'
-                                  : 'bg-yellow-500'
-                              }`}
-                              style={{ width: `${Math.min(progress.progressPercentage, 100)}%` }}
+                                  ? 'linear-gradient(135deg, #8b4513 0%, #654321 100%)'
+                                  : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+                              }}
                             ></div>
                           </div>
                         </div>
@@ -245,10 +426,20 @@ export const WorkbookList: React.FC<WorkbookListProps> = ({
                   })()}
                 </div>
 
-                <div className="flex items-center gap-2 ml-4">
+                <div className="flex items-center gap-2" style={{ marginLeft: 'var(--space-4)' }}>
                   <Link
                     to={`/workbooks/${workbook.id}`}
-                    className="px-3 py-2 text-blue-600 hover:bg-blue-50 rounded-lg border border-blue-200 hover:border-blue-300"
+                    className="transition-all duration-200 hover:scale-105"
+                    style={{
+                      padding: 'var(--space-2) var(--space-4)',
+                      backgroundColor: 'rgba(139, 69, 19, 0.1)',
+                      color: '#8b4513',
+                      fontWeight: '500',
+                      fontSize: 'var(--font-size-sm)',
+                      borderRadius: 'var(--radius-md)',
+                      textDecoration: 'none',
+                      border: '1px solid rgba(139, 69, 19, 0.2)'
+                    }}
                   >
                     상세보기
                   </Link>
@@ -256,7 +447,17 @@ export const WorkbookList: React.FC<WorkbookListProps> = ({
                   {onEdit && (
                     <button
                       onClick={() => onEdit(workbook)}
-                      className="px-3 py-2 text-green-600 hover:bg-green-50 rounded-lg border border-green-200 hover:border-green-300"
+                      className="transition-all duration-200 hover:scale-105"
+                      style={{
+                        padding: 'var(--space-2) var(--space-4)',
+                        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                        color: '#059669',
+                        fontWeight: '500',
+                        fontSize: 'var(--font-size-sm)',
+                        borderRadius: 'var(--radius-md)',
+                        border: '1px solid rgba(34, 197, 94, 0.2)',
+                        cursor: 'pointer'
+                      }}
                     >
                       수정
                     </button>
@@ -265,7 +466,17 @@ export const WorkbookList: React.FC<WorkbookListProps> = ({
                   {onDelete && (
                     <button
                       onClick={() => handleDelete(workbook)}
-                      className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg border border-red-200 hover:border-red-300"
+                      className="transition-all duration-200 hover:scale-105"
+                      style={{
+                        padding: 'var(--space-2) var(--space-4)',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        color: '#dc2626',
+                        fontWeight: '500',
+                        fontSize: 'var(--font-size-sm)',
+                        borderRadius: 'var(--radius-md)',
+                        border: '1px solid rgba(239, 68, 68, 0.2)',
+                        cursor: 'pointer'
+                      }}
                     >
                       삭제
                     </button>
@@ -279,8 +490,14 @@ export const WorkbookList: React.FC<WorkbookListProps> = ({
 
       {/* 페이지네이션 */}
       {totalPages > 1 && !loading && (
-        <div className="mt-6 flex items-center justify-between">
-          <div className="text-sm text-gray-600">
+        <div 
+          className="flex items-center justify-between"
+          style={{ marginTop: 'var(--space-6)' }}
+        >
+          <div style={{
+            fontSize: 'var(--font-size-sm)',
+            color: 'var(--color-text-secondary)'
+          }}>
             전체 {totalCount}개 문제집 중 {(filters.page - 1) * filters.limit + 1}-{Math.min(filters.page * filters.limit, totalCount)}개 표시
           </div>
           
@@ -288,7 +505,18 @@ export const WorkbookList: React.FC<WorkbookListProps> = ({
             <button
               onClick={() => handlePageChange(filters.page - 1)}
               disabled={filters.page <= 1}
-              className="px-3 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="transition-all duration-200"
+              style={{
+                padding: 'var(--space-2) var(--space-3)',
+                backgroundColor: 'rgba(255,255,255,0.8)',
+                color: 'var(--color-text-secondary)',
+                fontSize: 'var(--font-size-sm)',
+                fontWeight: '500',
+                border: '1px solid var(--color-border-light)',
+                borderRadius: 'var(--radius-md)',
+                cursor: filters.page <= 1 ? 'not-allowed' : 'pointer',
+                opacity: filters.page <= 1 ? 0.5 : 1
+              }}
             >
               이전
             </button>
@@ -301,11 +529,24 @@ export const WorkbookList: React.FC<WorkbookListProps> = ({
                 <button
                   key={page}
                   onClick={() => handlePageChange(page)}
-                  className={`px-3 py-2 border rounded-lg ${
-                    page === filters.page
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : 'text-gray-600 border-gray-300 hover:bg-gray-50'
-                  }`}
+                  className="transition-all duration-200"
+                  style={{
+                    padding: 'var(--space-2) var(--space-3)',
+                    backgroundColor: page === filters.page 
+                      ? '#8b4513' 
+                      : 'rgba(255,255,255,0.8)',
+                    color: page === filters.page 
+                      ? 'white' 
+                      : 'var(--color-text-secondary)',
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: '500',
+                    border: page === filters.page 
+                      ? '1px solid #8b4513' 
+                      : '1px solid var(--color-border-light)',
+                    borderRadius: 'var(--radius-md)',
+                    cursor: 'pointer',
+                    minWidth: '40px'
+                  }}
                 >
                   {page}
                 </button>
@@ -315,7 +556,18 @@ export const WorkbookList: React.FC<WorkbookListProps> = ({
             <button
               onClick={() => handlePageChange(filters.page + 1)}
               disabled={filters.page >= totalPages}
-              className="px-3 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="transition-all duration-200"
+              style={{
+                padding: 'var(--space-2) var(--space-3)',
+                backgroundColor: 'rgba(255,255,255,0.8)',
+                color: 'var(--color-text-secondary)',
+                fontSize: 'var(--font-size-sm)',
+                fontWeight: '500',
+                border: '1px solid var(--color-border-light)',
+                borderRadius: 'var(--radius-md)',
+                cursor: filters.page >= totalPages ? 'not-allowed' : 'pointer',
+                opacity: filters.page >= totalPages ? 0.5 : 1
+              }}
             >
               다음
             </button>
