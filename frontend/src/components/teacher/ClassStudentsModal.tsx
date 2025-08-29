@@ -31,6 +31,10 @@ const ClassStudentsModal: React.FC<ClassStudentsModalProps> = ({
     try {
       setLoading(true);
       
+      console.log('🔍 ClassStudentsModal - 데이터 로드 시작');
+      console.log('🔍 ClassStudentsModal - 현재 사용자:', user);
+      console.log('🔍 ClassStudentsModal - 사용자 역할:', user?.role);
+      
       // 현재 반의 학생들 로드
       const classStudents = await classApi.getClassStudents(cls.id);
       setStudents(classStudents);
