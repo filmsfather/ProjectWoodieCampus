@@ -356,20 +356,20 @@ const TeacherDashboard: React.FC = () => {
                         </div>
                       </div>
                       {user?.role === 'admin' && (
-                        <div className="flex gap-0.5 ml-2">
+                        <div className="flex gap-1 ml-2">
                           <button
                             onClick={() => openEditModal(cls)}
-                            className="p-1 bg-white/40 hover:bg-white/60 text-blue-600 rounded-md transition-all duration-200"
+                            className="p-1.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-700 hover:text-blue-800 rounded-md transition-all duration-200 shadow-sm hover:shadow-md"
                             title="반 정보 수정"
                           >
-                            <PencilIcon className="h-3 w-3" />
+                            <PencilIcon className="h-3.5 w-3.5" />
                           </button>
                           <button
                             onClick={() => handleDeleteClass(cls.id)}
-                            className="p-1 bg-white/40 hover:bg-white/60 text-red-600 rounded-md transition-all duration-200"
+                            className="p-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-700 hover:text-red-800 rounded-md transition-all duration-200 shadow-sm hover:shadow-md"
                             title="반 삭제"
                           >
-                            <TrashIcon className="h-3 w-3" />
+                            <TrashIcon className="h-3.5 w-3.5" />
                           </button>
                         </div>
                       )}

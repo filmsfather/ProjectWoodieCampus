@@ -398,22 +398,12 @@ export class AdminController {
     try {
       const { id } = req.params;
 
-      // 반 존재 확인 - 임시로 주석 처리 (해당 메소드가 없음)
-      // const existingClass = await DatabaseService.getClassById(id);
-      // if (!existingClass) {
-      //   const response: ApiResponse = {
-      //     success: false,
-      //     message: '반을 찾을 수 없습니다',
-      //   };
-      //   return res.status(404).json(response);
-      // }
-
-      // 반 삭제 - 임시로 주석 처리 (해당 메소드가 없음)
-      // await DatabaseService.deleteClass(id);
+      // 반 삭제 (소프트 삭제)
+      await DatabaseService.deleteClass(id);
 
       const response: ApiResponse = {
         success: true,
-        message: '반 삭제 기능은 추후 구현 예정입니다',
+        message: '반이 성공적으로 삭제되었습니다',
       };
       res.json(response);
     } catch (error) {

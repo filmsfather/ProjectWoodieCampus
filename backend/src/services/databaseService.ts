@@ -1516,6 +1516,19 @@ export class DatabaseService {
     return data;
   }
 
+  // Delete class (soft delete)
+  static async deleteClass(classId: string) {
+    const { data, error } = await supabase
+      .from('classes')
+      .update({ is_active: false })
+      .eq('id', classId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
   // Assign teacher to class
   static async assignTeacherToClass(teacherId: string, classId: string) {
     const { data, error } = await supabase
