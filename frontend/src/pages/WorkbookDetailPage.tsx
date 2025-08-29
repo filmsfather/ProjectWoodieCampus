@@ -4,6 +4,7 @@ import { WorkbookApi, type Workbook, type CreateWorkbookRequest } from '../servi
 import { SolutionApi, type WorkbookProgress } from '../services/solutionApi';
 import { WorkbookEditor } from '../components/WorkbookEditor';
 import { WorkbookForm } from '../components/WorkbookForm';
+import WorkbookAssignmentModal from '../components/WorkbookAssignmentModal';
 
 const WorkbookDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -14,6 +15,7 @@ const WorkbookDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
+  const [showAssignmentModal, setShowAssignmentModal] = useState(false);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // 문제집 정보 로드
@@ -115,6 +117,32 @@ const WorkbookDetailPage: React.FC = () => {
 
   const dismissNotification = () => {
     setNotification(null);
+  };
+
+  // 문제집 배포 처리
+  const handleWorkbookAssignment = async (assignment: {
+    targetType: 'individual' | 'group' | 'class';
+    targetIds: string[];
+    scheduledFor?: string;
+    dueDate?: string;
+  }) => {
+    if (!workbook?.id) return;
+
+    try {
+      // TODO: 실제 배포 API 호출
+      console.log('문제집 배포 요청:', { workbookId: workbook.id, ...assignment });
+      
+      // Mock success response
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setNotification({
+        type: 'success',
+        message: `문제집이 성공적으로 배포되었습니다.`,
+      });
+      setTimeout(() => setNotification(null), 3000);
+    } catch (err) {
+      throw new Error('문제집 배포에 실패했습니다');
+    }
   };
 
   if (loading) {
@@ -296,7 +324,7 @@ const WorkbookDetailPage: React.FC = () => {
             {/* 상태 변경 버튼 */}
             {workbook.status === 'draft' && (
               <button
-                onClick={() => handleStatusChange('published')}
+                onClick={() => setShowAssignmentModal(true)}
                 className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
               >
                 배포하기
@@ -304,12 +332,20 @@ const WorkbookDetailPage: React.FC = () => {
             )}
             
             {workbook.status === 'published' && (
-              <button
-                onClick={() => handleStatusChange('archived')}
-                className="px-3 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700"
-              >
-                보관하기
-              </button>
+              <>
+                <button
+                  onClick={() => setShowAssignmentModal(true)}
+                  className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  재배포
+                </button>
+                <button
+                  onClick={() => handleStatusChange('archived')}
+                  className="px-3 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700"
+                >
+                  보관하기
+                </button>
+              </>
             )}
             
             {workbook.status === 'archived' && (
@@ -356,6 +392,15 @@ const WorkbookDetailPage: React.FC = () => {
         <WorkbookEditor
           workbook={workbook}
           onUpdate={loadWorkbook}
+        />
+      )}
+
+      {/* 배포 모달 */}
+      {showAssignmentModal && workbook && (
+        <WorkbookAssignmentModal
+          workbook={workbook}
+          onClose={() => setShowAssignmentModal(false)}
+          onAssign={handleWorkbookAssignment}
         />
       )}
     </div>

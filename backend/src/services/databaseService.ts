@@ -1640,15 +1640,29 @@ export class DatabaseService {
 
   // Create workbook assignment
   static async createWorkbookAssignment(assignmentData: {
-    workbook_id: string;
-    assigned_by: string;
-    assigned_to_type: 'student' | 'class';
-    assigned_to_id: string;
-    due_date?: string;
+    workbookId: string;
+    assignedBy: string;
+    targetType: 'individual' | 'group' | 'class';
+    targetIds: string;
+    scheduledFor?: Date;
+    dueDate?: Date | null;
+    allowLateSubmission?: boolean;
+    showCorrectAnswers?: boolean;
+    maxAttempts?: number;
   }) {
     const { data, error } = await supabase
       .from('workbook_assignments')
-      .insert([assignmentData])
+      .insert([{
+        workbook_id: assignmentData.workbookId,
+        assigned_by: assignmentData.assignedBy,
+        target_type: assignmentData.targetType,
+        target_ids: assignmentData.targetIds,
+        scheduled_for: assignmentData.scheduledFor || new Date(),
+        due_date: assignmentData.dueDate,
+        allow_late_submission: assignmentData.allowLateSubmission ?? true,
+        show_correct_answers: assignmentData.showCorrectAnswers ?? false,
+        max_attempts: assignmentData.maxAttempts,
+      }])
       .select()
       .single();
 
@@ -1803,5 +1817,501 @@ export class DatabaseService {
 
     if (error) throw error;
     return data;
+  }
+
+  // Validation methods for workbook assignments
+
+  // Validate student IDs
+  static async validateStudentIds(studentIds: string[]): Promise<string[]> {
+    if (!studentIds.length) return [];
+
+    const { data, error } = await supabase
+      .from('users')
+      .select('id')
+      .eq('role', 'student')
+      .in('id', studentIds);
+
+    if (error) throw error;
+    return data?.map(user => user.id) || [];
+  }
+
+  // Validate teacher's assigned classes
+  static async validateTeacherClasses(teacherId: string, classIds: string[]): Promise<string[]> {
+    if (!classIds.length) return [];
+
+    const { data, error } = await supabase
+      .from('user_classes')
+      .select('class_id')
+      .eq('user_id', teacherId)
+      .in('class_id', classIds);
+
+    if (error) throw error;
+    return data?.map(uc => uc.class_id) || [];
+  }
+
+  // Validate teacher's owned student groups
+  static async validateStudentGroups(teacherId: string, groupIds: string[]): Promise<string[]> {
+    if (!groupIds.length) return [];
+
+    const { data, error } = await supabase
+      .from('student_groups')
+      .select('id')
+      .eq('created_by', teacherId)
+      .in('id', groupIds);
+
+    if (error) throw error;
+    return data?.map(group => group.id) || [];
+  }
+
+  // Get workbook assignments with pagination and filters
+  static async getWorkbookAssignments(filters: {
+    page: number;
+    limit: number;
+    status?: string;
+    targetType?: string;
+    assignedBy?: string;
+  }) {
+    let query = supabase
+      .from('workbook_assignments')
+      .select(`
+        *,
+        workbook:workbooks(id, title, description, status),
+        assigner:users!workbook_assignments_assigned_by_fkey(id, username, full_name)
+      `)
+      .order('created_at', { ascending: false });
+
+    if (filters.assignedBy) {
+      query = query.eq('assigned_by', filters.assignedBy);
+    }
+
+    if (filters.targetType) {
+      query = query.eq('target_type', filters.targetType);
+    }
+
+    const from = (filters.page - 1) * filters.limit;
+    const to = from + filters.limit - 1;
+
+    const { data, error, count } = await query
+      .range(from, to)
+      .select('*', { count: 'exact' });
+
+    if (error) throw error;
+
+    return {
+      data: data || [],
+      total: count || 0,
+      page: filters.page,
+      limit: filters.limit,
+      totalPages: Math.ceil((count || 0) / filters.limit),
+    };
+  }
+
+  // Get specific workbook assignment
+  static async getWorkbookAssignment(assignmentId: string) {
+    const { data, error } = await supabase
+      .from('workbook_assignments')
+      .select(`
+        *,
+        workbook:workbooks(id, title, description, status),
+        assigner:users!workbook_assignments_assigned_by_fkey(id, username, full_name)
+      `)
+      .eq('id', assignmentId)
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  // Get student workbook assignments with pagination
+  static async getStudentWorkbookAssignments(filters: {
+    page: number;
+    limit: number;
+    status?: string;
+    studentId: string;
+  }) {
+    let query = supabase
+      .from('student_workbook_assignments')
+      .select(`
+        *,
+        assignment:workbook_assignments(
+          id,
+          due_date,
+          allow_late_submission,
+          show_correct_answers,
+          max_attempts,
+          workbook:workbooks(id, title, description)
+        )
+      `)
+      .eq('student_id', filters.studentId)
+      .order('created_at', { ascending: false });
+
+    if (filters.status) {
+      query = query.eq('status', filters.status);
+    }
+
+    const from = (filters.page - 1) * filters.limit;
+    const to = from + filters.limit - 1;
+
+    const { data, error, count } = await query
+      .range(from, to)
+      .select('*', { count: 'exact' });
+
+    if (error) throw error;
+
+    return {
+      data: data || [],
+      total: count || 0,
+      page: filters.page,
+      limit: filters.limit,
+      totalPages: Math.ceil((count || 0) / filters.limit),
+    };
+  }
+
+  // Update workbook assignment
+  static async updateWorkbookAssignment(assignmentId: string, updates: any) {
+    // Convert camelCase to snake_case for database
+    const dbUpdates = Object.entries(updates).reduce((acc, [key, value]) => {
+      const dbKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
+      acc[dbKey] = value;
+      return acc;
+    }, {} as any);
+
+    const { data, error } = await supabase
+      .from('workbook_assignments')
+      .update(dbUpdates)
+      .eq('id', assignmentId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  // Get students by teacher (only students in teacher's classes)
+  static async getStudentsByTeacher(teacherId: string, search?: string) {
+    let query = supabase
+      .from('users')
+      .select(`
+        id,
+        username,
+        full_name,
+        class_id,
+        classes:class_id(id, name)
+      `)
+      .eq('role', 'student')
+      .eq('is_active', true);
+
+    // Filter by teacher's classes
+    const { data: teacherClasses } = await supabase
+      .from('user_classes')
+      .select('class_id')
+      .eq('user_id', teacherId);
+
+    if (teacherClasses && teacherClasses.length > 0) {
+      const classIds = teacherClasses.map(tc => tc.class_id);
+      query = query.in('class_id', classIds);
+    } else {
+      // Teacher has no classes assigned, return empty array
+      return [];
+    }
+
+    // Apply search filter
+    if (search) {
+      query = query.or(`full_name.ilike.%${search}%,username.ilike.%${search}%`);
+    }
+
+    const { data, error } = await query.order('full_name');
+
+    if (error) throw error;
+    
+    // Format the response
+    return (data || []).map(student => ({
+      id: student.id,
+      username: student.username,
+      full_name: student.full_name,
+      class_id: student.class_id,
+      class_name: student.classes?.name,
+    }));
+  }
+
+  // Get all students (admin only)
+  static async getAllStudents(search?: string) {
+    let query = supabase
+      .from('users')
+      .select(`
+        id,
+        username,
+        full_name,
+        class_id,
+        classes:class_id(id, name)
+      `)
+      .eq('role', 'student')
+      .eq('is_active', true);
+
+    // Apply search filter
+    if (search) {
+      query = query.or(`full_name.ilike.%${search}%,username.ilike.%${search}%`);
+    }
+
+    const { data, error } = await query.order('full_name');
+
+    if (error) throw error;
+    
+    // Format the response
+    return (data || []).map(student => ({
+      id: student.id,
+      username: student.username,
+      full_name: student.full_name,
+      class_id: student.class_id,
+      class_name: student.classes?.name,
+    }));
+  }
+
+  // Get classes by teacher
+  static async getClassesByTeacher(teacherId: string) {
+    const { data, error } = await supabase
+      .from('user_classes')
+      .select(`
+        class_id,
+        classes:classes(
+          id,
+          name,
+          grade_level,
+          description,
+          student_count:users(count)
+        )
+      `)
+      .eq('user_id', teacherId);
+
+    if (error) throw error;
+
+    // Format the response
+    return (data || []).map(tc => ({
+      id: tc.classes.id,
+      name: tc.classes.name,
+      grade_level: tc.classes.grade_level,
+      description: tc.classes.description,
+      student_count: tc.classes.student_count || 0,
+    }));
+  }
+
+  // Student group management methods
+
+  // Get student groups created by teacher
+  static async getStudentGroupsByTeacher(teacherId: string) {
+    const { data, error } = await supabase
+      .from('student_groups')
+      .select(`
+        id,
+        name,
+        description,
+        created_at,
+        updated_at,
+        student_count:student_group_members(count)
+      `)
+      .eq('created_by', teacherId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    return (data || []).map(group => ({
+      id: group.id,
+      name: group.name,
+      description: group.description,
+      student_count: group.student_count || 0,
+      created_at: group.created_at,
+      updated_at: group.updated_at,
+    }));
+  }
+
+  // Create student group
+  static async createStudentGroup(data: {
+    name: string;
+    description?: string;
+    createdBy: string;
+    studentIds: string[];
+  }) {
+    // Start transaction
+    const { data: group, error: groupError } = await supabase
+      .from('student_groups')
+      .insert([{
+        name: data.name,
+        description: data.description,
+        created_by: data.createdBy,
+      }])
+      .select()
+      .single();
+
+    if (groupError) throw groupError;
+
+    // Add students to group
+    const memberData = data.studentIds.map(studentId => ({
+      group_id: group.id,
+      student_id: studentId,
+    }));
+
+    const { error: memberError } = await supabase
+      .from('student_group_members')
+      .insert(memberData);
+
+    if (memberError) {
+      // Rollback group creation
+      await supabase.from('student_groups').delete().eq('id', group.id);
+      throw memberError;
+    }
+
+    return {
+      id: group.id,
+      name: group.name,
+      description: group.description,
+      student_count: data.studentIds.length,
+      created_at: group.created_at,
+      updated_at: group.updated_at,
+    };
+  }
+
+  // Get student group by ID (with ownership check)
+  static async getStudentGroupById(groupId: string, teacherId: string) {
+    const { data, error } = await supabase
+      .from('student_groups')
+      .select(`
+        id,
+        name,
+        description,
+        created_by,
+        created_at,
+        updated_at,
+        members:student_group_members(
+          student_id,
+          student:users(id, username, full_name)
+        )
+      `)
+      .eq('id', groupId)
+      .eq('created_by', teacherId)
+      .single();
+
+    if (error) return null;
+
+    return {
+      id: data.id,
+      name: data.name,
+      description: data.description,
+      student_count: data.members?.length || 0,
+      students: (data.members || []).map(member => ({
+        id: member.student.id,
+        username: member.student.username,
+        full_name: member.student.full_name,
+      })),
+      created_at: data.created_at,
+      updated_at: data.updated_at,
+    };
+  }
+
+  // Update student group
+  static async updateStudentGroup(groupId: string, updates: {
+    name?: string;
+    description?: string;
+    studentIds?: string[];
+  }) {
+    // Update group info
+    const groupUpdates: any = {};
+    if (updates.name) groupUpdates.name = updates.name;
+    if (updates.description !== undefined) groupUpdates.description = updates.description;
+
+    if (Object.keys(groupUpdates).length > 0) {
+      const { error: updateError } = await supabase
+        .from('student_groups')
+        .update(groupUpdates)
+        .eq('id', groupId);
+
+      if (updateError) throw updateError;
+    }
+
+    // Update members if studentIds provided
+    if (updates.studentIds) {
+      // Remove existing members
+      const { error: deleteError } = await supabase
+        .from('student_group_members')
+        .delete()
+        .eq('group_id', groupId);
+
+      if (deleteError) throw deleteError;
+
+      // Add new members
+      if (updates.studentIds.length > 0) {
+        const memberData = updates.studentIds.map(studentId => ({
+          group_id: groupId,
+          student_id: studentId,
+        }));
+
+        const { error: insertError } = await supabase
+          .from('student_group_members')
+          .insert(memberData);
+
+        if (insertError) throw insertError;
+      }
+    }
+
+    // Return updated group
+    const { data, error } = await supabase
+      .from('student_groups')
+      .select(`
+        id,
+        name,
+        description,
+        created_at,
+        updated_at,
+        student_count:student_group_members(count)
+      `)
+      .eq('id', groupId)
+      .single();
+
+    if (error) throw error;
+
+    return {
+      id: data.id,
+      name: data.name,
+      description: data.description,
+      student_count: data.student_count || 0,
+      created_at: data.created_at,
+      updated_at: data.updated_at,
+    };
+  }
+
+  // Delete student group
+  static async deleteStudentGroup(groupId: string) {
+    // Members will be deleted automatically due to CASCADE constraint
+    const { error } = await supabase
+      .from('student_groups')
+      .delete()
+      .eq('id', groupId);
+
+    if (error) throw error;
+  }
+
+  // Get students by class ID
+  static async getStudentsByClass(classId: string) {
+    const { data, error } = await supabase
+      .from('users')
+      .select(`
+        id,
+        username,
+        full_name,
+        class_id,
+        is_active
+      `)
+      .eq('role', 'student')
+      .eq('class_id', classId)
+      .eq('is_active', true)
+      .order('full_name');
+
+    if (error) throw error;
+    
+    return (data || []).map(student => ({
+      id: student.id,
+      username: student.username,
+      full_name: student.full_name,
+      class_id: student.class_id,
+    }));
   }
 }

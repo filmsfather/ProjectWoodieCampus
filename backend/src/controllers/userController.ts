@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { ApiResponse, AuthRequest } from '../types';
+import { DatabaseService } from '../services/databaseService';
 
 export class UserController {
   // GET /api/users (관리자 전용)
@@ -240,6 +241,43 @@ export class UserController {
         message: '사용자 생성 중 오류가 발생했습니다',
       };
       res.status(500).json(response);
+    }
+  }
+
+  // GET /api/users/students - 학생 목록 조회 (교사/관리자 전용)
+  static async getStudents(req: AuthRequest, res: Response) {
+    try {
+      // 권한 확인
+      if (!req.user || (req.user.role !== 'teacher' && req.user.role !== 'admin')) {
+        return res.status(403).json({
+          success: false,
+          message: '접근 권한이 없습니다.',
+        });
+      }
+
+      const { search } = req.query;
+
+      let students;
+      if (req.user.role === 'teacher') {
+        // 교사는 자신이 담당하는 반의 학생들만 조회
+        students = await DatabaseService.getStudentsByTeacher(req.user.userId, search as string);
+      } else {
+        // 관리자는 모든 학생 조회
+        students = await DatabaseService.getAllStudents(search as string);
+      }
+
+      res.json({
+        success: true,
+        data: students,
+        message: '학생 목록을 조회했습니다.',
+      });
+    } catch (error) {
+      console.error('학생 목록 조회 실패:', error);
+      res.status(500).json({
+        success: false,
+        message: '학생 목록을 가져올 수 없습니다.',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
     }
   }
 }

@@ -243,4 +243,148 @@ export class WorkbookApi {
 
     return colors[status] || 'bg-gray-100 text-gray-800';
   }
+
+  // 학생 목록 조회
+  static async getStudents(search?: string): Promise<Student[]> {
+    const searchParams = new URLSearchParams();
+    if (search) {
+      searchParams.append('search', search);
+    }
+
+    const response = await fetch(`${config.apiUrl}/api/users/students?${searchParams}`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('학생 목록 조회 실패');
+    }
+
+    const result = await response.json();
+    return result.data || [];
+  }
+
+  // 교사가 담당하는 반 목록 조회
+  static async getTeacherClasses(): Promise<TeacherClass[]> {
+    const response = await fetch(`${config.apiUrl}/api/classes/teacher`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('반 목록 조회 실패');
+    }
+
+    const result = await response.json();
+    return result.data || [];
+  }
+
+  // 특정 반의 학생 목록 조회
+  static async getStudentsByClass(classId: string): Promise<Student[]> {
+    const response = await fetch(`${config.apiUrl}/api/classes/${classId}/students`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('반 학생 목록 조회 실패');
+    }
+
+    const result = await response.json();
+    return result.data || [];
+  }
+
+  // 학생 그룹 목록 조회
+  static async getStudentGroups(): Promise<StudentGroup[]> {
+    const response = await fetch(`${config.apiUrl}/api/groups/student`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('그룹 목록 조회 실패');
+    }
+
+    const result = await response.json();
+    return result.data || [];
+  }
+
+  // 학생 그룹 생성
+  static async createStudentGroup(data: { name: string; description?: string; studentIds: string[] }): Promise<StudentGroup> {
+    const response = await fetch(`${config.apiUrl}/api/groups/student`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error('그룹 생성 실패');
+    }
+
+    const result = await response.json();
+    return result.data.group;
+  }
+
+  // 문제집 배포
+  static async assignWorkbook(workbookId: string, data: {
+    targetType: 'individual' | 'group' | 'class';
+    targetIds: string[];
+    scheduledFor?: string;
+    dueDate?: string;
+    allowLateSubmission?: boolean;
+    showCorrectAnswers?: boolean;
+    maxAttempts?: number;
+  }): Promise<any> {
+    const response = await fetch(`${config.apiUrl}/api/workbooks/${workbookId}/assign`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || '문제집 배포 실패');
+    }
+
+    const result = await response.json();
+    return result.data;
+  }
+}
+
+// 추가 타입 정의
+export interface Student {
+  id: string;
+  username: string;
+  full_name?: string;
+  class_id?: string;
+  class_name?: string;
+}
+
+export interface StudentGroup {
+  id: string;
+  name: string;
+  description?: string;
+  student_count: number;
+  created_by?: string;
+}
+
+export interface TeacherClass {
+  id: string;
+  name: string;
+  grade_level?: string;
+  student_count: number;
 }

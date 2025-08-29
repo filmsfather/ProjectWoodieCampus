@@ -329,6 +329,91 @@ export class ClassController {
       res.status(500).json(response);
     }
   }
+
+  // GET /api/classes/teacher - Get classes assigned to current teacher
+  static async getTeacherClasses(req: AuthRequest, res: Response) {
+    try {
+      const userId = req.user?.userId;
+      const userRole = req.user?.role;
+
+      if (!userId || userRole !== 'teacher') {
+        return res.status(403).json({
+          success: false,
+          message: '교사 권한이 필요합니다.',
+        });
+      }
+
+      const classes = await DatabaseService.getClassesByTeacher(userId);
+
+      res.json({
+        success: true,
+        data: classes,
+        message: '담당 반 목록을 조회했습니다.',
+      });
+    } catch (error) {
+      console.error('교사 반 목록 조회 실패:', error);
+      res.status(500).json({
+        success: false,
+        message: '담당 반 목록을 가져올 수 없습니다.',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  }
+
+  // GET /api/classes/:id/students - Get students in a specific class
+  static async getClassStudents(req: AuthRequest, res: Response) {
+    try {
+      const userId = req.user?.userId;
+      const userRole = req.user?.role;
+      const { id: classId } = req.params;
+
+      if (!userId) {
+        return res.status(401).json({
+          success: false,
+          message: '인증이 필요합니다.',
+        });
+      }
+
+      if (!classId) {
+        return res.status(400).json({
+          success: false,
+          message: '반 ID를 입력해주세요.',
+        });
+      }
+
+      // 권한 확인 - 관리자이거나 해당 반을 담당하는 교사만 조회 가능
+      let hasAccess = false;
+      if (userRole === 'admin') {
+        hasAccess = true;
+      } else if (userRole === 'teacher') {
+        // 교사가 해당 반을 담당하는지 확인
+        const teacherClasses = await DatabaseService.getClassesByTeacher(userId);
+        hasAccess = teacherClasses.some(cls => cls.id === classId);
+      }
+
+      if (!hasAccess) {
+        return res.status(403).json({
+          success: false,
+          message: '해당 반의 학생 목록을 조회할 권한이 없습니다.',
+        });
+      }
+
+      const students = await DatabaseService.getStudentsByClass(classId);
+
+      res.json({
+        success: true,
+        data: students,
+        message: '반 학생 목록을 조회했습니다.',
+      });
+    } catch (error) {
+      console.error('반 학생 목록 조회 실패:', error);
+      res.status(500).json({
+        success: false,
+        message: '반 학생 목록을 가져올 수 없습니다.',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  }
 }
 
 // 헬퍼 함수들
