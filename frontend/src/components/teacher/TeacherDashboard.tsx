@@ -322,94 +322,110 @@ const TeacherDashboard: React.FC = () => {
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-fit">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {classes.map((cls) => {
               const stats = classStats[cls.id];
               return (
                 <div
                   key={cls.id}
-                  className="bg-white rounded-lg shadow-sm border border-gray-200 hover:border-role-primary transition-colors flex flex-col h-full"
+                  className="group relative backdrop-blur-md bg-white/70 border border-white/30 rounded-xl shadow-lg hover:shadow-xl hover:bg-white/80 transition-all duration-300 overflow-hidden"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.5) 100%)',
+                    backdropFilter: 'blur(15px)',
+                    boxShadow: '0 4px 16px rgba(31, 38, 135, 0.1)'
+                  }}
                 >
-                  <div className="p-6 flex-1 flex flex-col">
-                    <div className="flex items-start justify-between mb-6">
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none"></div>
+                  <div className="relative p-4">
+                    <div className="flex items-start justify-between mb-3">
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-semibold text-gray-900 text-ellipsis-1 mb-1">
+                        <h3 className="text-base font-bold text-gray-900 mb-1 truncate">
                           {cls.name}
                         </h3>
-                        <div className="flex items-center gap-2 text-sm">
+                        <div className="flex flex-wrap gap-1">
                           {cls.grade_level && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-role-primary-light/20 text-blue-600 font-medium">
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/20 text-blue-700">
                               {cls.grade_level}학년
                             </span>
                           )}
                           {cls.subject && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-secondary/20 text-gray-700 font-medium">
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-purple-500/20 text-purple-700">
                               {cls.subject}
                             </span>
                           )}
                         </div>
                       </div>
                       {user?.role === 'admin' && (
-                        <div className="flex gap-1 ml-2">
+                        <div className="flex gap-0.5 ml-2">
                           <button
                             onClick={() => openEditModal(cls)}
-                            className="p-2 bg-blue-50 text-blue-600 hover:bg-info/20 rounded-lg transition-colors"
+                            className="p-1 bg-white/40 hover:bg-white/60 text-blue-600 rounded-md transition-all duration-200"
                             title="반 정보 수정"
                           >
-                            <PencilIcon className="h-4 w-4" />
+                            <PencilIcon className="h-3 w-3" />
                           </button>
                           <button
                             onClick={() => handleDeleteClass(cls.id)}
-                            className="p-2 bg-red-50 text-red-600 hover:bg-error/20 rounded-lg transition-colors"
+                            className="p-1 bg-white/40 hover:bg-white/60 text-red-600 rounded-md transition-all duration-200"
                             title="반 삭제"
                           >
-                            <TrashIcon className="h-4 w-4" />
+                            <TrashIcon className="h-3 w-3" />
                           </button>
                         </div>
                       )}
                     </div>
 
-                    {cls.description && (
-                      <div className="mt-4">
-                        <p className="text-sm text-gray-600 reading-leading text-ellipsis-2">
-                          {cls.description}
-                        </p>
-                      </div>
-                    )}
-
-                    {stats && (
-                      <div className="mt-3 grid grid-cols-2 gap-3">
-                        <div className="text-center p-3 bg-blue-50 rounded-lg">
-                          <div className="text-xl font-bold text-blue-600 numeric-mono">
-                            {stats.total_students}
+                    <div className="space-y-2 mb-3">
+                      {/* 선생님 정보 */}
+                      <div className="bg-white/40 rounded-lg p-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1.5">
+                            <UserGroupIcon className="h-3 w-3 text-gray-500" />
+                            <span className="text-xs font-medium text-gray-700">선생님</span>
                           </div>
-                          <div className="text-xs font-medium text-blue-600/80 mt-1">학생 수</div>
-                        </div>
-                        <div className="text-center p-3 bg-green-50 rounded-lg">
-                          <div className="text-xl font-bold text-green-600 numeric-mono">
-                            {stats.average_progress}%
-                          </div>
-                          <div className="text-xs font-medium text-green-600/80 mt-1">평균 진도</div>
+                          <span className="text-xs text-gray-600">
+                            {cls.teacher ? cls.teacher.full_name || cls.teacher.username : '미배정'}
+                          </span>
                         </div>
                       </div>
-                    )}
+                      
+                      {/* 학생 정보 */}
+                      <div className="bg-white/40 rounded-lg p-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1.5">
+                            <UsersIcon className="h-3 w-3 text-gray-500" />
+                            <span className="text-xs font-medium text-gray-700">학생</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-blue-600">
+                              {stats?.total_students || 0}명
+                            </span>
+                            {stats && stats.total_students > 0 && (
+                              <span className="text-xs text-green-600">
+                                진도 {stats.average_progress}%
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
 
-                    <div className="mt-auto pt-4 border-t border-neutral-200 space-y-2">
+                    <div className="flex gap-1.5">
                       {user?.role === 'admin' && (
                         <button
                           onClick={() => openTeacherAssignModal(cls)}
-                          className="w-full inline-flex justify-center items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors text-sm"
+                          className="flex-1 inline-flex justify-center items-center gap-1 px-2 py-1.5 bg-green-500/80 hover:bg-green-500 text-white text-xs font-medium rounded-md transition-all duration-200 hover:scale-105"
                         >
-                          <UserGroupIcon className="h-4 w-4" />
-                          선생님 배정
+                          <UserGroupIcon className="h-3 w-3" />
+                          선생님
                         </button>
                       )}
                       <button
                         onClick={() => openStudentsModal(cls)}
-                        className="w-full inline-flex justify-center items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors text-sm"
+                        className="flex-1 inline-flex justify-center items-center gap-1 px-2 py-1.5 bg-blue-500/80 hover:bg-blue-500 text-white text-xs font-medium rounded-md transition-all duration-200 hover:scale-105"
                       >
-                        <UsersIcon className="h-4 w-4" />
-                        학생 관리
+                        <UsersIcon className="h-3 w-3" />
+                        학생
                       </button>
                     </div>
                 </div>
