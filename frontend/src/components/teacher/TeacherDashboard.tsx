@@ -199,11 +199,40 @@ const TeacherDashboard: React.FC = () => {
           </div>
 
           {/* 로딩 메시지 */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+          <div 
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: 'var(--shadow-sm)',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: 'var(--radius-md)',
+              padding: 'var(--space-8)'
+            }}
+          >
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">반 목록을 불러오는 중입니다</h3>
-              <p className="text-gray-600">잠시만 기다려 주세요...</p>
+              <div 
+                className="animate-spin rounded-full mx-auto mb-4"
+                style={{
+                  height: '48px',
+                  width: '48px',
+                  border: '2px solid var(--color-neutral-200)',
+                  borderBottom: '2px solid var(--color-info)'
+                }}
+              ></div>
+              <h3 
+                className="mb-2"
+                style={{
+                  fontSize: 'var(--font-size-lg)',
+                  fontWeight: '500',
+                  color: 'var(--color-text-primary)'
+                }}
+              >
+                반 목록을 불러오는 중입니다
+              </h3>
+              <p style={{ color: 'var(--color-text-secondary)' }}>
+                잠시만 기다려 주세요...
+              </p>
             </div>
           </div>
         </div>
@@ -212,28 +241,70 @@ const TeacherDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-neutral-50)' }}>
+      <div className="container" style={{ paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-4)' }}>
         {/* 헤더 섹션 */}
         <div className="mb-8">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex justify-between items-start">
+          <div 
+            className="card relative overflow-hidden"
+            style={{
+              background: 'linear-gradient(135deg, rgba(90, 100, 80, 0.05) 0%, rgba(255,255,255,0.95) 100%)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid var(--color-border-light)'
+            }}
+          >
+            <div className="absolute top-0 right-0 w-32 h-32 opacity-5">
+              <AcademicCapIcon className="w-full h-full" style={{ color: 'var(--color-primary)' }} />
+            </div>
+            <div className="relative flex justify-between items-start">
               <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <AcademicCapIcon className="h-6 w-6 text-blue-600" />
+                <div className="flex items-center gap-4 mb-3">
+                  <div 
+                    className="p-3 rounded-xl shadow-sm"
+                    style={{
+                      backgroundColor: 'var(--color-primary)',
+                      background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%)'
+                    }}
+                  >
+                    <AcademicCapIcon className="h-7 w-7 text-white" />
                   </div>
-                  <h1 className="text-2xl font-bold text-gray-900">반 관리 대시보드</h1>
+                  <h1 
+                    className="text-3xl font-bold"
+                    style={{ color: 'var(--color-text-primary)' }}
+                  >
+                    반 관리 대시보드
+                  </h1>
                 </div>
-                <p className="text-gray-600 reading-leading">
-                  안녕하세요, <span className="font-medium text-gray-900">{user?.full_name || user?.username}</span>님! 
+                <p 
+                  className="text-base leading-relaxed"
+                  style={{ color: 'var(--color-text-secondary)' }}
+                >
+                  안녕하세요, <span 
+                    className="font-semibold"
+                    style={{ color: 'var(--color-primary)' }}
+                  >
+                    {user?.full_name || user?.username}
+                  </span>님! 
                   {user?.role === 'admin' ? ' 모든 반을 관리하고' : ' 담당하시는 반을'} 효율적으로 운영하세요.
                 </p>
               </div>
               {user?.role === 'admin' && (
                 <button
                   onClick={() => setShowCreateModal(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 role-primary text-white font-medium rounded-lg shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2"
+                  className="inline-flex items-center gap-3 px-6 py-3 font-semibold rounded-xl shadow-lg transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-4"
+                  style={{
+                    backgroundColor: 'var(--color-accent)',
+                    color: 'white',
+                    focusRingColor: 'var(--color-accent)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-accent-dark)';
+                    e.currentTarget.style.boxShadow = 'var(--shadow-xl)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-accent)';
+                    e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+                  }}
                 >
                   <PlusIcon className="h-5 w-5" />
                   새 반 만들기
@@ -245,68 +316,208 @@ const TeacherDashboard: React.FC = () => {
 
         {/* 통계 요약 카드 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col h-full">
-            <div className="p-6 flex items-center justify-between flex-1">
+          {/* 반 수 통계 카드 */}
+          <div 
+            className="group relative transition-all duration-300 hover:shadow-lg flex flex-col h-full"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: 'var(--shadow-sm)',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: 'var(--radius-md)'
+            }}
+          >
+            <div style={{ padding: 'var(--space-6)' }} className="flex items-center justify-between flex-1">
               <div className="flex-1">
-                <div className="text-sm font-medium text-gray-600 mb-1">
+                <div 
+                  className="mb-1"
+                  style={{ 
+                    fontSize: 'var(--font-size-sm)', 
+                    fontWeight: '500',
+                    color: 'var(--color-secondary)'
+                  }}
+                >
                   {user?.role === 'admin' ? '전체 반 수' : '담당 반 수'}
                 </div>
-                <div className="text-2xl font-bold text-gray-900 numeric-mono">
+                <div 
+                  className="numeric-mono"
+                  style={{ 
+                    fontSize: 'var(--font-size-2xl)', 
+                    fontWeight: '700',
+                    color: 'var(--color-text-primary)'
+                  }}
+                >
                   {classes.length}개
                 </div>
               </div>
-              <div className="p-3 bg-blue-50 rounded-lg">
-                <AcademicCapIcon className="h-6 w-6 text-blue-600" />
+              <div 
+                style={{
+                  padding: 'var(--space-3)',
+                  backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid rgba(59, 130, 246, 0.2)'
+                }}
+              >
+                <AcademicCapIcon 
+                  className="h-6 w-6" 
+                  style={{ color: 'var(--color-info)' }}
+                />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col h-full">
-            <div className="p-6 flex items-center justify-between flex-1">
+          {/* 학생 수 통계 카드 */}
+          <div 
+            className="group relative transition-all duration-300 hover:shadow-lg flex flex-col h-full"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: 'var(--shadow-sm)',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: 'var(--radius-md)'
+            }}
+          >
+            <div style={{ padding: 'var(--space-6)' }} className="flex items-center justify-between flex-1">
               <div className="flex-1">
-                <div className="text-sm font-medium text-gray-600 mb-1">
+                <div 
+                  className="mb-1"
+                  style={{ 
+                    fontSize: 'var(--font-size-sm)', 
+                    fontWeight: '500',
+                    color: 'var(--color-secondary)'
+                  }}
+                >
                   총 학생 수
                 </div>
-                <div className="text-2xl font-bold text-gray-900 numeric-mono">
+                <div 
+                  className="numeric-mono"
+                  style={{ 
+                    fontSize: 'var(--font-size-2xl)', 
+                    fontWeight: '700',
+                    color: 'var(--color-text-primary)'
+                  }}
+                >
                   {Object.values(classStats).reduce((sum, stats) => sum + (stats?.total_students || 0), 0)}명
                 </div>
               </div>
-              <div className="p-3 bg-green-50 rounded-lg">
-                <UsersIcon className="h-6 w-6 text-green-600" />
+              <div 
+                style={{
+                  padding: 'var(--space-3)',
+                  backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid rgba(34, 197, 94, 0.2)'
+                }}
+              >
+                <UsersIcon 
+                  className="h-6 w-6" 
+                  style={{ color: '#22c55e' }}
+                />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col h-full">
-            <div className="p-6 flex items-center justify-between flex-1">
+          {/* 과제 수 통계 카드 */}
+          <div 
+            className="group relative transition-all duration-300 hover:shadow-lg flex flex-col h-full"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: 'var(--shadow-sm)',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: 'var(--radius-md)'
+            }}
+          >
+            <div style={{ padding: 'var(--space-6)' }} className="flex items-center justify-between flex-1">
               <div className="flex-1">
-                <div className="text-sm font-medium text-gray-600 mb-1">
+                <div 
+                  className="mb-1"
+                  style={{ 
+                    fontSize: 'var(--font-size-sm)', 
+                    fontWeight: '500',
+                    color: 'var(--color-secondary)'
+                  }}
+                >
                   활성 과제
                 </div>
-                <div className="text-2xl font-bold text-gray-900 numeric-mono">
+                <div 
+                  className="numeric-mono"
+                  style={{ 
+                    fontSize: 'var(--font-size-2xl)', 
+                    fontWeight: '700',
+                    color: 'var(--color-text-primary)'
+                  }}
+                >
                   {Object.values(classStats).reduce((sum, stats) => sum + (stats?.active_assignments || 0), 0)}개
                 </div>
               </div>
-              <div className="p-3 bg-yellow-50 rounded-lg">
-                <BookOpenIcon className="h-6 w-6 text-yellow-600" />
+              <div 
+                style={{
+                  padding: 'var(--space-3)',
+                  backgroundColor: 'rgba(251, 191, 36, 0.1)',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid rgba(251, 191, 36, 0.2)'
+                }}
+              >
+                <BookOpenIcon 
+                  className="h-6 w-6" 
+                  style={{ color: '#fbbf24' }}
+                />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col h-full">
-            <div className="p-6 flex items-center justify-between flex-1">
+          {/* 진도율 통계 카드 */}
+          <div 
+            className="group relative transition-all duration-300 hover:shadow-lg flex flex-col h-full"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: 'var(--shadow-sm)',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: 'var(--radius-md)'
+            }}
+          >
+            <div style={{ padding: 'var(--space-6)' }} className="flex items-center justify-between flex-1">
               <div className="flex-1">
-                <div className="text-sm font-medium text-gray-600 mb-1">
+                <div 
+                  className="mb-1"
+                  style={{ 
+                    fontSize: 'var(--font-size-sm)', 
+                    fontWeight: '500',
+                    color: 'var(--color-secondary)'
+                  }}
+                >
                   평균 진도율
                 </div>
-                <div className="text-2xl font-bold text-gray-900 numeric-mono">
+                <div 
+                  className="numeric-mono"
+                  style={{ 
+                    fontSize: 'var(--font-size-2xl)', 
+                    fontWeight: '700',
+                    color: 'var(--color-text-primary)'
+                  }}
+                >
                   {classes.length > 0 
                     ? Math.round(Object.values(classStats).reduce((sum, stats) => sum + (stats?.average_progress || 0), 0) / classes.length)
                     : 0}%
                 </div>
               </div>
-              <div className="p-3 bg-blue-50 rounded-lg">
-                <ChartBarIcon className="h-6 w-6 text-blue-600" />
+              <div 
+                style={{
+                  padding: 'var(--space-3)',
+                  backgroundColor: 'rgba(168, 85, 247, 0.1)',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid rgba(168, 85, 247, 0.2)'
+                }}
+              >
+                <ChartBarIcon 
+                  className="h-6 w-6" 
+                  style={{ color: '#a855f7' }}
+                />
               </div>
             </div>
           </div>
@@ -314,15 +525,49 @@ const TeacherDashboard: React.FC = () => {
 
         {/* 반 목록 섹션 */}
         {classes.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="text-center py-16 p-6">
-              <div className="p-4 bg-neutral-100 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-                <AcademicCapIcon className="h-10 w-10 text-gray-600" />
+          <div 
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: 'var(--shadow-sm)',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: 'var(--radius-md)'
+            }}
+          >
+            <div className="text-center" style={{ padding: 'var(--space-16) var(--space-6)' }}>
+              <div 
+                className="mx-auto mb-4 flex items-center justify-center"
+                style={{
+                  padding: 'var(--space-4)',
+                  backgroundColor: 'var(--color-neutral-100)',
+                  borderRadius: '50%',
+                  width: '80px',
+                  height: '80px'
+                }}
+              >
+                <AcademicCapIcon 
+                  className="h-10 w-10" 
+                  style={{ color: 'var(--color-secondary)' }}
+                />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 
+                className="mb-2"
+                style={{
+                  fontSize: 'var(--font-size-lg)',
+                  fontWeight: '600',
+                  color: 'var(--color-text-primary)'
+                }}
+              >
                 {user?.role === 'admin' ? '생성된 반이 없습니다' : '담당 반이 없습니다'}
               </h3>
-              <p className="text-gray-700 mb-6 max-w-sm mx-auto reading-leading">
+              <p 
+                className="mx-auto reading-leading max-w-sm"
+                style={{
+                  color: 'var(--color-text-secondary)',
+                  marginBottom: 'var(--space-6)'
+                }}
+              >
                 {user?.role === 'admin' 
                   ? '새 반을 만들어서 교사와 학생들을 배정해보세요.' 
                   : '관리자가 반을 배정할 때까지 기다려주세요.'}
@@ -330,7 +575,26 @@ const TeacherDashboard: React.FC = () => {
               {user?.role === 'admin' && (
                 <button
                   onClick={() => setShowCreateModal(true)}
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+                  className="inline-flex items-center justify-center gap-2 transition-all duration-200"
+                  style={{
+                    padding: 'var(--space-3) var(--space-6)',
+                    backgroundColor: 'var(--color-accent)',
+                    color: 'white',
+                    fontWeight: '500',
+                    borderRadius: 'var(--radius-md)',
+                    boxShadow: 'var(--shadow-sm)',
+                    border: 'none'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#994133';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-accent)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                  }}
                 >
                   <PlusIcon className="h-5 w-5" />
                   새 반 만들기
@@ -340,11 +604,22 @@ const TeacherDashboard: React.FC = () => {
           </div>
         ) : (
           <div>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">
+          <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-6)' }}>
+            <h2 
+              style={{
+                fontSize: 'var(--font-size-xl)',
+                fontWeight: '600',
+                color: 'var(--color-text-primary)'
+              }}
+            >
               {user?.role === 'admin' ? '전체 반 목록' : '담당 반 목록'}
             </h2>
-            <div className="text-sm text-gray-600">
+            <div 
+              style={{
+                fontSize: 'var(--font-size-sm)',
+                color: 'var(--color-text-secondary)'
+              }}
+            >
               총 {classes.length}개 반
             </div>
           </div>

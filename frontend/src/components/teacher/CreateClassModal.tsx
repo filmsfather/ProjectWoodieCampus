@@ -49,7 +49,7 @@ const CreateClassModal: React.FC<CreateClassModalProps> = ({ onClose, onSubmit }
 
   return (
     <div 
-      className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
+      className="fixed inset-0 flex items-center justify-center"
       style={{
         position: 'fixed',
         top: 0,
@@ -58,43 +58,85 @@ const CreateClassModal: React.FC<CreateClassModalProps> = ({ onClose, onSubmit }
         bottom: 0,
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
         zIndex: 9999,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
+        backdropFilter: 'blur(4px)',
+        WebkitBackdropFilter: 'blur(4px)'
       }}
     >
       <div 
-        className="relative mx-auto p-5 border w-96 shadow-lg rounded-md bg-white"
+        className="relative"
         style={{
-          backgroundColor: 'white',
-          borderRadius: '8px',
-          padding: '20px',
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          borderRadius: 'var(--radius-lg)',
+          padding: 'var(--space-6)',
+          boxShadow: 'var(--shadow-lg)',
+          border: '1px solid var(--color-border-light)',
           maxWidth: '400px',
           width: '90%',
           maxHeight: '90vh',
           overflowY: 'auto'
         }}
       >
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium text-gray-900">새 반 만들기</h3>
+        <div className="flex justify-between items-center" style={{ marginBottom: 'var(--space-4)' }}>
+          <h3 
+            style={{
+              fontSize: 'var(--font-size-lg)',
+              fontWeight: '600',
+              color: 'var(--color-text-primary)'
+            }}
+          >
+            새 반 만들기
+          </h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="transition-colors duration-200"
+            style={{
+              color: 'var(--color-text-secondary)',
+              padding: 'var(--space-1)',
+              borderRadius: 'var(--radius-sm)',
+              border: 'none',
+              background: 'transparent'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--color-text-primary)';
+              e.currentTarget.style.backgroundColor = 'var(--color-neutral-100)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--color-text-secondary)';
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }}
           >
             <XMarkIcon className="h-6 w-6" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit}>
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
+            <div 
+              style={{
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                border: '1px solid rgba(239, 68, 68, 0.2)',
+                color: '#dc2626',
+                padding: 'var(--space-3)',
+                borderRadius: 'var(--radius-md)',
+                marginBottom: 'var(--space-4)'
+              }}
+            >
               {error}
             </div>
           )}
 
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+          <div style={{ marginBottom: 'var(--space-4)' }}>
+            <label 
+              htmlFor="name" 
+              className="block mb-2"
+              style={{
+                fontSize: 'var(--font-size-sm)',
+                fontWeight: '500',
+                color: 'var(--color-text-primary)'
+              }}
+            >
               반 이름 *
             </label>
             <input
@@ -104,8 +146,23 @@ const CreateClassModal: React.FC<CreateClassModalProps> = ({ onClose, onSubmit }
               required
               value={formData.name}
               onChange={handleChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full transition-all duration-200 focus:outline-none"
+              style={{
+                padding: 'var(--space-3)',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--color-border)',
+                backgroundColor: 'white',
+                fontSize: 'var(--font-size-base)'
+              }}
               placeholder="예: 3-1반, 수학 A반"
+              onFocus={(e) => {
+                e.target.style.borderColor = 'var(--color-primary)';
+                e.target.style.boxShadow = '0 0 0 3px rgba(90, 100, 80, 0.1)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = 'var(--color-border)';
+                e.target.style.boxShadow = 'none';
+              }}
             />
           </div>
 

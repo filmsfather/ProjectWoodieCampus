@@ -218,10 +218,33 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ }) => {
 
   if (loading) {
     return (
-      <div className="admin-dashboard loading">
-        <div className="loading-spinner">
-          <div className="spinner"></div>
-          <p>대시보드를 로드하고 있습니다...</p>
+      <div className="min-h-screen" style={{ backgroundColor: 'var(--color-neutral-50)' }}>
+        <div className="container" style={{ paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-4)' }}>
+          <div 
+            className="text-center"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: 'var(--shadow-sm)',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: 'var(--radius-md)',
+              padding: 'var(--space-8)'
+            }}
+          >
+            <div 
+              className="animate-spin rounded-full mx-auto mb-4"
+              style={{
+                height: '48px',
+                width: '48px',
+                border: '2px solid var(--color-neutral-200)',
+                borderBottom: '2px solid var(--color-primary)'
+              }}
+            ></div>
+            <p style={{ color: 'var(--color-text-primary)', fontWeight: '500' }}>
+              관리자 대시보드를 로드하고 있습니다...
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -229,11 +252,52 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ }) => {
 
   if (error) {
     return (
-      <div className="admin-dashboard error">
-        <div className="error-message">
-          <h3>❌ 오류 발생</h3>
-          <p>{error}</p>
-          <button onClick={loadDashboardData} className="retry-btn">다시 시도</button>
+      <div className="min-h-screen" style={{ backgroundColor: 'var(--color-neutral-50)' }}>
+        <div className="container" style={{ paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-4)' }}>
+          <div 
+            className="text-center"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: 'var(--shadow-sm)',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: 'var(--radius-md)',
+              padding: 'var(--space-8)'
+            }}
+          >
+            <h3 
+              className="mb-4"
+              style={{
+                fontSize: 'var(--font-size-xl)',
+                fontWeight: '600',
+                color: 'var(--color-text-primary)'
+              }}
+            >
+              ❌ 오류 발생
+            </h3>
+            <p 
+              className="mb-6"
+              style={{ color: 'var(--color-text-secondary)', marginBottom: 'var(--space-6)' }}
+            >
+              {error}
+            </p>
+            <button 
+              onClick={loadDashboardData} 
+              className="transition-all duration-200"
+              style={{
+                padding: 'var(--space-3) var(--space-6)',
+                backgroundColor: 'var(--color-accent)',
+                color: 'white',
+                fontWeight: '500',
+                borderRadius: 'var(--radius-md)',
+                boxShadow: 'var(--shadow-sm)',
+                border: 'none'
+              }}
+            >
+              다시 시도
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -242,237 +306,940 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ }) => {
   // 섹션에 따른 렌더링
   if (activeSection === 'subjects') {
     return (
-      <div className="admin-dashboard">
-        <div className="dashboard-header">
-          <button 
-            className="back-button"
-            onClick={() => setActiveSection('dashboard')}
+      <div className="min-h-screen" style={{ backgroundColor: 'var(--color-neutral-50)' }}>
+        <div className="container" style={{ paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-4)' }}>
+          <div 
+            className="mb-8"
+            style={{
+              background: 'linear-gradient(135deg, rgba(90, 100, 80, 0.05) 0%, rgba(255,255,255,0.95) 100%)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: 'var(--radius-md)',
+              padding: 'var(--space-6)'
+            }}
           >
-            ← 대시보드로 돌아가기
-          </button>
-          <h1>교과목 관리</h1>
-        </div>
-        {/* <SubjectManagement /> */}
-        <div style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
-          교과목 관리 기능은 임시로 비활성화되었습니다.
+            <button 
+              className="mb-4 transition-all duration-200"
+              onClick={() => setActiveSection('dashboard')}
+              style={{
+                padding: 'var(--space-2) var(--space-4)',
+                backgroundColor: 'var(--color-neutral-100)',
+                color: 'var(--color-primary)',
+                fontWeight: '500',\n                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--color-border-light)',
+                cursor: 'pointer'
+              }}
+            >
+              ← 대시보드로 돌아가기
+            </button>
+            <h1 
+              style={{
+                fontSize: 'var(--font-size-3xl)',\n                fontWeight: '700',\n                color: 'var(--color-text-primary)'
+              }}
+            >
+              교과목 관리
+            </h1>
+          </div>
+          {/* <SubjectManagement /> */}
+          <div 
+            className="text-center"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: 'var(--shadow-sm)',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: 'var(--radius-md)',
+              padding: 'var(--space-8)',
+              color: 'var(--color-text-secondary)'
+            }}
+          >
+            교과목 관리 기능은 임시로 비활성화되었습니다.
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="admin-dashboard">
-      <div className="dashboard-header">
-        <h1>관리자 대시보드</h1>
-        <p>시스템 전반을 관리하고 모니터링하세요</p>
-      </div>
-      
-      <div className="dashboard-content">
-        {/* 시스템 상태 */}
-        <div className="system-health">
-          <div className="health-indicator">
-            <span className="health-icon">{getHealthIcon(metrics.systemHealth)}</span>
-            <div className="health-content">
-              <h3>시스템 상태</h3>
-              <p className={`health-status ${getHealthColor(metrics.systemHealth)}`}>
-                {metrics.systemHealth === 'healthy' && '정상'}
-                {metrics.systemHealth === 'warning' && '주의'}
-                {metrics.systemHealth === 'error' && '오류'}
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-neutral-50)' }}>
+      <div className="container" style={{ paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-4)' }}>
+        {/* 헤더 섹션 */}
+        <div className="mb-8">
+          <div 
+            className="relative overflow-hidden"
+            style={{
+              background: 'linear-gradient(135deg, rgba(90, 100, 80, 0.05) 0%, rgba(255,255,255,0.95) 100%)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: 'var(--radius-md)',
+              padding: 'var(--space-6)'
+            }}
+          >
+            {/* 배경 워터마크 */}
+            <div 
+              className="absolute inset-0 flex items-center justify-end pr-8 opacity-5 pointer-events-none"
+              style={{ transform: 'scale(1.5) translateX(20px)' }}
+            >
+              <div style={{ fontSize: '120px' }}>⚙️</div>
+            </div>
+            
+            <div className="relative z-10">
+              <h1 
+                style={{
+                  fontSize: 'var(--font-size-3xl)',
+                  fontWeight: '700',
+                  color: 'var(--color-text-primary)',
+                  marginBottom: 'var(--space-2)'
+                }}
+              >
+                관리자 대시보드
+              </h1>
+              <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-lg)' }}>
+                시스템 전반을 관리하고 모니터링하세요
               </p>
             </div>
           </div>
         </div>
+        {/* 시스템 상태 */}
+        <div className="mb-8">
+          <div 
+            className="transition-all duration-300 hover:shadow-lg"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: 'var(--shadow-sm)',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: 'var(--radius-md)',
+              padding: 'var(--space-6)'
+            }}
+          >
+            <div className="flex items-center gap-4">
+              <span style={{ fontSize: '2rem' }}>{getHealthIcon(metrics.systemHealth)}</span>
+              <div>
+                <h3 
+                  style={{
+                    fontSize: 'var(--font-size-lg)',
+                    fontWeight: '600',
+                    color: 'var(--color-text-primary)',
+                    marginBottom: 'var(--space-1)'
+                  }}
+                >
+                  시스템 상태
+                </h3>
+                <p 
+                  style={{
+                    color: metrics.systemHealth === 'healthy' ? '#10b981' : 
+                           metrics.systemHealth === 'warning' ? '#f59e0b' : '#ef4444',
+                    fontWeight: '500',
+                    fontSize: 'var(--font-size-sm)'
+                  }}
+                >
+                  {metrics.systemHealth === 'healthy' && '정상'}
+                  {metrics.systemHealth === 'warning' && '주의'}
+                  {metrics.systemHealth === 'error' && '오류'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        {/* 전체 통계 */}
-        <div className="stats-section">
-          <div className="stat-card primary">
-            <div className="stat-icon">👥</div>
-            <div className="stat-content">
-              <h3>전체 사용자</h3>
-              <p className="stat-number">{metrics.totalUsers}</p>
-              <p className="stat-label">명</p>
-            </div>
-          </div>
-          
-          <div className="stat-card success">
-            <div className="stat-icon">🎓</div>
-            <div className="stat-content">
-              <h3>학생</h3>
-              <p className="stat-number">{metrics.totalStudents}</p>
-              <p className="stat-label">명</p>
-            </div>
-          </div>
-          
-          <div className="stat-card info">
-            <div className="stat-icon">👨‍🏫</div>
-            <div className="stat-content">
-              <h3>교사</h3>
-              <p className="stat-number">{metrics.totalTeachers}</p>
-              <p className="stat-label">명</p>
+        {/* 사용자 통계 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div 
+            className="group relative transition-all duration-300 hover:shadow-lg"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: 'var(--shadow-sm)',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: 'var(--radius-md)'
+            }}
+          >
+            <div style={{ padding: 'var(--space-6)' }} className="flex items-center justify-between">
+              <div className="flex-1">
+                <div 
+                  className="mb-1"
+                  style={{ 
+                    fontSize: 'var(--font-size-sm)', 
+                    fontWeight: '500',
+                    color: 'var(--color-secondary)'
+                  }}
+                >
+                  전체 사용자
+                </div>
+                <div 
+                  className="numeric-mono"
+                  style={{ 
+                    fontSize: 'var(--font-size-2xl)', 
+                    fontWeight: '700',
+                    color: 'var(--color-text-primary)'
+                  }}
+                >
+                  {metrics.totalUsers}명
+                </div>
+              </div>
+              <div 
+                style={{
+                  padding: 'var(--space-3)',
+                  backgroundColor: 'rgba(90, 100, 80, 0.1)',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '1.5rem'
+                }}
+              >
+                👥
+              </div>
             </div>
           </div>
 
-          <div className="stat-card warning">
-            <div className="stat-icon">⚡</div>
-            <div className="stat-content">
-              <h3>관리자</h3>
-              <p className="stat-number">{metrics.totalAdmins}</p>
-              <p className="stat-label">명</p>
+          <div 
+            className="group relative transition-all duration-300 hover:shadow-lg"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: 'var(--shadow-sm)',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: 'var(--radius-md)'
+            }}
+          >
+            <div style={{ padding: 'var(--space-6)' }} className="flex items-center justify-between">
+              <div className="flex-1">
+                <div 
+                  className="mb-1"
+                  style={{ 
+                    fontSize: 'var(--font-size-sm)', 
+                    fontWeight: '500',
+                    color: 'var(--color-secondary)'
+                  }}
+                >
+                  학생
+                </div>
+                <div 
+                  className="numeric-mono"
+                  style={{ 
+                    fontSize: 'var(--font-size-2xl)', 
+                    fontWeight: '700',
+                    color: 'var(--color-text-primary)'
+                  }}
+                >
+                  {metrics.totalStudents}명
+                </div>
+              </div>
+              <div 
+                style={{
+                  padding: 'var(--space-3)',
+                  backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '1.5rem'
+                }}
+              >
+                🎓
+              </div>
+            </div>
+          </div>
+
+          <div 
+            className="group relative transition-all duration-300 hover:shadow-lg"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: 'var(--shadow-sm)',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: 'var(--radius-md)'
+            }}
+          >
+            <div style={{ padding: 'var(--space-6)' }} className="flex items-center justify-between">
+              <div className="flex-1">
+                <div 
+                  className="mb-1"
+                  style={{ 
+                    fontSize: 'var(--font-size-sm)', 
+                    fontWeight: '500',
+                    color: 'var(--color-secondary)'
+                  }}
+                >
+                  교사
+                </div>
+                <div 
+                  className="numeric-mono"
+                  style={{ 
+                    fontSize: 'var(--font-size-2xl)', 
+                    fontWeight: '700',
+                    color: 'var(--color-text-primary)'
+                  }}
+                >
+                  {metrics.totalTeachers}명
+                </div>
+              </div>
+              <div 
+                style={{
+                  padding: 'var(--space-3)',
+                  backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '1.5rem'
+                }}
+              >
+                👨‍🏫
+              </div>
+            </div>
+          </div>
+
+          <div 
+            className="group relative transition-all duration-300 hover:shadow-lg"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: 'var(--shadow-sm)',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: 'var(--radius-md)'
+            }}
+          >
+            <div style={{ padding: 'var(--space-6)' }} className="flex items-center justify-between">
+              <div className="flex-1">
+                <div 
+                  className="mb-1"
+                  style={{ 
+                    fontSize: 'var(--font-size-sm)', 
+                    fontWeight: '500',
+                    color: 'var(--color-secondary)'
+                  }}
+                >
+                  관리자
+                </div>
+                <div 
+                  className="numeric-mono"
+                  style={{ 
+                    fontSize: 'var(--font-size-2xl)', 
+                    fontWeight: '700',
+                    color: 'var(--color-text-primary)'
+                  }}
+                >
+                  {metrics.totalAdmins}명
+                </div>
+              </div>
+              <div 
+                style={{
+                  padding: 'var(--space-3)',
+                  backgroundColor: 'rgba(170, 70, 50, 0.1)',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '1.5rem'
+                }}
+              >
+                ⚡
+              </div>
             </div>
           </div>
         </div>
 
         {/* 컨텐츠 통계 */}
-        <div className="content-stats">
-          <div className="stat-card secondary">
-            <div className="stat-icon">📚</div>
-            <div className="stat-content">
-              <h3>문제집</h3>
-              <p className="stat-number">{metrics.totalWorkbooks}</p>
-              <p className="stat-label">개</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <div 
+            className="group relative transition-all duration-300 hover:shadow-lg"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: 'var(--shadow-sm)',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: 'var(--radius-md)'
+            }}
+          >
+            <div style={{ padding: 'var(--space-6)' }} className="flex items-center justify-between">
+              <div className="flex-1">
+                <div 
+                  className="mb-1"
+                  style={{ 
+                    fontSize: 'var(--font-size-sm)', 
+                    fontWeight: '500',
+                    color: 'var(--color-secondary)'
+                  }}
+                >
+                  문제집
+                </div>
+                <div 
+                  className="numeric-mono"
+                  style={{ 
+                    fontSize: 'var(--font-size-2xl)', 
+                    fontWeight: '700',
+                    color: 'var(--color-text-primary)'
+                  }}
+                >
+                  {metrics.totalWorkbooks}개
+                </div>
+              </div>
+              <div 
+                style={{
+                  padding: 'var(--space-3)',
+                  backgroundColor: 'rgba(168, 85, 247, 0.1)',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '1.5rem'
+                }}
+              >
+                📚
+              </div>
             </div>
           </div>
-          
-          <div className="stat-card secondary">
-            <div className="stat-icon">❓</div>
-            <div className="stat-content">
-              <h3>문제</h3>
-              <p className="stat-number">{metrics.totalProblems}</p>
-              <p className="stat-label">개</p>
+
+          <div 
+            className="group relative transition-all duration-300 hover:shadow-lg"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: 'var(--shadow-sm)',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: 'var(--radius-md)'
+            }}
+          >
+            <div style={{ padding: 'var(--space-6)' }} className="flex items-center justify-between">
+              <div className="flex-1">
+                <div 
+                  className="mb-1"
+                  style={{ 
+                    fontSize: 'var(--font-size-sm)', 
+                    fontWeight: '500',
+                    color: 'var(--color-secondary)'
+                  }}
+                >
+                  문제
+                </div>
+                <div 
+                  className="numeric-mono"
+                  style={{ 
+                    fontSize: 'var(--font-size-2xl)', 
+                    fontWeight: '700',
+                    color: 'var(--color-text-primary)'
+                  }}
+                >
+                  {metrics.totalProblems}개
+                </div>
+              </div>
+              <div 
+                style={{
+                  padding: 'var(--space-3)',
+                  backgroundColor: 'rgba(251, 191, 36, 0.1)',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '1.5rem'
+                }}
+              >
+                ❓
+              </div>
             </div>
           </div>
-          
-          <div className="stat-card secondary">
-            <div className="stat-icon">📈</div>
-            <div className="stat-content">
-              <h3>오늘의 활동</h3>
-              <p className="stat-number">{metrics.todayActivities}</p>
-              <p className="stat-label">건</p>
+
+          <div 
+            className="group relative transition-all duration-300 hover:shadow-lg"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: 'var(--shadow-sm)',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: 'var(--radius-md)'
+            }}
+          >
+            <div style={{ padding: 'var(--space-6)' }} className="flex items-center justify-between">
+              <div className="flex-1">
+                <div 
+                  className="mb-1"
+                  style={{ 
+                    fontSize: 'var(--font-size-sm)', 
+                    fontWeight: '500',
+                    color: 'var(--color-secondary)'
+                  }}
+                >
+                  오늘의 활동
+                </div>
+                <div 
+                  className="numeric-mono"
+                  style={{ 
+                    fontSize: 'var(--font-size-2xl)', 
+                    fontWeight: '700',
+                    color: 'var(--color-text-primary)'
+                  }}
+                >
+                  {metrics.todayActivities}건
+                </div>
+              </div>
+              <div 
+                style={{
+                  padding: 'var(--space-3)',
+                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '1.5rem'
+                }}
+              >
+                📈
+              </div>
             </div>
           </div>
         </div>
 
         {/* 관리 작업 */}
-        <div className="admin-actions">
-          <h2>관리 작업</h2>
-          <div className="action-buttons">
+        <div style={{ marginBottom: 'var(--space-8)' }}>
+          <h2 
+            style={{
+              fontSize: 'var(--font-size-xl)',
+              fontWeight: '600',
+              color: 'var(--color-text-primary)',
+              marginBottom: 'var(--space-6)'
+            }}
+          >
+            관리 작업
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <button 
-              className="action-btn primary"
+              className="group relative transition-all duration-300 hover:shadow-lg text-left"
               onClick={() => window.location.href = '/admin'}
+              style={{
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                boxShadow: 'var(--shadow-sm)',
+                border: '1px solid var(--color-border-light)',
+                borderRadius: 'var(--radius-md)',
+                padding: 'var(--space-4)'
+              }}
             >
-              <span className="action-icon">👤</span>
-              <div className="action-content">
-                <h4>사용자 관리</h4>
-                <p>사용자를 생성하고 관리합니다</p>
+              <div className="flex items-center gap-3">
+                <div 
+                  style={{
+                    padding: 'var(--space-3)',
+                    backgroundColor: 'rgba(90, 100, 80, 0.1)',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: '1.5rem'
+                  }}
+                >
+                  👤
+                </div>
+                <div className="flex-1">
+                  <h4 
+                    style={{
+                      fontSize: 'var(--font-size-base)',
+                      fontWeight: '600',
+                      color: 'var(--color-text-primary)',
+                      marginBottom: 'var(--space-1)'
+                    }}
+                  >
+                    사용자 관리
+                  </h4>
+                  <p 
+                    style={{
+                      fontSize: 'var(--font-size-sm)',
+                      color: 'var(--color-text-secondary)'
+                    }}
+                  >
+                    사용자를 생성하고 관리합니다
+                  </p>
+                </div>
               </div>
             </button>
             
             <button 
-              className="action-btn success"
+              className="group relative transition-all duration-300 hover:shadow-lg text-left"
               onClick={() => window.location.href = '/workbooks'}
+              style={{
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                boxShadow: 'var(--shadow-sm)',
+                border: '1px solid var(--color-border-light)',
+                borderRadius: 'var(--radius-md)',
+                padding: 'var(--space-4)'
+              }}
             >
-              <span className="action-icon">📚</span>
-              <div className="action-content">
-                <h4>문제집 관리</h4>
-                <p>모든 문제집을 확인합니다</p>
+              <div className="flex items-center gap-3">
+                <div 
+                  style={{
+                    padding: 'var(--space-3)',
+                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: '1.5rem'
+                  }}
+                >
+                  📚
+                </div>
+                <div className="flex-1">
+                  <h4 
+                    style={{
+                      fontSize: 'var(--font-size-base)',
+                      fontWeight: '600',
+                      color: 'var(--color-text-primary)',
+                      marginBottom: 'var(--space-1)'
+                    }}
+                  >
+                    문제집 관리
+                  </h4>
+                  <p 
+                    style={{
+                      fontSize: 'var(--font-size-sm)',
+                      color: 'var(--color-text-secondary)'
+                    }}
+                  >
+                    모든 문제집을 확인합니다
+                  </p>
+                </div>
               </div>
             </button>
             
             <button 
-              className="action-btn info"
+              className="group relative transition-all duration-300 hover:shadow-lg text-left"
               onClick={() => window.location.href = '/problems'}
+              style={{
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                boxShadow: 'var(--shadow-sm)',
+                border: '1px solid var(--color-border-light)',
+                borderRadius: 'var(--radius-md)',
+                padding: 'var(--space-4)'
+              }}
             >
-              <span className="action-icon">❓</span>
-              <div className="action-content">
-                <h4>문제 관리</h4>
-                <p>모든 문제를 확인합니다</p>
+              <div className="flex items-center gap-3">
+                <div 
+                  style={{
+                    padding: 'var(--space-3)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: '1.5rem'
+                  }}
+                >
+                  ❓
+                </div>
+                <div className="flex-1">
+                  <h4 
+                    style={{
+                      fontSize: 'var(--font-size-base)',
+                      fontWeight: '600',
+                      color: 'var(--color-text-primary)',
+                      marginBottom: 'var(--space-1)'
+                    }}
+                  >
+                    문제 관리
+                  </h4>
+                  <p 
+                    style={{
+                      fontSize: 'var(--font-size-sm)',
+                      color: 'var(--color-text-secondary)'
+                    }}
+                  >
+                    모든 문제를 확인합니다
+                  </p>
+                </div>
               </div>
             </button>
             
             <button 
-              className="action-btn secondary"
+              className="group relative transition-all duration-300 hover:shadow-lg text-left"
               onClick={() => {
-                // 교과목 관리 섹션을 표시하도록 상태 변경
                 setActiveSection('subjects');
               }}
+              style={{
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                boxShadow: 'var(--shadow-sm)',
+                border: '1px solid var(--color-border-light)',
+                borderRadius: 'var(--radius-md)',
+                padding: 'var(--space-4)'
+              }}
             >
-              <span className="action-icon">📖</span>
-              <div className="action-content">
-                <h4>교과목 관리</h4>
-                <p>교과목을 생성하고 관리합니다</p>
+              <div className="flex items-center gap-3">
+                <div 
+                  style={{
+                    padding: 'var(--space-3)',
+                    backgroundColor: 'rgba(168, 85, 247, 0.1)',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: '1.5rem'
+                  }}
+                >
+                  📖
+                </div>
+                <div className="flex-1">
+                  <h4 
+                    style={{
+                      fontSize: 'var(--font-size-base)',
+                      fontWeight: '600',
+                      color: 'var(--color-text-primary)',
+                      marginBottom: 'var(--space-1)'
+                    }}
+                  >
+                    교과목 관리
+                  </h4>
+                  <p 
+                    style={{
+                      fontSize: 'var(--font-size-sm)',
+                      color: 'var(--color-text-secondary)'
+                    }}
+                  >
+                    교과목을 생성하고 관리합니다
+                  </p>
+                </div>
               </div>
             </button>
             
             <button 
-              className="action-btn warning"
+              className="group relative transition-all duration-300 hover:shadow-lg text-left"
               onClick={() => {
-                // 시스템 설정 페이지로 이동 (향후 구현)
                 alert('시스템 설정 페이지는 향후 구현 예정입니다.');
               }}
+              style={{
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                boxShadow: 'var(--shadow-sm)',
+                border: '1px solid var(--color-border-light)',
+                borderRadius: 'var(--radius-md)',
+                padding: 'var(--space-4)'
+              }}
             >
-              <span className="action-icon">⚙️</span>
-              <div className="action-content">
-                <h4>시스템 설정</h4>
-                <p>시스템 전반을 설정합니다</p>
+              <div className="flex items-center gap-3">
+                <div 
+                  style={{
+                    padding: 'var(--space-3)',
+                    backgroundColor: 'rgba(251, 191, 36, 0.1)',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: '1.5rem'
+                  }}
+                >
+                  ⚙️
+                </div>
+                <div className="flex-1">
+                  <h4 
+                    style={{
+                      fontSize: 'var(--font-size-base)',
+                      fontWeight: '600',
+                      color: 'var(--color-text-primary)',
+                      marginBottom: 'var(--space-1)'
+                    }}
+                  >
+                    시스템 설정
+                  </h4>
+                  <p 
+                    style={{
+                      fontSize: 'var(--font-size-sm)',
+                      color: 'var(--color-text-secondary)'
+                    }}
+                  >
+                    시스템 전반을 설정합니다
+                  </p>
+                </div>
               </div>
             </button>
           </div>
         </div>
 
         {/* 최근 사용자 */}
-        <div className="recent-users">
-          <h2>최근 가입 사용자</h2>
+        <div style={{ marginBottom: 'var(--space-8)' }}>
+          <h2 
+            style={{
+              fontSize: 'var(--font-size-xl)',
+              fontWeight: '600',
+              color: 'var(--color-text-primary)',
+              marginBottom: 'var(--space-6)'
+            }}
+          >
+            최근 가입 사용자
+          </h2>
           {recentUsers.length > 0 ? (
-            <div className="user-list">
-              {recentUsers.map((user) => (
-                <div key={user.id} className="user-item">
-                  <div className="user-info">
-                    <div className="user-avatar">
+            <div 
+              style={{
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                boxShadow: 'var(--shadow-sm)',
+                border: '1px solid var(--color-border-light)',
+                borderRadius: 'var(--radius-md)',
+                padding: 'var(--space-4)'
+              }}
+            >
+              {recentUsers.map((user, index) => (
+                <div key={user.id}>
+                  <div className="flex items-center gap-4 py-4">
+                    <div 
+                      className="flex items-center justify-center text-white font-medium"
+                      style={{
+                        width: '40px',
+                        height: '40px',
+                        backgroundColor: user.role === 'admin' ? 'var(--color-accent)' : 
+                                       user.role === 'teacher' ? 'var(--color-primary)' : 
+                                       'var(--color-info)',
+                        borderRadius: '50%',
+                        fontSize: 'var(--font-size-sm)'
+                      }}
+                    >
                       {getRoleDisplayName(user.role).charAt(0)}
                     </div>
-                    <div className="user-content">
-                      <h4>{user.full_name || user.username}</h4>
-                      <p className="user-email">{user.email}</p>
-                      <div className="user-meta">
-                        <span className={`role-badge ${user.role}`}>
+                    <div className="flex-1">
+                      <h4 
+                        style={{
+                          fontSize: 'var(--font-size-base)',
+                          fontWeight: '600',
+                          color: 'var(--color-text-primary)',
+                          marginBottom: 'var(--space-1)'
+                        }}
+                      >
+                        {user.full_name || user.username}
+                      </h4>
+                      <p 
+                        style={{
+                          fontSize: 'var(--font-size-sm)',
+                          color: 'var(--color-text-secondary)',
+                          marginBottom: 'var(--space-2)'
+                        }}
+                      >
+                        {user.email}
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <span 
+                          className="px-2 py-1 text-xs font-medium rounded"
+                          style={{
+                            backgroundColor: user.role === 'admin' ? 'rgba(170, 70, 50, 0.1)' : 
+                                           user.role === 'teacher' ? 'rgba(90, 100, 80, 0.1)' : 
+                                           'rgba(59, 130, 246, 0.1)',
+                            color: user.role === 'admin' ? 'var(--color-accent)' : 
+                                   user.role === 'teacher' ? 'var(--color-primary)' : 
+                                   'var(--color-info)'
+                          }}
+                        >
                           {getRoleDisplayName(user.role)}
                         </span>
-                        <span className="join-date">
+                        <span 
+                          style={{
+                            fontSize: 'var(--font-size-xs)',
+                            color: 'var(--color-text-secondary)'
+                          }}
+                        >
                           {formatDate(user.created_at)}
                         </span>
                       </div>
                     </div>
                   </div>
+                  {index < recentUsers.length - 1 && (
+                    <div 
+                      style={{
+                        height: '1px',
+                        backgroundColor: 'var(--color-border-light)'
+                      }}
+                    ></div>
+                  )}
                 </div>
               ))}
             </div>
           ) : (
-            <div className="no-users">
-              <p>👤 최근 가입한 사용자가 없습니다.</p>
+            <div 
+              className="text-center"
+              style={{
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                boxShadow: 'var(--shadow-sm)',
+                border: '1px solid var(--color-border-light)',
+                borderRadius: 'var(--radius-md)',
+                padding: 'var(--space-8)'
+              }}
+            >
+              <div style={{ fontSize: '2rem', marginBottom: 'var(--space-2)' }}>👤</div>
+              <p style={{ color: 'var(--color-text-secondary)' }}>
+                최근 가입한 사용자가 없습니다.
+              </p>
             </div>
           )}
         </div>
 
         {/* 시스템 로그 */}
-        <div className="system-logs">
-          <h2>시스템 활동 로그</h2>
+        <div style={{ marginBottom: 'var(--space-8)' }}>
+          <h2 
+            style={{
+              fontSize: 'var(--font-size-xl)',
+              fontWeight: '600',
+              color: 'var(--color-text-primary)',
+              marginBottom: 'var(--space-6)'
+            }}
+          >
+            시스템 활동 로그
+          </h2>
           {systemLogs.length > 0 ? (
-            <div className="log-list">
-              {systemLogs.map((log) => (
-                <div key={log.id} className={`log-item ${log.level}`}>
-                  <div className="log-icon">
-                    {getLogIcon(log.type)}
+            <div 
+              style={{
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                boxShadow: 'var(--shadow-sm)',
+                border: '1px solid var(--color-border-light)',
+                borderRadius: 'var(--radius-md)',
+                padding: 'var(--space-4)'
+              }}
+            >
+              {systemLogs.map((log, index) => (
+                <div key={log.id}>
+                  <div className="flex items-start gap-3 py-3">
+                    <div 
+                      className="flex items-center justify-center"
+                      style={{
+                        width: '32px',
+                        height: '32px',
+                        backgroundColor: 'var(--color-neutral-100)',
+                        borderRadius: 'var(--radius-md)',
+                        fontSize: '1rem',
+                        flexShrink: 0
+                      }}
+                    >
+                      {getLogIcon(log.type)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p 
+                        style={{
+                          fontSize: 'var(--font-size-sm)',
+                          color: 'var(--color-text-primary)',
+                          marginBottom: 'var(--space-1)'
+                        }}
+                      >
+                        {log.message}
+                      </p>
+                      <span 
+                        style={{
+                          fontSize: 'var(--font-size-xs)',
+                          color: 'var(--color-text-secondary)'
+                        }}
+                      >
+                        {formatDate(log.timestamp)}
+                      </span>
+                    </div>
                   </div>
-                  <div className="log-content">
-                    <span className="log-message">{log.message}</span>
-                    <span className="log-time">{formatDate(log.timestamp)}</span>
-                  </div>
+                  {index < systemLogs.length - 1 && (
+                    <div 
+                      style={{
+                        height: '1px',
+                        backgroundColor: 'var(--color-border-light)'
+                      }}
+                    ></div>
+                  )}
                 </div>
               ))}
             </div>
           ) : (
-            <div className="no-logs">
-              <p>📋 시스템 로그가 없습니다.</p>
+            <div 
+              className="text-center"
+              style={{
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                boxShadow: 'var(--shadow-sm)',
+                border: '1px solid var(--color-border-light)',
+                borderRadius: 'var(--radius-md)',
+                padding: 'var(--space-8)'
+              }}
+            >
+              <div style={{ fontSize: '2rem', marginBottom: 'var(--space-2)' }}>📋</div>
+              <p style={{ color: 'var(--color-text-secondary)' }}>
+                시스템 로그가 없습니다.
+              </p>
             </div>
           )}
         </div>

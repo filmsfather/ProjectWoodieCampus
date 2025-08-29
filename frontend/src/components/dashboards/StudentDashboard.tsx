@@ -74,49 +74,193 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ }) => {
 
   if (loading) {
     return (
-      <Stack gap="lg" className="max-w-container mx-auto p-6">
-        {/* 헤더 스켈레톤 */}
-        <Stack gap="xs">
-          <div className="h-8 bg-neutral-200 rounded animate-pulse w-48"></div>
-          <div className="h-5 bg-neutral-200 rounded animate-pulse w-96"></div>
-        </Stack>
-        
-        {/* 통계 카드 스켈레톤 */}
-        <SkeletonGrid count={4} cardSize="md" />
-        
-        {/* 나머지 카드들 스켈레톤 */}
-        <SkeletonGrid count={3} cardSize="lg" />
-      </Stack>
+      <div className="min-h-screen" style={{ backgroundColor: 'var(--color-neutral-50)' }}>
+        <div className="container" style={{ paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-4)' }}>
+          {/* 헤더 스켈레톤 */}
+          <div style={{ marginBottom: 'var(--space-6)' }}>
+            <div 
+              className="animate-pulse mb-2"
+              style={{ 
+                height: '32px',
+                backgroundColor: 'var(--color-neutral-200)',
+                borderRadius: 'var(--radius-md)',
+                width: '200px'
+              }}
+            ></div>
+            <div 
+              className="animate-pulse"
+              style={{ 
+                height: '20px',
+                backgroundColor: 'var(--color-neutral-200)',
+                borderRadius: 'var(--radius-md)',
+                width: '400px'
+              }}
+            ></div>
+          </div>
+          
+          {/* 통계 카드 스켈레톤 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            {[...Array(4)].map((_, i) => (
+              <div 
+                key={i}
+                className="animate-pulse"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+                  backdropFilter: 'blur(12px)',
+                  WebkitBackdropFilter: 'blur(12px)',
+                  boxShadow: 'var(--shadow-sm)',
+                  border: '1px solid var(--color-border-light)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: 'var(--space-6)',
+                  height: '120px'
+                }}
+              >
+                <div 
+                  className="mb-2"
+                  style={{
+                    height: '16px',
+                    backgroundColor: 'var(--color-neutral-200)',
+                    borderRadius: 'var(--radius-sm)',
+                    width: '60%'
+                  }}
+                ></div>
+                <div 
+                  style={{
+                    height: '24px',
+                    backgroundColor: 'var(--color-neutral-200)',
+                    borderRadius: 'var(--radius-sm)',
+                    width: '40%'
+                  }}
+                ></div>
+              </div>
+            ))}
+          </div>
+          
+          {/* 로딩 메시지 */}
+          <div 
+            className="text-center"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: 'var(--shadow-sm)',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: 'var(--radius-md)',
+              padding: 'var(--space-8)'
+            }}
+          >
+            <div 
+              className="animate-spin rounded-full mx-auto mb-4"
+              style={{
+                height: '48px',
+                width: '48px',
+                border: '2px solid var(--color-neutral-200)',
+                borderBottom: '2px solid var(--color-primary)'
+              }}
+            ></div>
+            <p style={{ color: 'var(--color-text-primary)', fontWeight: '500' }}>
+              학습 대시보드를 로드하고 있습니다...
+            </p>
+          </div>
+        </div>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <div className="max-w-container mx-auto p-6">
-        <EmptyState
-          icon="❌"
-          title="오류 발생"
-          description={error}
-          action={
+      <div className="min-h-screen" style={{ backgroundColor: 'var(--color-neutral-50)' }}>
+        <div className="container" style={{ paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-4)' }}>
+          <div 
+            className="text-center"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: 'var(--shadow-sm)',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: 'var(--radius-md)',
+              padding: 'var(--space-8)'
+            }}
+          >
+            <div style={{ fontSize: '3rem', marginBottom: 'var(--space-4)' }}>❌</div>
+            <h3 
+              className="mb-4"
+              style={{
+                fontSize: 'var(--font-size-xl)',
+                fontWeight: '600',
+                color: 'var(--color-text-primary)'
+              }}
+            >
+              오류 발생
+            </h3>
+            <p 
+              className="mb-6"
+              style={{ color: 'var(--color-text-secondary)', marginBottom: 'var(--space-6)' }}
+            >
+              {error}
+            </p>
             <button 
               onClick={loadDashboardData} 
-              className="btn-spacing bg-role-primary text-white rounded-lg hover:bg-role-primary/90 transition-colors font-medium"
+              className="transition-all duration-200"
+              style={{
+                padding: 'var(--space-3) var(--space-6)',
+                backgroundColor: 'var(--color-primary)',
+                color: 'white',
+                fontWeight: '500',
+                borderRadius: 'var(--radius-md)',
+                boxShadow: 'var(--shadow-sm)',
+                border: 'none'
+              }}
             >
               다시 시도
             </button>
-          }
-        />
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <Stack gap="lg" className="max-w-container mx-auto p-6">
-      {/* 헤더 */}
-      <Stack gap="xs">
-        <h1 className="text-fluid-4xl font-bold text-neutral-900">학습 대시보드</h1>
-        <p className="text-fluid-base text-neutral-600 reading-leading">오늘의 학습 현황을 확인하고 복습을 진행하세요</p>
-      </Stack>
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-neutral-50)' }}>
+      <div className="container" style={{ paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-4)' }}>
+        {/* 헤더 섹션 */}
+        <div className="mb-8">
+          <div 
+            className="relative overflow-hidden"
+            style={{
+              background: 'linear-gradient(135deg, rgba(90, 100, 80, 0.05) 0%, rgba(255,255,255,0.95) 100%)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: 'var(--radius-md)',
+              padding: 'var(--space-6)'
+            }}
+          >
+            {/* 배경 워터마크 */}
+            <div 
+              className="absolute inset-0 flex items-center justify-end pr-8 opacity-5 pointer-events-none"
+              style={{ transform: 'scale(1.5) translateX(20px)' }}
+            >
+              <div style={{ fontSize: '120px' }}>📚</div>
+            </div>
+            
+            <div className="relative z-10">
+              <h1 
+                style={{
+                  fontSize: 'var(--font-size-3xl)',
+                  fontWeight: '700',
+                  color: 'var(--color-text-primary)',
+                  marginBottom: 'var(--space-2)'
+                }}
+              >
+                학습 대시보드
+              </h1>
+              <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-lg)' }}>
+                오늘의 학습 현황을 확인하고 복습을 진행하세요
+              </p>
+            </div>
+          </div>
+        </div>
       
       {/* 통계 카드 그리드 */}
       <AutoGrid cardSize="md" gap="md" stretch>
