@@ -183,6 +183,12 @@ export class AdminApi {
 
   // =================== 선생님-반 배정 (관리자 전용) ===================
 
+  // 반에 배정된 선생님 목록 조회
+  static async getClassTeachers(classId: string): Promise<User[]> {
+    const response = await this.request<User[]>(`/admin/classes/${classId}/teachers`);
+    return response.data || [];
+  }
+
   // 교사를 반에 배정
   static async assignTeacherToClass(teacherId: string, classId: string): Promise<any> {
     const response = await this.request(`/admin/teachers/${teacherId}/classes/${classId}`, {

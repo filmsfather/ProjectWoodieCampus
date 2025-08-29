@@ -47,6 +47,9 @@ router.put('/classes/:id', AdminController.updateClass);
 router.delete('/classes/:id', AdminController.deleteClass);
 
 // 선생님-반 배정 관리 API
+// GET /api/admin/classes/:classId/teachers - 반에 배정된 선생님 목록 조회
+router.get('/classes/:classId/teachers', AdminController.getClassTeachers);
+
 // POST /api/admin/teachers/:teacherId/classes/:classId - 선생님을 반에 배정
 router.post('/teachers/:teacherId/classes/:classId', AdminController.assignTeacherToClass);
 

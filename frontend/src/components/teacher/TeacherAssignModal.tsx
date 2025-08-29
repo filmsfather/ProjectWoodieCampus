@@ -28,25 +28,21 @@ const TeacherAssignModal: React.FC<TeacherAssignModalProps> = ({
     try {
       setLoading(true);
       
+      // 현재 반에 배정된 선생님들 조회
+      const assignedTeachers = await AdminApi.getClassTeachers(cls.id);
+      setAssignedTeachers(assignedTeachers);
+      
       // 모든 사용자 중에서 teacher 역할만 가져오기
       const { users: allUsers } = await AdminApi.getUsers();
       const teachers = allUsers.filter(user => user.role === 'teacher');
       
-      // 현재 반에 배정된 선생님과 배정 가능한 선생님 분리
-      // 임시로 모든 선생님을 배정 가능한 선생님으로 표시
-      // 실제로는 각 반에 어떤 선생님이 배정되어 있는지 API에서 가져와야 함
-      setAssignedTeachers(cls.teacher ? [{ 
-        id: cls.teacher.id, 
-        username: cls.teacher.username, 
-        fullName: cls.teacher.full_name,
-        role: 'teacher' as const,
-        isActive: true,
-        createdAt: new Date().toISOString()
-      }] : []);
+      // 현재 반에 배정되지 않은 선생님들만 배정 가능한 선생님으로 설정
+      const assignedTeacherIds = new Set(assignedTeachers.map(t => t.id));
+      const availableTeachers = teachers.filter(teacher => 
+        !assignedTeacherIds.has(teacher.id)
+      );
       
-      setAvailableTeachers(teachers.filter(teacher => 
-        !cls.teacher || teacher.id !== cls.teacher.id
-      ));
+      setAvailableTeachers(availableTeachers);
       
     } catch (error) {
       console.error('Failed to load teacher data:', error);

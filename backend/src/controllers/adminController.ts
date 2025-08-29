@@ -525,6 +525,49 @@ export class AdminController {
 
   // =================== 선생님-반 배정 관리 ===================
   
+  // GET /api/admin/classes/:classId/teachers - 반에 배정된 선생님 목록 조회
+  static async getClassTeachers(req: AuthRequest, res: Response) {
+    try {
+      const { classId } = req.params;
+
+      // 반에 배정된 선생님들 조회
+      const { data: assignments, error: assignError } = await DatabaseService.supabase
+        .from('teacher_classes')
+        .select(`
+          teacher_id,
+          created_at,
+          users:teacher_id (
+            id,
+            username,
+            fullName,
+            email,
+            role,
+            is_active,
+            created_at
+          )
+        `)
+        .eq('class_id', classId);
+
+      if (assignError) throw assignError;
+
+      // 선생님 정보 추출
+      const teachers = assignments?.map(assignment => assignment.users).filter(Boolean) || [];
+
+      const response: ApiResponse = {
+        success: true,
+        data: teachers,
+      };
+      res.json(response);
+    } catch (error) {
+      console.error('Get class teachers error:', error);
+      const response: ApiResponse = {
+        success: false,
+        message: error instanceof Error ? error.message : '반 선생님 조회 중 오류가 발생했습니다',
+      };
+      res.status(500).json(response);
+    }
+  }
+
   // POST /api/admin/teachers/:teacherId/classes/:classId - 선생님을 반에 배정
   static async assignTeacherToClass(req: AuthRequest, res: Response) {
     try {
