@@ -591,4 +591,130 @@ export class AdminController {
       res.status(500).json(response);
     }
   }
+
+  // =================== 선생님-반 배정 관리 ===================
+  
+  // POST /api/admin/teachers/:teacherId/classes/:classId - 선생님을 반에 배정
+  static async assignTeacherToClass(req: AuthRequest, res: Response) {
+    try {
+      const { teacherId, classId } = req.params;
+
+      // 선생님 존재 확인
+      const { data: teacher, error: teacherError } = await DatabaseService.supabase
+        .from('users')
+        .select('*')
+        .eq('id', teacherId)
+        .eq('role', 'teacher')
+        .eq('is_active', true)
+        .single();
+
+      if (teacherError || !teacher) {
+        const response: ApiResponse = {
+          success: false,
+          message: '선생님을 찾을 수 없습니다',
+        };
+        return res.status(404).json(response);
+      }
+
+      // 반 존재 확인
+      const { data: classExists, error: classError } = await DatabaseService.supabase
+        .from('classes')
+        .select('id')
+        .eq('id', classId)
+        .single();
+
+      if (classError || !classExists) {
+        const response: ApiResponse = {
+          success: false,
+          message: '반을 찾을 수 없습니다',
+        };
+        return res.status(404).json(response);
+      }
+
+      // 이미 배정되어 있는지 확인
+      const { data: existingAssignment } = await DatabaseService.supabase
+        .from('teacher_classes')
+        .select('*')
+        .eq('teacher_id', teacherId)
+        .eq('class_id', classId)
+        .single();
+
+      if (existingAssignment) {
+        const response: ApiResponse = {
+          success: false,
+          message: '해당 선생님은 이미 이 반에 배정되어 있습니다',
+        };
+        return res.status(400).json(response);
+      }
+
+      // 선생님-반 배정
+      const { error: assignError } = await DatabaseService.supabase
+        .from('teacher_classes')
+        .insert({
+          teacher_id: teacherId,
+          class_id: classId,
+          created_at: new Date().toISOString()
+        });
+
+      if (assignError) throw assignError;
+
+      const response: ApiResponse = {
+        success: true,
+        message: '선생님이 반에 성공적으로 배정되었습니다',
+      };
+      res.json(response);
+    } catch (error) {
+      console.error('Assign teacher to class error:', error);
+      const response: ApiResponse = {
+        success: false,
+        message: error instanceof Error ? error.message : '교사 배정 중 오류가 발생했습니다',
+      };
+      res.status(500).json(response);
+    }
+  }
+
+  // DELETE /api/admin/teachers/:teacherId/classes/:classId - 선생님을 반에서 제거
+  static async removeTeacherFromClass(req: AuthRequest, res: Response) {
+    try {
+      const { teacherId, classId } = req.params;
+
+      // 배정 관계 확인
+      const { data: existingAssignment, error: checkError } = await DatabaseService.supabase
+        .from('teacher_classes')
+        .select('*')
+        .eq('teacher_id', teacherId)
+        .eq('class_id', classId)
+        .single();
+
+      if (checkError || !existingAssignment) {
+        const response: ApiResponse = {
+          success: false,
+          message: '해당 선생님은 이 반에 배정되어 있지 않습니다',
+        };
+        return res.status(404).json(response);
+      }
+
+      // 선생님-반 배정 제거
+      const { error: removeError } = await DatabaseService.supabase
+        .from('teacher_classes')
+        .delete()
+        .eq('teacher_id', teacherId)
+        .eq('class_id', classId);
+
+      if (removeError) throw removeError;
+
+      const response: ApiResponse = {
+        success: true,
+        message: '선생님이 반에서 성공적으로 제거되었습니다',
+      };
+      res.json(response);
+    } catch (error) {
+      console.error('Remove teacher from class error:', error);
+      const response: ApiResponse = {
+        success: false,
+        message: error instanceof Error ? error.message : '교사 제거 중 오류가 발생했습니다',
+      };
+      res.status(500).json(response);
+    }
+  }
 }
