@@ -1,7 +1,8 @@
-/* Import all styles first - COMMENTED OUT TO AVOID TAILWIND CONFLICTS */
-/* @import './styles/design-system.css'; */
-/* @import './styles/layout.css'; */
-/* @import './styles/accessibility.css'; */
+/* Import design system tokens and essential styles */
+@import './styles/design-system.css';
+@import './styles/layout.css';
+@import './styles/accessibility.css';
+/* Dashboard and admin styles commented out to avoid Tailwind conflicts */
 /* @import './styles/dashboard.css'; */
 /* @import './styles/admin.css'; */
 

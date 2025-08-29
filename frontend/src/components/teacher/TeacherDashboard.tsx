@@ -134,22 +134,37 @@ const TeacherDashboard: React.FC = () => {
 
   if (loading || authLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="min-h-screen" style={{ backgroundColor: 'var(--color-neutral-50)' }}>
+        <div className="container" style={{ paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-4)' }}>
           {/* 헤더 스켈레톤 */}
           <div className="mb-8">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="card">
               <div className="flex justify-between items-start">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="p-2 bg-gray-200 rounded-lg animate-pulse">
-                      <div className="h-6 w-6 bg-gray-300 rounded"></div>
+                    <div 
+                      className="p-2 rounded-lg animate-pulse"
+                      style={{ backgroundColor: 'var(--color-neutral-200)' }}
+                    >
+                      <div 
+                        className="h-6 w-6 rounded"
+                        style={{ backgroundColor: 'var(--color-neutral-300)' }}
+                      ></div>
                     </div>
-                    <div className="h-8 w-48 bg-gray-200 rounded animate-pulse"></div>
+                    <div 
+                      className="h-8 w-48 rounded animate-pulse"
+                      style={{ backgroundColor: 'var(--color-neutral-200)' }}
+                    ></div>
                   </div>
-                  <div className="h-4 w-96 bg-gray-200 rounded animate-pulse"></div>
+                  <div 
+                    className="h-4 w-96 rounded animate-pulse"
+                    style={{ backgroundColor: 'var(--color-neutral-200)' }}
+                  ></div>
                 </div>
-                <div className="h-10 w-32 bg-gray-200 rounded-lg animate-pulse"></div>
+                <div 
+                  className="h-10 w-32 rounded-lg animate-pulse"
+                  style={{ backgroundColor: 'var(--color-neutral-200)' }}
+                ></div>
               </div>
             </div>
           </div>
@@ -157,14 +172,26 @@ const TeacherDashboard: React.FC = () => {
           {/* 통계 카드 스켈레톤 */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div key={i} className="card">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <div className="h-4 w-20 bg-gray-200 rounded animate-pulse mb-2"></div>
-                    <div className="h-8 w-16 bg-gray-200 rounded animate-pulse mb-1"></div>
+                    <div 
+                      className="h-4 w-20 rounded animate-pulse mb-2"
+                      style={{ backgroundColor: 'var(--color-neutral-200)' }}
+                    ></div>
+                    <div 
+                      className="h-8 w-16 rounded animate-pulse mb-1"
+                      style={{ backgroundColor: 'var(--color-neutral-200)' }}
+                    ></div>
                   </div>
-                  <div className="p-3 bg-gray-200 rounded-lg animate-pulse">
-                    <div className="h-6 w-6 bg-gray-300 rounded"></div>
+                  <div 
+                    className="p-3 rounded-lg animate-pulse"
+                    style={{ backgroundColor: 'var(--color-neutral-200)' }}
+                  >
+                    <div 
+                      className="h-6 w-6 rounded"
+                      style={{ backgroundColor: 'var(--color-neutral-300)' }}
+                    ></div>
                   </div>
                 </div>
               </div>
@@ -328,12 +355,13 @@ const TeacherDashboard: React.FC = () => {
               return (
                 <div
                   key={cls.id}
-                  className="group relative bg-white/90 border border-gray-200 rounded-xl shadow-lg hover:shadow-xl hover:bg-white transition-all duration-300 overflow-hidden backdrop-blur-sm"
+                  className="card group relative transition-all duration-300 hover:shadow-lg"
                   style={{
-                    background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.9) 100%)',
-                    backdropFilter: 'blur(10px)',
-                    WebkitBackdropFilter: 'blur(10px)',
-                    boxShadow: '0 8px 32px rgba(31, 38, 135, 0.15)'
+                    background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,240,0.9) 100%)',
+                    backdropFilter: 'blur(12px)',
+                    WebkitBackdropFilter: 'blur(12px)',
+                    boxShadow: 'var(--shadow-md)',
+                    border: '1px solid var(--color-border-light)'
                   }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none"></div>
@@ -360,14 +388,52 @@ const TeacherDashboard: React.FC = () => {
                         <div className="flex gap-1 ml-2 flex-shrink-0">
                           <button
                             onClick={() => openEditModal(cls)}
-                            className="p-2 bg-blue-100 hover:bg-blue-200 text-blue-700 hover:text-blue-800 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg border border-blue-200"
+                            className="inline-flex items-center justify-center"
+                            style={{
+                              width: '36px',
+                              height: '36px',
+                              padding: '8px',
+                              backgroundColor: '#dbeafe',
+                              color: '#1d4ed8',
+                              border: '1px solid #93c5fd',
+                              borderRadius: 'var(--radius-md)',
+                              boxShadow: 'var(--shadow-sm)',
+                              transition: 'all 0.2s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = '#bfdbfe';
+                              e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = '#dbeafe';
+                              e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                            }}
                             title="반 정보 수정"
                           >
                             <PencilIcon className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => handleDeleteClass(cls.id)}
-                            className="p-2 bg-red-100 hover:bg-red-200 text-red-700 hover:text-red-800 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg border border-red-200"
+                            className="inline-flex items-center justify-center"
+                            style={{
+                              width: '36px',
+                              height: '36px',
+                              padding: '8px',
+                              backgroundColor: '#fee2e2',
+                              color: '#dc2626',
+                              border: '1px solid #fca5a5',
+                              borderRadius: 'var(--radius-md)',
+                              boxShadow: 'var(--shadow-sm)',
+                              transition: 'all 0.2s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = '#fecaca';
+                              e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = '#fee2e2';
+                              e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                            }}
                             title="반 삭제"
                           >
                             <TrashIcon className="h-4 w-4" />
