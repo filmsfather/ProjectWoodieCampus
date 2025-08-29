@@ -539,7 +539,7 @@ export class AdminController {
           users:teacher_id (
             id,
             username,
-            fullName,
+            full_name,
             email,
             role,
             is_active,
@@ -550,8 +550,16 @@ export class AdminController {
 
       if (assignError) throw assignError;
 
-      // 선생님 정보 추출
-      const teachers = assignments?.map(assignment => assignment.users).filter(Boolean) || [];
+      // 선생님 정보 추출 및 프론트엔드 형식으로 변환
+      const teachers = assignments?.map(assignment => {
+        if (assignment.users) {
+          return {
+            ...assignment.users,
+            fullName: assignment.users.full_name, // camelCase로 변환
+          };
+        }
+        return null;
+      }).filter(Boolean) || [];
 
       const response: ApiResponse = {
         success: true,
