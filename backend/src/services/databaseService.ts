@@ -1414,8 +1414,8 @@ export class DatabaseService {
       .from('classes')
       .select(`
         *,
-        teacher:users(id, username, full_name),
-        student_count:users(count)
+        teacher:users!classes_teacher_id_fkey(id, username, full_name),
+        student_count:users!users_class_id_fkey(count)
       `)
       .eq('is_active', true)
       .order('created_at', { ascending: false });
