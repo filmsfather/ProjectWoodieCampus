@@ -366,19 +366,34 @@ const TeacherDashboard: React.FC = () => {
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none"></div>
                   <div className="relative p-4">
-                    <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-start justify-between mb-4">
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-base font-bold text-gray-900 mb-1 truncate">
+                        <h3 
+                          className="text-lg font-bold mb-2 truncate leading-tight"
+                          style={{ color: 'var(--color-text-primary)' }}
+                        >
                           {cls.name}
                         </h3>
-                        <div className="flex flex-wrap gap-1">
+                        <div className="flex flex-wrap gap-2">
                           {cls.grade_level && (
-                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/20 text-blue-700">
+                            <span 
+                              className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold"
+                              style={{
+                                backgroundColor: 'var(--color-primary-light)',
+                                color: 'white'
+                              }}
+                            >
                               {cls.grade_level}학년
                             </span>
                           )}
                           {cls.subject && (
-                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-purple-500/20 text-purple-700">
+                            <span 
+                              className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold"
+                              style={{
+                                backgroundColor: 'var(--color-accent)',
+                                color: 'white'
+                              }}
+                            >
                               {cls.subject}
                             </span>
                           )}
@@ -442,77 +457,147 @@ const TeacherDashboard: React.FC = () => {
                       )}
                     </div>
 
-                    <div className="space-y-2 mb-3">
+                    <div className="space-y-3 mb-4">
                       {/* 선생님 정보 */}
-                      <div className="bg-white/40 rounded-lg p-2">
+                      <div 
+                        className="rounded-lg p-3 transition-all duration-200"
+                        style={{
+                          backgroundColor: 'rgba(90, 100, 80, 0.08)',
+                          border: '1px solid var(--color-primary-light)',
+                          borderOpacity: '0.3'
+                        }}
+                      >
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-1.5">
-                            <UserGroupIcon className="h-3 w-3 text-gray-500" />
-                            <span className="text-xs font-medium text-gray-700">선생님</span>
+                          <div className="flex items-center gap-2">
+                            <UserGroupIcon 
+                              className="h-4 w-4" 
+                              style={{ color: 'var(--color-primary)' }}
+                            />
+                            <span 
+                              className="text-sm font-medium"
+                              style={{ color: 'var(--color-text-primary)' }}
+                            >
+                              담당교사
+                            </span>
                           </div>
-                          <div className="text-xs text-gray-600 text-right">
+                          <div className="text-sm text-right">
                             {cls.teachers && cls.teachers.length > 0 ? (
-                              cls.teachers.length === 1 ? (
-                                <span>{cls.teachers[0].full_name || cls.teachers[0].username}</span>
-                              ) : (
-                                <span>{cls.teachers[0].full_name || cls.teachers[0].username} 외 {cls.teachers.length - 1}명</span>
-                              )
+                              <div style={{ color: 'var(--color-primary)' }} className="font-medium">
+                                {cls.teachers.length === 1 ? (
+                                  cls.teachers[0].full_name || cls.teachers[0].username
+                                ) : (
+                                  `${cls.teachers[0].full_name || cls.teachers[0].username} 외 ${cls.teachers.length - 1}명`
+                                )}
+                              </div>
                             ) : (
-                              <span>미배정</span>
+                              <span style={{ color: 'var(--color-text-tertiary)' }}>미배정</span>
                             )}
                           </div>
                         </div>
                       </div>
                       
                       {/* 학생 정보 */}
-                      <div className="bg-white/40 rounded-lg p-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-1.5">
-                            <UsersIcon className="h-3 w-3 text-gray-500" />
-                            <span className="text-xs font-medium text-gray-700">학생</span>
+                      <div 
+                        className="rounded-lg p-3 transition-all duration-200"
+                        style={{
+                          backgroundColor: 'rgba(23, 162, 184, 0.08)',
+                          border: '1px solid var(--color-info)',
+                          borderOpacity: '0.3'
+                        }}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <UsersIcon 
+                              className="h-4 w-4" 
+                              style={{ color: 'var(--color-info)' }}
+                            />
+                            <span 
+                              className="text-sm font-medium"
+                              style={{ color: 'var(--color-text-primary)' }}
+                            >
+                              학생현황
+                            </span>
                           </div>
-                          <div className="text-xs text-gray-600 text-right">
-                            <div className="flex items-center gap-2">
-                              <span className="font-bold text-blue-600">
-                                {cls.students?.length || 0}명
+                          <div className="flex items-center gap-3">
+                            <span 
+                              className="text-sm font-bold"
+                              style={{ color: 'var(--color-info)' }}
+                            >
+                              {cls.students?.length || 0}명
+                            </span>
+                            {stats && stats.total_students > 0 && (
+                              <span 
+                                className="text-xs px-2 py-1 rounded-full"
+                                style={{ 
+                                  backgroundColor: 'var(--color-success-light)',
+                                  color: 'var(--color-success)'
+                                }}
+                              >
+                                진도 {stats.average_progress}%
                               </span>
-                              {stats && stats.total_students > 0 && (
-                                <span className="text-green-600">
-                                  진도 {stats.average_progress}%
-                                </span>
-                              )}
-                            </div>
-                            {cls.students && cls.students.length > 0 && (
-                              <div className="mt-1 text-gray-500">
-                                {cls.students.length <= 3 ? (
-                                  cls.students.map(student => student.full_name || student.username).join(', ')
-                                ) : (
-                                  `${cls.students.slice(0, 2).map(s => s.full_name || s.username).join(', ')} 외 ${cls.students.length - 2}명`
-                                )}
-                              </div>
                             )}
                           </div>
                         </div>
+                        {cls.students && cls.students.length > 0 && (
+                          <div 
+                            className="text-xs leading-relaxed"
+                            style={{ color: 'var(--color-text-secondary)' }}
+                          >
+                            {cls.students.length <= 4 ? (
+                              cls.students.map(student => student.full_name || student.username).join(', ')
+                            ) : (
+                              `${cls.students.slice(0, 3).map(s => s.full_name || s.username).join(', ')} 외 ${cls.students.length - 3}명`
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
 
-                    <div className="flex gap-1.5">
-                      {user?.role === 'admin' && (
+                    <div className="pt-3 border-t border-gray-100">
+                      <div className="flex gap-2">
+                        {user?.role === 'admin' && (
+                          <button
+                            onClick={() => openTeacherAssignModal(cls)}
+                            className="flex-1 inline-flex justify-center items-center gap-2 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:scale-[1.02]"
+                            style={{
+                              backgroundColor: 'var(--color-primary)',
+                              color: 'white',
+                              boxShadow: 'var(--shadow-sm)'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = 'var(--color-primary-dark)';
+                              e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = 'var(--color-primary)';
+                              e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                            }}
+                          >
+                            <UserGroupIcon className="h-4 w-4" />
+                            교사 관리
+                          </button>
+                        )}
                         <button
-                          onClick={() => openTeacherAssignModal(cls)}
-                          className="flex-1 inline-flex justify-center items-center gap-1 px-2 py-1.5 bg-green-500/80 hover:bg-green-500 text-white text-xs font-medium rounded-md transition-all duration-200 hover:scale-105"
+                          onClick={() => openStudentsModal(cls)}
+                          className="flex-1 inline-flex justify-center items-center gap-2 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:scale-[1.02]"
+                          style={{
+                            backgroundColor: 'var(--color-info)',
+                            color: 'white',
+                            boxShadow: 'var(--shadow-sm)'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = '#138496';
+                            e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'var(--color-info)';
+                            e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                          }}
                         >
-                          <UserGroupIcon className="h-3 w-3" />
-                          선생님
+                          <UsersIcon className="h-4 w-4" />
+                          학생 관리
                         </button>
-                      )}
-                      <button
-                        onClick={() => openStudentsModal(cls)}
-                        className="flex-1 inline-flex justify-center items-center gap-1 px-2 py-1.5 bg-blue-500/80 hover:bg-blue-500 text-white text-xs font-medium rounded-md transition-all duration-200 hover:scale-105"
-                      >
-                        <UsersIcon className="h-3 w-3" />
-                        학생
-                      </button>
+                      </div>
                     </div>
                 </div>
               </div>
