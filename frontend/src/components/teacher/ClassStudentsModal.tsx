@@ -38,14 +38,18 @@ const ClassStudentsModal: React.FC<ClassStudentsModalProps> = ({
 
       // 관리자인 경우 모든 학생 목록도 로드 (반 배정용)
       if (user?.role === 'admin') {
+        console.log('🔍 ClassStudentsModal - 관리자 권한으로 모든 사용자 조회 시작');
         const { users: allUsers } = await AdminApi.getUsers();
+        console.log('🔍 ClassStudentsModal - 조회된 모든 사용자:', allUsers);
         const studentUsers = allUsers.filter(u => u.role === 'student');
+        console.log('🔍 ClassStudentsModal - 필터된 학생 사용자:', studentUsers);
         setAllStudents(studentUsers);
         
         // 현재 반에 속하지 않은 학생들만 필터링
         const available = studentUsers.filter(student => 
           !student.class_id || student.class_id !== cls.id
         );
+        console.log('🔍 ClassStudentsModal - 추가 가능한 학생들:', available);
         setAvailableStudents(available);
       }
     } catch (error) {
