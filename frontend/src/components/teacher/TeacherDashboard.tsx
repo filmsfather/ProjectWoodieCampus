@@ -33,7 +33,10 @@ const TeacherDashboard: React.FC = () => {
   const loadClasses = async () => {
     try {
       setLoading(true);
-      const data = await teacherApi.getMyClasses();
+      // 관리자는 모든 반을 조회, 교사는 담당 반만 조회
+      const data = user?.role === 'admin' 
+        ? await AdminApi.getAllClasses()
+        : await teacherApi.getMyClasses();
       console.log('📊 Loaded classes:', data);
       setClasses(data);
       
