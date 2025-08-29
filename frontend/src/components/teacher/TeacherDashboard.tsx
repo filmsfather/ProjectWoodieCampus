@@ -383,9 +383,17 @@ const TeacherDashboard: React.FC = () => {
                             <UserGroupIcon className="h-3 w-3 text-gray-500" />
                             <span className="text-xs font-medium text-gray-700">선생님</span>
                           </div>
-                          <span className="text-xs text-gray-600">
-                            {cls.teacher ? cls.teacher.full_name || cls.teacher.username : '미배정'}
-                          </span>
+                          <div className="text-xs text-gray-600 text-right">
+                            {cls.teachers && cls.teachers.length > 0 ? (
+                              cls.teachers.length === 1 ? (
+                                <span>{cls.teachers[0].full_name || cls.teachers[0].username}</span>
+                              ) : (
+                                <span>{cls.teachers[0].full_name || cls.teachers[0].username} 외 {cls.teachers.length - 1}명</span>
+                              )
+                            ) : (
+                              <span>미배정</span>
+                            )}
+                          </div>
                         </div>
                       </div>
                       

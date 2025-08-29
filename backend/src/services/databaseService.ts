@@ -1410,18 +1410,50 @@ export class DatabaseService {
 
   // Get all classes
   static async getClasses() {
-    const { data, error } = await supabase
+    const { data: classes, error } = await supabase
       .from('classes')
       .select(`
         *,
-        teacher:users!classes_teacher_id_fkey(id, username, full_name),
         student_count:users!users_class_id_fkey(count)
       `)
       .eq('is_active', true)
       .order('created_at', { ascending: false });
-
+      
     if (error) throw error;
-    return data;
+
+    // Get assigned teachers for each class
+    if (classes && classes.length > 0) {
+      const classIds = classes.map(cls => cls.id);
+      
+      const { data: teacherAssignments, error: teacherError } = await supabase
+        .from('teacher_classes')
+        .select(`
+          class_id,
+          users!teacher_classes_teacher_id_fkey(id, username, full_name)
+        `)
+        .in('class_id', classIds);
+        
+      if (teacherError) throw teacherError;
+      
+      // Group teachers by class_id
+      const teachersByClass = teacherAssignments?.reduce((acc, assignment) => {
+        const classId = assignment.class_id;
+        if (!acc[classId]) acc[classId] = [];
+        if (assignment.users) {
+          acc[classId].push(assignment.users);
+        }
+        return acc;
+      }, {} as Record<string, any[]>) || {};
+      
+      // Add teachers to each class
+      return classes.map(cls => ({
+        ...cls,
+        teachers: teachersByClass[cls.id] || [],
+        teacher: teachersByClass[cls.id]?.[0] || null // For backward compatibility
+      }));
+    }
+    
+    return classes;
   }
 
   // Get classes by teacher ID

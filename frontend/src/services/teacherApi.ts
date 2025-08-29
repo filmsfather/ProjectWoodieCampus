@@ -15,6 +15,11 @@ export interface Class {
     username: string;
     full_name: string;
   };
+  teachers?: {
+    id: string;
+    username: string;
+    full_name: string;
+  }[];
   student_count?: number;
 }
 
