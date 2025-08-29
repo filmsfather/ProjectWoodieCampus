@@ -6,15 +6,17 @@ import {
   UsersIcon,
   ChartBarIcon,
   AcademicCapIcon,
-  BookOpenIcon
+  BookOpenIcon,
+  UserGroupIcon
 } from '@heroicons/react/24/outline';
 import { teacherApi, classApi } from '../../services/teacherApi';
 import { AdminApi } from '../../services/adminApi';
-import type { Class, Student, ClassStats } from '../../services/teacherApi';
+import type { Class, ClassStats } from '../../services/teacherApi';
 import { useAuth } from '../../hooks/useAuth';
 import CreateClassModal from './CreateClassModal';
 import EditClassModal from './EditClassModal';
 import ClassStudentsModal from './ClassStudentsModal';
+import TeacherAssignModal from './TeacherAssignModal';
 
 const TeacherDashboard: React.FC = () => {
   const { user, loading: authLoading } = useAuth();
@@ -23,6 +25,7 @@ const TeacherDashboard: React.FC = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showStudentsModal, setShowStudentsModal] = useState(false);
+  const [showTeacherAssignModal, setShowTeacherAssignModal] = useState(false);
   const [selectedClass, setSelectedClass] = useState<Class | null>(null);
   const [classStats, setClassStats] = useState<Record<string, ClassStats>>({});
 
@@ -122,6 +125,11 @@ const TeacherDashboard: React.FC = () => {
   const openStudentsModal = (cls: Class) => {
     setSelectedClass(cls);
     setShowStudentsModal(true);
+  };
+
+  const openTeacherAssignModal = (cls: Class) => {
+    setSelectedClass(cls);
+    setShowTeacherAssignModal(true);
   };
 
   if (loading || authLoading) {
@@ -386,7 +394,16 @@ const TeacherDashboard: React.FC = () => {
                       </div>
                     )}
 
-                    <div className="mt-auto pt-4 border-t border-neutral-200">
+                    <div className="mt-auto pt-4 border-t border-neutral-200 space-y-2">
+                      {user?.role === 'admin' && (
+                        <button
+                          onClick={() => openTeacherAssignModal(cls)}
+                          className="w-full inline-flex justify-center items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors text-sm"
+                        >
+                          <UserGroupIcon className="h-4 w-4" />
+                          선생님 배정
+                        </button>
+                      )}
                       <button
                         onClick={() => openStudentsModal(cls)}
                         className="w-full inline-flex justify-center items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors text-sm"
@@ -430,6 +447,17 @@ const TeacherDashboard: React.FC = () => {
               setSelectedClass(null);
             }}
             onStudentUpdate={loadClasses}
+          />
+        )}
+
+        {showTeacherAssignModal && selectedClass && (
+          <TeacherAssignModal
+            class={selectedClass}
+            onClose={() => {
+              setShowTeacherAssignModal(false);
+              setSelectedClass(null);
+            }}
+            onUpdate={loadClasses}
           />
         )}
       </div>
