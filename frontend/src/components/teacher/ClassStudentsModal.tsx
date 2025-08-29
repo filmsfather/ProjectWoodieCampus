@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { XMarkIcon, UserPlusIcon, UserMinusIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, UserPlusIcon, UserMinusIcon } from '@heroicons/react/24/outline';
 import { classApi } from '../../services/teacherApi';
 import type { Class, Student } from '../../services/teacherApi';
 import { AdminApi } from '../../services/adminApi';
@@ -18,7 +18,6 @@ const ClassStudentsModal: React.FC<ClassStudentsModalProps> = ({
 }) => {
   const { user } = useAuth();
   const [students, setStudents] = useState<Student[]>([]);
-  const [allStudents, setAllStudents] = useState<Student[]>([]);
   const [availableStudents, setAvailableStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -39,16 +38,39 @@ const ClassStudentsModal: React.FC<ClassStudentsModalProps> = ({
       // 관리자인 경우 모든 학생 목록도 로드 (반 배정용)
       if (user?.role === 'admin') {
         console.log('🔍 ClassStudentsModal - 관리자 권한으로 모든 사용자 조회 시작');
-        const { users: allUsers } = await AdminApi.getUsers();
+        console.log('🔍 ClassStudentsModal - 현재 반 ID:', cls.id);
+        
+        const response = await AdminApi.getUsers();
+        console.log('🔍 ClassStudentsModal - AdminApi.getUsers() 전체 응답:', response);
+        
+        const allUsers = response.users;
         console.log('🔍 ClassStudentsModal - 조회된 모든 사용자:', allUsers);
-        const studentUsers = allUsers.filter(u => u.role === 'student');
+        console.log('🔍 ClassStudentsModal - 첫 번째 사용자 예시:', allUsers[0]);
+        
+        // 각 사용자의 role 확인
+        allUsers.forEach((user, index) => {
+          console.log(`🔍 ClassStudentsModal - 사용자 ${index}: role="${user.role}", class_id="${user.class_id}"`);
+        });
+        
+        const studentUsers = allUsers.filter(u => {
+          console.log(`🔍 ClassStudentsModal - 사용자 "${u.username}" role 체크: "${u.role}" === "student" ? ${u.role === 'student'}`);
+          return u.role === 'student';
+        }).map(user => ({
+          id: user.id,
+          username: user.username,
+          full_name: user.fullName || user.username,
+          email: user.email || undefined,
+          class_id: user.class_id || undefined,
+          created_at: user.createdAt
+        }));
         console.log('🔍 ClassStudentsModal - 필터된 학생 사용자:', studentUsers);
-        setAllStudents(studentUsers);
         
         // 현재 반에 속하지 않은 학생들만 필터링
-        const available = studentUsers.filter(student => 
-          !student.class_id || student.class_id !== cls.id
-        );
+        const available = studentUsers.filter(student => {
+          const isAvailable = !student.class_id || student.class_id !== cls.id;
+          console.log(`🔍 ClassStudentsModal - 학생 "${student.username}" 추가 가능 여부: class_id="${student.class_id}" !== "${cls.id}" ? ${isAvailable}`);
+          return isAvailable;
+        });
         console.log('🔍 ClassStudentsModal - 추가 가능한 학생들:', available);
         setAvailableStudents(available);
       }
@@ -91,23 +113,6 @@ const ClassStudentsModal: React.FC<ClassStudentsModalProps> = ({
     }
   };
 
-  const handleMoveStudent = async (studentId: string, newClassId: string) => {
-    if (!confirm('정말로 이 학생을 다른 반으로 이동하시겠습니까?')) {
-      return;
-    }
-
-    try {
-      setActionLoading(studentId);
-      await classApi.moveStudentToClass(newClassId, studentId);
-      await loadData();
-      onStudentUpdate();
-    } catch (error) {
-      console.error('Failed to move student:', error);
-      alert('학생 이동에 실패했습니다.');
-    } finally {
-      setActionLoading(null);
-    }
-  };
 
   if (loading) {
     return (

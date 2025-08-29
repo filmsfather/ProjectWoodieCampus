@@ -1,5 +1,5 @@
 import { config } from '../config';
-import type { Class, CreateClassData, UpdateClassData, Student } from './teacherApi';
+import type { Class, CreateClassData, UpdateClassData } from './teacherApi';
 
 // 타입 정의
 export interface User {
