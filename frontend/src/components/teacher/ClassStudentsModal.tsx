@@ -16,7 +16,7 @@ const ClassStudentsModal: React.FC<ClassStudentsModalProps> = ({
   onClose, 
   onStudentUpdate 
 }) => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [students, setStudents] = useState<Student[]>([]);
   const [availableStudents, setAvailableStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,16 +24,21 @@ const ClassStudentsModal: React.FC<ClassStudentsModalProps> = ({
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   useEffect(() => {
-    loadData();
-  }, [cls.id]);
+    if (!authLoading && user) {
+      loadData();
+    }
+  }, [cls.id, user, authLoading]);
 
   const loadData = async () => {
     try {
       setLoading(true);
       
       console.log('🔍 ClassStudentsModal - 데이터 로드 시작');
+      console.log('🔍 ClassStudentsModal - authLoading:', authLoading);
       console.log('🔍 ClassStudentsModal - 현재 사용자:', user);
       console.log('🔍 ClassStudentsModal - 사용자 역할:', user?.role);
+      console.log('🔍 ClassStudentsModal - localStorage user:', localStorage.getItem('user'));
+      console.log('🔍 ClassStudentsModal - localStorage token:', localStorage.getItem('accessToken'));
       
       // 현재 반의 학생들 로드
       const classStudents = await classApi.getClassStudents(cls.id);
