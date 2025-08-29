@@ -1,16 +1,17 @@
-/* Import all styles first */
-@import './styles/design-system.css';
-@import './styles/layout.css';
-@import './styles/accessibility.css';
-@import './styles/dashboard.css';
-@import './styles/admin.css';
+/* Import all styles first - COMMENTED OUT TO AVOID TAILWIND CONFLICTS */
+/* @import './styles/design-system.css'; */
+/* @import './styles/layout.css'; */
+/* @import './styles/accessibility.css'; */
+/* @import './styles/dashboard.css'; */
+/* @import './styles/admin.css'; */
 
-#root {
+/* #root styles commented out to avoid Tailwind conflicts */
+/* #root {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
-}
+} */
 
 .logo {
   height: 6em;
