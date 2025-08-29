@@ -505,7 +505,8 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ }) => {
           </CardContent>
         </Card>
       )}
-    </Stack>
+      </div>
+    </div>
   );
 };
 

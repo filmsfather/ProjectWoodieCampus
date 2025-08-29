@@ -325,7 +325,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ }) => {
                 padding: 'var(--space-2) var(--space-4)',
                 backgroundColor: 'var(--color-neutral-100)',
                 color: 'var(--color-primary)',
-                fontWeight: '500',\n                borderRadius: 'var(--radius-md)',
+                fontWeight: '500',
+                borderRadius: 'var(--radius-md)',
                 border: '1px solid var(--color-border-light)',
                 cursor: 'pointer'
               }}
@@ -334,7 +335,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ }) => {
             </button>
             <h1 
               style={{
-                fontSize: 'var(--font-size-3xl)',\n                fontWeight: '700',\n                color: 'var(--color-text-primary)'
+                fontSize: 'var(--font-size-3xl)',
+                fontWeight: '700',
+                color: 'var(--color-text-primary)'
               }}
             >
               교과목 관리
