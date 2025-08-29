@@ -1445,11 +1445,35 @@ export class DatabaseService {
         return acc;
       }, {} as Record<string, any[]>) || {};
       
-      // Add teachers to each class
+      // Get students for each class
+      const { data: students, error: studentsError } = await supabase
+        .from('users')
+        .select('id, username, full_name, class_id')
+        .eq('role', 'student')
+        .eq('is_active', true)
+        .in('class_id', classIds);
+        
+      if (studentsError) throw studentsError;
+      
+      // Group students by class_id
+      const studentsByClass = students?.reduce((acc, student) => {
+        const classId = student.class_id;
+        if (!acc[classId]) acc[classId] = [];
+        acc[classId].push({
+          id: student.id,
+          username: student.username,
+          full_name: student.full_name
+        });
+        return acc;
+      }, {} as Record<string, any[]>) || {};
+      
+      // Add teachers and students to each class
       return classes.map(cls => ({
         ...cls,
         teachers: teachersByClass[cls.id] || [],
-        teacher: teachersByClass[cls.id]?.[0] || null // For backward compatibility
+        teacher: teachersByClass[cls.id]?.[0] || null, // For backward compatibility
+        students: studentsByClass[cls.id] || [],
+        student_count: studentsByClass[cls.id]?.length || 0
       }));
     }
     

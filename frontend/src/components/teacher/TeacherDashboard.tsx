@@ -404,14 +404,25 @@ const TeacherDashboard: React.FC = () => {
                             <UsersIcon className="h-3 w-3 text-gray-500" />
                             <span className="text-xs font-medium text-gray-700">학생</span>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-blue-600">
-                              {stats?.total_students || 0}명
-                            </span>
-                            {stats && stats.total_students > 0 && (
-                              <span className="text-xs text-green-600">
-                                진도 {stats.average_progress}%
+                          <div className="text-xs text-gray-600 text-right">
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-blue-600">
+                                {cls.students?.length || 0}명
                               </span>
+                              {stats && stats.total_students > 0 && (
+                                <span className="text-green-600">
+                                  진도 {stats.average_progress}%
+                                </span>
+                              )}
+                            </div>
+                            {cls.students && cls.students.length > 0 && (
+                              <div className="mt-1 text-gray-500">
+                                {cls.students.length <= 3 ? (
+                                  cls.students.map(student => student.full_name || student.username).join(', ')
+                                ) : (
+                                  `${cls.students.slice(0, 2).map(s => s.full_name || s.username).join(', ')} 외 ${cls.students.length - 2}명`
+                                )}
+                              </div>
                             )}
                           </div>
                         </div>
