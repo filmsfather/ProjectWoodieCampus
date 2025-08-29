@@ -114,6 +114,7 @@ export class AdminController {
             isActive: user.is_active,
             createdAt: user.created_at,
             lastLogin: user.last_login,
+            class_id: user.class_id,
           })),
           pagination: {
             currentPage: pageNum,

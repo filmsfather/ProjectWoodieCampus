@@ -11,6 +11,7 @@ export interface User {
   isActive: boolean;
   createdAt: string;
   lastLogin?: string;
+  class_id?: string | null;
 }
 
 export interface CreateUserRequest {
