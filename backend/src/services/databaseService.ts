@@ -2067,33 +2067,6 @@ export class DatabaseService {
     }));
   }
 
-  // Get classes by teacher
-  static async getClassesByTeacher(teacherId: string) {
-    const { data, error } = await supabase
-      .from('user_classes')
-      .select(`
-        class_id,
-        classes:classes(
-          id,
-          name,
-          grade_level,
-          description,
-          student_count:users(count)
-        )
-      `)
-      .eq('user_id', teacherId);
-
-    if (error) throw error;
-
-    // Format the response
-    return (data || []).map(tc => ({
-      id: tc.classes.id,
-      name: tc.classes.name,
-      grade_level: tc.classes.grade_level,
-      description: tc.classes.description,
-      student_count: tc.classes.student_count || 0,
-    }));
-  }
 
   // Student group management methods
 
@@ -2289,29 +2262,4 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  // Get students by class ID
-  static async getStudentsByClass(classId: string) {
-    const { data, error } = await supabase
-      .from('users')
-      .select(`
-        id,
-        username,
-        full_name,
-        class_id,
-        is_active
-      `)
-      .eq('role', 'student')
-      .eq('class_id', classId)
-      .eq('is_active', true)
-      .order('full_name');
-
-    if (error) throw error;
-    
-    return (data || []).map(student => ({
-      id: student.id,
-      username: student.username,
-      full_name: student.full_name,
-      class_id: student.class_id,
-    }));
-  }
 }

@@ -342,7 +342,7 @@ export const rateLimit = (windowMs: number = 15 * 60 * 1000, maxRequests: number
 };
 
 // Input validation 미들웨어
-export const validateWorkbookAssignmentInput = (req: AuthRequest, res: Response, next: NextFunction) => {
+export const validateWorkbookAssignmentInput = async (req: AuthRequest, res: Response, next: NextFunction) => {
   const { targetType, targetIds, scheduledFor, dueDate, maxAttempts } = req.body;
 
   // 필수 필드 검증
