@@ -17,7 +17,7 @@ import EditClassModal from './EditClassModal';
 import ClassStudentsModal from './ClassStudentsModal';
 
 const TeacherDashboard: React.FC = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [classes, setClasses] = useState<Class[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -27,8 +27,10 @@ const TeacherDashboard: React.FC = () => {
   const [classStats, setClassStats] = useState<Record<string, ClassStats>>({});
 
   useEffect(() => {
-    loadClasses();
-  }, []);
+    if (user && !authLoading) {
+      loadClasses();
+    }
+  }, [user, authLoading]);
 
   const loadClasses = async () => {
     try {
@@ -122,7 +124,7 @@ const TeacherDashboard: React.FC = () => {
     setShowStudentsModal(true);
   };
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
